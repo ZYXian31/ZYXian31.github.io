@@ -279,6 +279,430 @@
 
 
   
+    <article id="post-CS336-Spring2025-Lec3" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2025/07/05/CS336-Spring2025-Lec3/" class="article-date">
+  <time class="dt-published" datetime="2025-07-05T06:54:38.000Z" itemprop="datePublished">2025-07-05</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2025/07/05/CS336-Spring2025-Lec3/">CS336 Lecture 3:LM架构与训练 - 学习笔记</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p><strong>课程主题：</strong> 深入分析大型语言模型的架构设计与训练技术<br><strong>学习方式：</strong> 通过实际部署模型的配置学习最佳实践<br><strong>日期：</strong> 2025-07-05</p>
+</blockquote>
+<hr>
+<h2 id="📋-课程概述"><a href="#📋-课程概述" class="headerlink" title="📋 课程概述"></a>📋 课程概述</h2><p>本节课深入探讨了大型语言模型（LLM）的架构设计和训练过程中的关键技术选择。通过分析多个主流模型的实际配置，总结出架构设计的共性与差异，为实际开发提供指导。</p>
+<h3 id="🎯-主要内容结构"><a href="#🎯-主要内容结构" class="headerlink" title="🎯 主要内容结构"></a>🎯 主要内容结构</h3><ol>
+<li><strong>Transformer架构回顾与现代变体</strong></li>
+<li><strong>架构组件的设计选择</strong></li>
+<li><strong>超参数设置的经验法则</strong></li>
+<li><strong>训练稳定性技巧</strong></li>
+<li><strong>注意力机制的优化变体</strong></li>
+</ol>
+<hr>
+<h2 id="🏗️-内容-1-Transformer架构基础"><a href="#🏗️-内容-1-Transformer架构基础" class="headerlink" title="🏗️ 内容 1: Transformer架构基础"></a>🏗️ 内容 1: Transformer架构基础</h2><h3 id="1-1-标准Transformer-vs-现代变体"><a href="#1-1-标准Transformer-vs-现代变体" class="headerlink" title="1.1 标准Transformer vs 现代变体"></a>1.1 标准Transformer vs 现代变体</h3><p><strong>原始Transformer的特点：</strong></p>
+<ul>
+<li>位置编码：正弦余弦函数</li>
+<li>前馈网络：ReLU激活</li>
+<li>归一化：Post-norm LayerNorm（在残差连接后面）</li>
+</ul>
+<p><strong>现代实现的改进：</strong></p>
+<ul>
+<li><strong>Pre-norm结构</strong>：在残差连接之前在多头注意力计算之前进行归一化</li>
+<li><strong>RoPE位置编码</strong>：旋转位置嵌入</li>
+<li><strong>SwiGLU激活</strong>：替代ReLU</li>
+<li><strong>无偏置项</strong>：线性层和LayerNorm不使用bias</li>
+</ul>
+<h3 id="1-2-架构选择的考量原则"><a href="#1-2-架构选择的考量原则" class="headerlink" title="1.2 架构选择的考量原则"></a>1.2 架构选择的考量原则</h3><ul>
+<li>从实际部署的大模型中学习经验</li>
+<li>重视计算效率与性能的平衡</li>
+<li>考虑训练稳定性和可扩展性</li>
+</ul>
+<hr>
+<h2 id="🔧-内容-2-关键架构组件设计"><a href="#🔧-内容-2-关键架构组件设计" class="headerlink" title="🔧 内容 2: 关键架构组件设计"></a>🔧 内容 2: 关键架构组件设计</h2><h3 id="2-1-归一化层设计"><a href="#2-1-归一化层设计" class="headerlink" title="2.1 归一化层设计"></a>2.1 归一化层设计</h3><h4 id="Pre-norm-vs-Post-norm"><a href="#Pre-norm-vs-Post-norm" class="headerlink" title="Pre-norm vs Post-norm"></a>Pre-norm vs Post-norm</h4><p><strong>Pre-norm结构：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">x → LayerNorm → MultiHeadAttention → Add → LayerNorm → FFN → Add</span><br></pre></td></tr></table></figure>
+
+<p><strong>Post-norm结构：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">x → MultiHeadAttention → Add → LayerNorm → FFN → Add → LayerNorm</span><br></pre></td></tr></table></figure>
+
+<p><strong>Pre-norm优势：</strong></p>
+<ul>
+<li>保持残差连接的主要信号路径（原始的 x 一直贯穿整个通路）</li>
+<li>梯度传播更稳定，减少梯度爆炸（PostNorm 深层的梯度更大，训练更不稳定）</li>
+<li>支持更大的学习率</li>
+<li>几乎所有现代LM都采用Pre-norm（除了OPT350M）</li>
+</ul>
+<h4 id="LayerNorm-vs-RMSNorm"><a href="#LayerNorm-vs-RMSNorm" class="headerlink" title="LayerNorm vs RMSNorm"></a>LayerNorm vs RMSNorm</h4><p><strong>LayerNorm公式：</strong><br>$$\text{LayerNorm}(x) &#x3D; \frac{x - \mu}{\sqrt{\sigma^2 + \varepsilon}} \cdot \gamma + \beta$$</p>
+<p>其中：$\mu &#x3D; \frac{1}{d}\sum_{i&#x3D;1}^{d} x_i$，$\sigma^2 &#x3D; \frac{1}{d}\sum_{i&#x3D;1}^{d} (x_i - \mu)^2$</p>
+<p><strong>RMSNorm公式：</strong><br>$$\text{RMSNorm}(x) &#x3D; \frac{x}{\sqrt{\frac{1}{d}\sum_{i&#x3D;1}^{d} x_i^2 + \varepsilon}} \cdot \gamma$$</p>
+<p><strong>RMSNorm的优势：</strong></p>
+<ul>
+<li>计算更高效（不需要计算均值和偏置项）</li>
+<li>效果与LayerNorm相当</li>
+<li>参数更少（无bias项β）</li>
+<li>内存访问模式更优</li>
+</ul>
+<blockquote>
+<p><strong>性能对比：</strong> 虽然transformer中norm计算的FLOPS占比很小（0.17%），但runtime占比达25.5%，因为占据了大量的内存访问</p>
+</blockquote>
+<p><strong>使用情况：</strong></p>
+<ul>
+<li><strong>LayerNorm：</strong> GPT1&#x2F;2&#x2F;3, OPT, GPT-J, BLOOM</li>
+<li><strong>RMSNorm：</strong> LLaMA系列, PaLM, Chinchilla, T5</li>
+</ul>
+<h3 id="2-2-前馈网络-FFN-设计"><a href="#2-2-前馈网络-FFN-设计" class="headerlink" title="2.2 前馈网络(FFN)设计"></a>2.2 前馈网络(FFN)设计</h3><h4 id="标准FFN与无偏置设计"><a href="#标准FFN与无偏置设计" class="headerlink" title="标准FFN与无偏置设计"></a>标准FFN与无偏置设计</h4><p><strong>原始Transformer FFN：</strong><br>$$\text{FFN}(x) &#x3D; \max(0, xW_1 + b_1)W_2 + b_2$$</p>
+<p><strong>现代实现（无偏置）：</strong><br>$$\text{FFN}(x) &#x3D; \sigma(xW_1)W_2$$</p>
+<p><strong>优势：</strong></p>
+<ul>
+<li>内存效率更高</li>
+<li>优化稳定性更好</li>
+<li>参数量减少</li>
+</ul>
+<h3 id="2-3-激活函数选择"><a href="#2-3-激活函数选择" class="headerlink" title="2.3 激活函数选择"></a>2.3 激活函数选择</h3><h4 id="主流激活函数对比"><a href="#主流激活函数对比" class="headerlink" title="主流激活函数对比"></a>主流激活函数对比</h4><p><strong>ReLU：</strong><br>$$\text{FFN}(x) &#x3D; \max(0, xW_1)W_2$$</p>
+<p><strong>GeLU：</strong><br>$$\text{FFN}(x) &#x3D; \text{GELU}(xW_1)W_2$$<br>$$\text{GELU}(x) &#x3D; x \cdot \Phi(x) &#x3D; x \cdot \frac{1}{2}\left[1 + \text{erf}\left(\frac{x}{\sqrt{2}}\right)\right]$$</p>
+<p><strong>SwiGLU：</strong><br>$$\text{Swish}(x) &#x3D; x \cdot \text{sigmoid}(x) &#x3D; \frac{x}{1 + e^{-x}}$$</p>
+<h4 id="门控线性单元-GLU"><a href="#门控线性单元-GLU" class="headerlink" title="门控线性单元(GLU)"></a>门控线性单元(GLU)</h4><p><strong>基本GLU思想：</strong><br>$$\text{GLU}(x) &#x3D; \sigma(xW_1) \odot (xV)$$</p>
+<p><strong>ReGLU：</strong><br>$$\text{FFN}_{\text{ReGLU}}(x) &#x3D; (\max(0, xW_1) \odot xV)W_2$$</p>
+<p><strong>SwiGLU：</strong><br>$$\text{FFN}_{\text{SwiGLU}}(x) &#x3D; (\text{Swish}(xW_1) \odot xV)W_2$$</p>
+<p><strong>GeGLU：</strong><br>$$\text{FFN}_{\text{GeGLU}}(x) &#x3D; (\text{GELU}(xW_1) \odot xV)W_2$$</p>
+<p><strong>性能表现：</strong></p>
+<ul>
+<li>GLU变体通常带来一致的性能提升</li>
+<li>门控模型的 $d_{\text{ff}}$ 维度通常缩放为原来的 $\frac{2}{3}$</li>
+</ul>
+<h3 id="2-4-层结构：串行-vs-并行"><a href="#2-4-层结构：串行-vs-并行" class="headerlink" title="2.4 层结构：串行 vs 并行"></a>2.4 层结构：串行 vs 并行</h3><p><strong>传统串行结构：</strong><br>$$y &#x3D; x + \text{MLP}(\text{LayerNorm}(x + \text{Attention}(\text{LayerNorm}(x))))$$</p>
+<p><strong>并行结构：</strong><br>$$y &#x3D; x + \text{MLP}(\text{LayerNorm}(x)) + \text{Attention}(\text{LayerNorm}(x))$$</p>
+<p><strong>并行结构优势：</strong></p>
+<ul>
+<li>LayerNorm可以共享</li>
+<li>矩阵乘法可以融合</li>
+<li>计算效率提升</li>
+<li>使用模型：GPT-J, PaLM, GPT-NeoX</li>
+</ul>
+<blockquote>
+<p><strong>注意：</strong> 最近的研究工作多用串行而不是并行</p>
+</blockquote>
+<hr>
+<h2 id="📍-内容-3-位置编码技术"><a href="#📍-内容-3-位置编码技术" class="headerlink" title="📍 内容 3: 位置编码技术"></a>📍 内容 3: 位置编码技术</h2><h3 id="3-1-位置编码类型对比"><a href="#3-1-位置编码类型对比" class="headerlink" title="3.1 位置编码类型对比"></a>3.1 位置编码类型对比</h3><p><strong>正弦编码：</strong><br>$$\text{PE}(pos, 2i) &#x3D; \sin\left(\frac{pos}{10000^{2i&#x2F;d_{\text{model}}}}\right)$$<br>$$\text{PE}(pos, 2i+1) &#x3D; \cos\left(\frac{pos}{10000^{2i&#x2F;d_{\text{model}}}}\right)$$</p>
+<p><strong>绝对位置嵌入：</strong><br>$$\text{Embed}(x, i) &#x3D; v_x + u_i$$</p>
+<p><strong>相对位置嵌入：</strong><br>$$\text{Embed}(x, i) &#x3D; v_x + \text{RelativeEmbedding}(i-j)$$</p>
+<h3 id="3-2-RoPE（旋转位置嵌入）"><a href="#3-2-RoPE（旋转位置嵌入）" class="headerlink" title="3.2 RoPE（旋转位置嵌入）"></a>3.2 RoPE（旋转位置嵌入）</h3><p><strong>设计理念：</strong><br>相对位置嵌入应满足：<br>$$\langle f(x,i), f(y,j) \rangle &#x3D; g(x,y,i-j)$$</p>
+<p><strong>RoPE的数学实现：</strong></p>
+<p>对于2D情况，旋转矩阵为：<br>$$R_{\theta} &#x3D; \begin{pmatrix} \cos\theta &amp; -\sin\theta \ \sin\theta &amp; \cos\theta \end{pmatrix}$$</p>
+<p>对于位置 $m$ 的查询向量 $q_m$ 和位置 $n$ 的键向量 $k_n$：<br>$$q_m &#x3D; R_{\theta_m} \cdot W_q x_m$$<br>$$k_n &#x3D; R_{\theta_n} \cdot W_k x_n$$</p>
+<p>其中 $\theta_i &#x3D; \frac{i}{10000^{2j&#x2F;d}}$ 对于维度 $j$</p>
+<p><strong>内积计算：</strong><br>$$\langle q_m, k_n \rangle &#x3D; \langle R_{\theta_m} W_q x_m, R_{\theta_n} W_k x_n \rangle &#x3D; \langle W_q x_m, R_{\theta_{n-m}} W_k x_n \rangle$$</p>
+<p><strong>优势：</strong></p>
+<ul>
+<li>真正的相对位置感知</li>
+<li>避免了正弦编码的交叉项问题</li>
+<li>大多数2024+模型的标准选择</li>
+</ul>
+<hr>
+<h2 id="📊-内容-4-超参数设计经验"><a href="#📊-内容-4-超参数设计经验" class="headerlink" title="📊 内容 4: 超参数设计经验"></a>📊 内容 4: 超参数设计经验</h2><h3 id="4-1-前馈维度比例"><a href="#4-1-前馈维度比例" class="headerlink" title="4.1 前馈维度比例"></a>4.1 前馈维度比例</h3><h4 id="标准比例关系"><a href="#标准比例关系" class="headerlink" title="标准比例关系"></a>标准比例关系</h4><p><strong>基本经验法则：</strong><br>$$d_{\text{ff}} &#x3D; 4 \times d_{\text{model}}$$</p>
+<p><strong>GLU变体的调整：</strong><br>$$d_{\text{ff}} &#x3D; \frac{8}{3} \times d_{\text{model}} \approx 2.67 \times d_{\text{model}}$$</p>
+<p><strong>实际模型案例：</strong></p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>$d_{\text{ff}}&#x2F;d_{\text{model}}$</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PaLM</td>
+<td>4.0</td>
+<td>标准比例</td>
+</tr>
+<tr>
+<td>Mistral 7B</td>
+<td>3.5</td>
+<td>GLU变体</td>
+</tr>
+<tr>
+<td>LLaMA-2 70B</td>
+<td>3.5</td>
+<td>GLU变体</td>
+</tr>
+<tr>
+<td>LLaMA 70B</td>
+<td>2.68</td>
+<td>GLU变体</td>
+</tr>
+<tr>
+<td>T5 11B</td>
+<td>64.0</td>
+<td>极端案例</td>
+</tr>
+<tr>
+<td>T5 v1.1</td>
+<td>2.5</td>
+<td>修正后</td>
+</tr>
+</tbody></table>
+<p><strong>特殊案例分析：</strong></p>
+<ul>
+<li>T5 11B模型：$d_{\text{ff}} &#x3D; 65536$，$d_{\text{model}} &#x3D; 1024$，比例为64倍</li>
+<li>经验表明1-10倍的范围内性能相对稳定</li>
+</ul>
+<h3 id="4-2-注意力头配置"><a href="#4-2-注意力头配置" class="headerlink" title="4.2 注意力头配置"></a>4.2 注意力头配置</h3><h4 id="头维度设计原则"><a href="#头维度设计原则" class="headerlink" title="头维度设计原则"></a>头维度设计原则</h4><p><strong>标准配置：</strong><br>$$\text{head_dim} \times \text{num_heads} &#x3D; d_{\text{model}}$$</p>
+<p><strong>实际案例：</strong></p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>头数</th>
+<th>头维度</th>
+<th>模型维度</th>
+<th>比例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GPT-3</td>
+<td>96</td>
+<td>128</td>
+<td>12288</td>
+<td>1.0</td>
+</tr>
+<tr>
+<td>T5</td>
+<td>128</td>
+<td>128</td>
+<td>1024</td>
+<td>16.0</td>
+</tr>
+<tr>
+<td>LLaMA-2</td>
+<td>64</td>
+<td>128</td>
+<td>8192</td>
+<td>1.0</td>
+</tr>
+<tr>
+<td>PaLM</td>
+<td>48</td>
+<td>258</td>
+<td>18432</td>
+<td>1.48</td>
+</tr>
+</tbody></table>
+<p><strong>设计考虑：</strong></p>
+<ul>
+<li>大多数模型采用1:1的比例</li>
+<li>Google的某些模型采用更高的比例</li>
+</ul>
+<h3 id="4-3-模型深宽比"><a href="#4-3-模型深宽比" class="headerlink" title="4.3 模型深宽比"></a>4.3 模型深宽比</h3><h4 id="典型深宽比范围"><a href="#典型深宽比范围" class="headerlink" title="典型深宽比范围"></a>典型深宽比范围</h4><p><strong>模型维度&#x2F;层数比例：</strong></p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>$d_{\text{model}}&#x2F;n_{\text{layer}}$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>BLOOM</td>
+<td>205</td>
+</tr>
+<tr>
+<td>T5 v1.1</td>
+<td>171</td>
+</tr>
+<tr>
+<td>PaLM (540B)</td>
+<td>156</td>
+</tr>
+<tr>
+<td>GPT-3&#x2F;OPT&#x2F;Mistral&#x2F;Qwen</td>
+<td>128</td>
+</tr>
+<tr>
+<td>LLaMA&#x2F;LLaMA-2&#x2F;Chinchilla</td>
+<td>102</td>
+</tr>
+<tr>
+<td>T5 (11B)</td>
+<td>43</td>
+</tr>
+<tr>
+<td>GPT-2</td>
+<td>33</td>
+</tr>
+</tbody></table>
+<p><strong>设计考虑：</strong></p>
+<ul>
+<li>极深模型并行化困难，延迟较高</li>
+<li>100-200的比例范围通常表现良好</li>
+</ul>
+<h3 id="4-4-词表大小设计"><a href="#4-4-词表大小设计" class="headerlink" title="4.4 词表大小设计"></a>4.4 词表大小设计</h3><p><strong>单语言模型：</strong> 30-50K词汇</p>
+<ul>
+<li>GPT-2&#x2F;3: 50,257</li>
+<li>LLaMA: 32,000</li>
+<li>T5: 32,128</li>
+</ul>
+<p><strong>多语言模型：</strong> 100-250K词汇</p>
+<ul>
+<li>mT5: 250,000</li>
+<li>PaLM: 256,000</li>
+<li>GPT-4: 100,276</li>
+</ul>
+<h3 id="4-5-正则化策略"><a href="#4-5-正则化策略" class="headerlink" title="4.5 正则化策略"></a>4.5 正则化策略</h3><h4 id="Dropout使用趋势"><a href="#Dropout使用趋势" class="headerlink" title="Dropout使用趋势"></a>Dropout使用趋势</h4><p><strong>历史vs现代：</strong></p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>Dropout</th>
+<th>Weight Decay</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GPT-2</td>
+<td>0.1</td>
+<td>0.1</td>
+<td>早期模型</td>
+</tr>
+<tr>
+<td>T5</td>
+<td>0.1</td>
+<td>0</td>
+<td>早期模型</td>
+</tr>
+<tr>
+<td>T5 v1.1</td>
+<td>0</td>
+<td>0</td>
+<td>现代趋势</td>
+</tr>
+<tr>
+<td>LLaMA</td>
+<td>0</td>
+<td>0.1</td>
+<td>现代趋势</td>
+</tr>
+<tr>
+<td>PaLM</td>
+<td>0</td>
+<td>变化</td>
+<td>现代趋势</td>
+</tr>
+</tbody></table>
+<h4 id="权重衰减的作用"><a href="#权重衰减的作用" class="headerlink" title="权重衰减的作用"></a>权重衰减的作用</h4><p><strong>数学表示：</strong><br>$$\mathcal{L}<em>{\text{total}} &#x3D; \mathcal{L}</em>{\text{original}} + \lambda \sum_{i} |\theta_i|^2$$</p>
+<p><strong>作用机制：</strong></p>
+<ul>
+<li>主要影响优化动态，而非过拟合控制</li>
+<li>与学习率调度（如余弦调度）存在交互作用</li>
+<li>相同权重衰减设置在不同学习率调度下效果不同</li>
+</ul>
+<hr>
+<h2 id="🛡️-内容-5-训练稳定性技巧"><a href="#🛡️-内容-5-训练稳定性技巧" class="headerlink" title="🛡️ 内容 5: 训练稳定性技巧"></a>🛡️ 内容 5: 训练稳定性技巧</h2><h3 id="5-1-Softmax稳定性问题"><a href="#5-1-Softmax稳定性问题" class="headerlink" title="5.1 Softmax稳定性问题"></a>5.1 Softmax稳定性问题</h3><h4 id="标准Softmax"><a href="#标准Softmax" class="headerlink" title="标准Softmax"></a>标准Softmax</h4><p><strong>计算公式：</strong><br>$$\text{softmax}(x_i) &#x3D; \frac{e^{x_i}}{\sum_{j&#x3D;1}^{n} e^{x_j}}$$</p>
+<p><strong>数值稳定版本：</strong><br>$$\text{softmax}(x_i) &#x3D; \frac{e^{x_i - \max(x)}}{\sum_{j&#x3D;1}^{n} e^{x_j - \max(x)}}$$</p>
+<h4 id="Z-loss技术"><a href="#Z-loss技术" class="headerlink" title="Z-loss技术"></a>Z-loss技术</h4><p><strong>问题：</strong> 输出softmax可能数值不稳定</p>
+<p><strong>原始损失：</strong><br>$$\log P(x) &#x3D; U(x) - \log Z(x)$$</p>
+<p><strong>添加Z-loss后：</strong><br>$$\log P(x) &#x3D; U(x) - \alpha \log Z(x)$$</p>
+<p>其中 $Z(x) &#x3D; \sum_{j} e^{U_j(x)}$，PaLM设置 $\alpha &#x3D; 10^{-4}$</p>
+<p><strong>目标：</strong> 鼓励softmax将 $\log(Z)$ 正则化接近0，提升训练稳定性</p>
+<h4 id="QK归一化"><a href="#QK归一化" class="headerlink" title="QK归一化"></a>QK归一化</h4><p><strong>方法：</strong> 在query和key进行矩阵乘法前分别进行LayerNorm</p>
+<p><strong>实现：</strong><br>$$\text{Attention}(Q, K, V) &#x3D; \text{softmax}\left(\frac{\text{LayerNorm}(Q) \cdot \text{LayerNorm}(K)^T}{\sqrt{d_k}}\right) V$$</p>
+<p><strong>使用模型：</strong> DCLM, OLMo2, Gemma 2</p>
+<h3 id="5-2-Logit软截断"><a href="#5-2-Logit软截断" class="headerlink" title="5.2 Logit软截断"></a>5.2 Logit软截断</h3><p><strong>技术实现：</strong><br>$$\text{logits}_{\text{capped}} &#x3D; \text{soft_cap} \cdot \tanh\left(\frac{\text{logits}}{\text{soft_cap}}\right)$$</p>
+<p><strong>目的：</strong> 防止logits过大导致的数值问题<br><strong>权衡：</strong> 可能影响模型性能</p>
+<hr>
+<h2 id="⚡-内容-6-注意力机制优化"><a href="#⚡-内容-6-注意力机制优化" class="headerlink" title="⚡ 内容 6: 注意力机制优化"></a>⚡ 内容 6: 注意力机制优化</h2><h3 id="6-1-注意力计算复杂度分析"><a href="#6-1-注意力计算复杂度分析" class="headerlink" title="6.1 注意力计算复杂度分析"></a>6.1 注意力计算复杂度分析</h3><h4 id="标准注意力复杂度"><a href="#标准注意力复杂度" class="headerlink" title="标准注意力复杂度"></a>标准注意力复杂度</h4><p><strong>训练时（并行计算）：</strong></p>
+<ul>
+<li>总算术操作：$O(bnd^2)$</li>
+<li>总内存访问：$O(bnd + bhn^2 + d^2)$  </li>
+<li>算术强度：$O\left(\frac{1}{k} + \frac{1}{(bn)^{-1}}\right)$</li>
+</ul>
+<p><strong>推理时（序列生成）：</strong></p>
+<ul>
+<li>总算术操作：$O(bnd^2)$</li>
+<li>总内存访问：$O(bn^2d + nd^2)$</li>
+<li>算术强度：$O\left(\frac{n}{d} + \frac{1}{b^{-1}}\right)$</li>
+</ul>
+<p>其中 $b$ &#x3D; batch size，$n$ &#x3D; 序列长度，$d$ &#x3D; 模型维度，$h$ &#x3D; 注意力头数</p>
+<h3 id="6-2-GQA-MQA技术"><a href="#6-2-GQA-MQA技术" class="headerlink" title="6.2 GQA&#x2F;MQA技术"></a>6.2 GQA&#x2F;MQA技术</h3><h4 id="MQA（多查询注意力）"><a href="#MQA（多查询注意力）" class="headerlink" title="MQA（多查询注意力）"></a>MQA（多查询注意力）</h4><p><strong>核心思想：</strong> 多个查询共享单一的键值维度</p>
+<p><strong>优化后的内存访问：</strong><br>$$O(bnd + bn^2k + nd^2)$$</p>
+<p><strong>算术强度：</strong><br>$$O\left(\frac{1}{d} + \frac{n}{dh} + \frac{1}{b^{-1}}\right)$$</p>
+<p>其中 $k$ 是共享的键值维度数</p>
+<h4 id="GQA（分组查询注意力）"><a href="#GQA（分组查询注意力）" class="headerlink" title="GQA（分组查询注意力）"></a>GQA（分组查询注意力）</h4><p><strong>设计：</strong> 将查询头分组，每组共享键值</p>
+<p><strong>分组策略：</strong></p>
+<ul>
+<li>查询头数：$H_q$</li>
+<li>键值头数：$H_{kv}$</li>
+<li>分组大小：$G &#x3D; \frac{H_q}{H_{kv}}$</li>
+</ul>
+<p><strong>性能对比：</strong></p>
+<ul>
+<li>MQA：小幅性能下降，显著内存节省</li>
+<li>GQA：性能损失更小，内存节省适中</li>
+</ul>
+<h3 id="6-3-稀疏注意力模式"><a href="#6-3-稀疏注意力模式" class="headerlink" title="6.3 稀疏注意力模式"></a>6.3 稀疏注意力模式</h3><h4 id="滑动窗口注意力"><a href="#滑动窗口注意力" class="headerlink" title="滑动窗口注意力"></a>滑动窗口注意力</h4><p><strong>窗口大小：</strong> $W$</p>
+<p><strong>注意力矩阵：</strong><br>$$A_{ij} &#x3D; \begin{cases}<br>\text{Attention}(q_i, k_j) &amp; \text{if } |i-j| \leq W \<br>0 &amp; \text{otherwise}<br>\end{cases}$$</p>
+<p><strong>复杂度：</strong> $O(nWd)$ 而非 $O(n^2d)$</p>
+<h4 id="混合注意力策略"><a href="#混合注意力策略" class="headerlink" title="混合注意力策略"></a>混合注意力策略</h4><p><strong>Cohere Command A策略：</strong></p>
+<ul>
+<li>每4层使用一次全注意力</li>
+<li>其他层使用滑动窗口注意力</li>
+</ul>
+<p><strong>数学表示：</strong><br>$$\text{Layer}_i &#x3D; \begin{cases}<br>\text{FullAttention} &amp; \text{if } i \bmod 4 &#x3D; 0 \<br>\text{SlidingWindowAttention} &amp; \text{otherwise}<br>\end{cases}$$</p>
+<hr>
+<h2 id="📋-总结与要点"><a href="#📋-总结与要点" class="headerlink" title="📋 总结与要点"></a>📋 总结与要点</h2><h3 id="🎯-架构设计的共识"><a href="#🎯-架构设计的共识" class="headerlink" title="🎯 架构设计的共识"></a>🎯 架构设计的共识</h3><ol>
+<li><strong>Pre-norm几乎是标准选择</strong>，带来更好的训练稳定性</li>
+<li><strong>RMSNorm在计算效率上优于LayerNorm</strong></li>
+<li><strong>GLU变体通常优于标准激活函数</strong></li>
+<li><strong>RoPE成为位置编码的主流选择</strong></li>
+</ol>
+<h3 id="📏-超参数的经验法则"><a href="#📏-超参数的经验法则" class="headerlink" title="📏 超参数的经验法则"></a>📏 超参数的经验法则</h3><ol>
+<li><strong>4倍前馈比例</strong>（GLU为8&#x2F;3倍）广泛适用</li>
+<li><strong>头维度设计遵循简单的乘积关系</strong></li>
+<li><strong>深宽比在100-200范围内表现良好</strong></li>
+<li><strong>现代模型趋向减少dropout使用</strong></li>
+</ol>
+<h3 id="🚀-实际部署考虑"><a href="#🚀-实际部署考虑" class="headerlink" title="🚀 实际部署考虑"></a>🚀 实际部署考虑</h3><ol>
+<li><strong>推理效率驱动GQA&#x2F;MQA的采用</strong></li>
+<li><strong>稳定性技巧对大规模训练至关重要</strong></li>
+<li><strong>架构选择需要在性能和效率间平衡</strong></li>
+</ol>
+<h3 id="💡-学习启示"><a href="#💡-学习启示" class="headerlink" title="💡 学习启示"></a>💡 学习启示</h3><p>通过分析主流模型的实际配置，我们发现虽然存在多种架构变体，但成功的大模型在关键设计选择上表现出显著的一致性。这些经验为新模型的设计提供了宝贵的指导原则。</p>
+<hr>
+<h2 id="📚-参考资料"><a href="#📚-参考资料" class="headerlink" title="📚 参考资料"></a>📚 参考资料</h2><ol>
+<li><a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=ptFiH_bHnJw">CS336 Lecture 3 Video</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/stanford-cs336/spring2025-lectures/blob/e9cb2488fdb53ea37f0e38924ec3a1701925cef3/nonexecutable/2025%20Lecture%203%20-%20architecture.pdf">Course Materials</a></li>
+<li>Su, J., et al. (2021). RoFormer: Enhanced Transformer with Rotary Position Embedding</li>
+<li>Shazeer, N. (2020). GLU Variants Improve Transformer</li>
+<li>Zhang, B., &amp; Sennrich, R. (2019). Root Mean Square Layer Normalization</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2025/07/05/CS336-Spring2025-Lec3/" data-id="cmcqh1lo600005alh3mvjcop1" data-title="CS336 Lecture 3:LM架构与训练 - 学习笔记" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-hello-world" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2025/07/05/hello-world/" class="article-date">
@@ -362,6 +786,10 @@
         
           <li>
             <a href="/2025/07/05/CS336-Spring2025-Lec2/">CS336 Language Modeling :Tensors, Operations &amp; Training</a>
+          </li>
+        
+          <li>
+            <a href="/2025/07/05/CS336-Spring2025-Lec3/">CS336 Lecture 3:LM架构与训练 - 学习笔记</a>
           </li>
         
           <li>
