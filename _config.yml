@@ -3,17 +3,20 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
-subtitle: ''
-description: ''
+title: ZYXian31's Blog
+subtitle: '技术学习笔记'
+description: '记录学习与成长'
 keywords:
-author: John Doe
-language: en
-timezone: ''
+  - 机器学习
+  - 深度学习
+  - LLM
+author: ZYXian31
+language: zh-CN
+timezone: 'Asia/Shanghai'
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: http://example.com
+url: https://ZYXian31.github.io
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
