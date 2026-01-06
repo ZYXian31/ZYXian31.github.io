@@ -102,12 +102,768 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <h2 id="claude-code-基础结构"><a href="#claude-code-基础结构" class="headerlink" title="claude code 基础结构"></a>claude code 基础结构</h2><p><img src="/images/mkm.jpeg"></p>
+        <h2 id="claude-code-基础结构"><a href="#claude-code-基础结构" class="headerlink" title="claude code 基础结构"></a>claude code 基础结构</h2><h3 id="被很多人忽略的：Claude-Code-的“全流程助手”能力"><a href="#被很多人忽略的：Claude-Code-的“全流程助手”能力" class="headerlink" title="被很多人忽略的：Claude Code 的“全流程助手”能力"></a>被很多人忽略的：Claude Code 的“全流程助手”能力</h3><p>很多人第一次用 Claude Code，会把它当成“更聪明的代码生成器”。但从官方的能力图来看，它更像是一个贯穿项目全生命周期的搭档：<strong>从摸清现状 → 方案设计 → 质量保障 → 部署发布 → 线上维护</strong>，每一步都能帮你把“隐性工作”显性化。</p>
+<p><img src="/images/cc-1.png"></p>
+<h4 id="1-Discover：先搞懂再动手（最省时间）"><a href="#1-Discover：先搞懂再动手（最省时间）" class="headerlink" title="1) Discover：先搞懂再动手（最省时间）"></a>1) Discover：先搞懂再动手（最省时间）</h4><ul>
+<li><strong>Explore codebase and history</strong>：快速梳理代码结构、关键数据流、历史变更动机（为什么当初这么写）。</li>
+<li><strong>Search documentation</strong>：把 README&#x2F;约定&#x2F;注释里的规则提炼成清单，避免“我以为可以”的踩坑。</li>
+<li><strong>Onboard &amp; Setup</strong>：把从零跑起来写成可复制步骤（依赖&#x2F;环境变量&#x2F;权限&#x2F;常见报错）。</li>
+</ul>
+<h4 id="2-Design：把“想法”写成可评审的方案"><a href="#2-Design：把“想法”写成可评审的方案" class="headerlink" title="2) Design：把“想法”写成可评审的方案"></a>2) Design：把“想法”写成可评审的方案</h4><ul>
+<li><strong>Plan project</strong>：把目标拆成里程碑、任务与验收标准（Definition of Done）。</li>
+<li><strong>Develop tech specs</strong>：输出可讨论的技术规格：接口、数据结构、迁移与回滚、风险点。</li>
+<li><strong>Define architecture</strong>：明确模块边界与依赖关系，提前识别耦合与扩展点。</li>
+</ul>
+<h4 id="3-Build：别只让它写功能，要让它补齐质量"><a href="#3-Build：别只让它写功能，要让它补齐质量" class="headerlink" title="3) Build：别只让它写功能，要让它补齐质量"></a>3) Build：别只让它写功能，要让它补齐质量</h4><ul>
+<li><strong>Write and execute tests</strong>：补单测&#x2F;集成测试、边界条件、回归用例，让修改“可证伪、可验证”。</li>
+<li><strong>Create commits and PRs</strong>：把变更拆成清晰的 commit&#x2F;PR，写明影响面、验证步骤与截图&#x2F;日志。</li>
+</ul>
+<h4 id="4-Deploy：发布是一套流程，不是一次-push"><a href="#4-Deploy：发布是一套流程，不是一次-push" class="headerlink" title="4) Deploy：发布是一套流程，不是一次 push"></a>4) Deploy：发布是一套流程，不是一次 push</h4><ul>
+<li><strong>Automate CI&#x2F;CD</strong>：把 lint&#x2F;test&#x2F;build&#x2F;deploy 自动化，减少“本地能跑线上炸”的概率。</li>
+<li><strong>Configure environments</strong>：整理不同环境（dev&#x2F;staging&#x2F;prod）的配置与密钥，降低不可复现问题。</li>
+<li><strong>Manage deployments</strong>：做发布清单、灰度&#x2F;回滚策略与发布后核验。</li>
+</ul>
+<h4 id="5-Support-Scale：线上问题与长期演进"><a href="#5-Support-Scale：线上问题与长期演进" class="headerlink" title="5) Support &amp; Scale：线上问题与长期演进"></a>5) Support &amp; Scale：线上问题与长期演进</h4><ul>
+<li><strong>Debug errors</strong>：基于日志&#x2F;堆栈&#x2F;指标快速定位原因并给出验证路径。</li>
+<li><strong>Large-scale refactor</strong>：做大规模迁移与重构时，分阶段推进并保持可运行、可回滚。</li>
+<li><strong>Monitor usage &amp; performance</strong>：补可观测性（指标&#x2F;日志&#x2F;Tracing），把“慢&#x2F;贵&#x2F;不稳定”变成可优化的数据。</li>
+</ul>
+<blockquote>
+<p>一句话总结：Claude Code 的价值常常不在“写得快”，而在于把那些容易被忽略的环节（理解、对齐、测试、部署、排错、观测）做得更系统，让整个交付链路更稳。</p>
+</blockquote>
+<h3 id="Claude-Code-的内部设计：一个“会用工具的助手”是怎么工作的？"><a href="#Claude-Code-的内部设计：一个“会用工具的助手”是怎么工作的？" class="headerlink" title="Claude Code 的内部设计：一个“会用工具的助手”是怎么工作的？"></a>Claude Code 的内部设计：一个“会用工具的助手”是怎么工作的？</h3><p>很多人把 Claude Code 理解成“能在终端里写代码的聊天机器人”，但从架构上看，它更像一个<strong>Agent（智能体）系统</strong>：模型负责推理与决策，工具负责执行可验证的动作，两者通过一个固定循环协作。</p>
+<p><img src="/images/cc-2.png"></p>
+<h4 id="图-1-解读：三步循环（Gather-context-→-Plan-→-Action）-迭代"><a href="#图-1-解读：三步循环（Gather-context-→-Plan-→-Action）-迭代" class="headerlink" title="图 1 解读：三步循环（Gather context → Plan → Action）+ 迭代"></a>图 1 解读：三步循环（Gather context → Plan → Action）+ 迭代</h4><p>在 Claude Code 的工作流里，每次解决问题基本都会走一个循环：</p>
+<ul>
+<li><p><strong>Gather context（收集上下文）</strong><br>先把“要做什么”弄清楚：读取项目文件、检查目录结构、查看报错日志、理解现有实现与约束。<br>这一步的意义是：让后续决策<strong>基于事实</strong>而不是凭空猜。</p>
+</li>
+<li><p><strong>Formulate a plan（制定计划）</strong><br>把目标拆成可执行步骤：要改哪些文件、先做什么再做什么、有哪些风险点、如何验证成功。<br>这一步的意义是：把复杂任务变成<strong>可控的多步流程</strong>（也方便你 review）。</p>
+</li>
+<li><p><strong>Take an action（采取行动）</strong><br>通过工具执行“确定性的操作”：跑命令、搜索代码、修改文件、发起提交等。<br>执行后再回到 Gather context，读取新的输出&#x2F;结果，<strong>不断迭代</strong>直到完成。</p>
+</li>
+</ul>
+<p>此外，图里还有两个关键部件：</p>
+<ul>
+<li><strong>Memory（记忆）</strong>：保存长期偏好与项目约定（例如代码风格、分支策略、你常用的命令），减少重复沟通成本（通过 CLAUDE.md 实现)。  </li>
+<li><strong>Tools（工具）</strong>：把“能想”与“能做”分开；模型做决策，工具做执行，让结果更可复现、更易验证。</li>
+</ul>
+<p><img src="/images/cc-3.png"></p>
+<h4 id="图-2-解读：Claude-Code-的“工具箱”意味着什么？"><a href="#图-2-解读：Claude-Code-的“工具箱”意味着什么？" class="headerlink" title="图 2 解读：Claude Code 的“工具箱”意味着什么？"></a>图 2 解读：Claude Code 的“工具箱”意味着什么？</h4><p>工具列表可以理解为 Claude Code 的“可调用能力接口”，典型分两类：</p>
+<ul>
+<li><p><strong>读&#x2F;查类（让结论有依据）</strong>：例如列目录、读文件、grep 搜索、按模式找文件。<br>用途：快速定位入口、追踪调用链、找配置&#x2F;脚本、确认事实。</p>
+</li>
+<li><p><strong>执行&#x2F;改动类（让动作可验证）</strong>：例如运行 shell 命令、编辑文件、批量编辑、创建提交&#x2F;PR。<br>用途：把计划落地，并通过日志&#x2F;diff&#x2F;测试结果验证“确实改对了”。</p>
+</li>
+</ul>
+<p>你会注意到列表里还有两个容易被忽略但很重要的能力：</p>
+<ul>
+<li><strong>Task（子任务&#x2F;子代理）</strong>：把复杂问题拆给“子代理”并行处理（比如一边读代码一边写测试计划）。  </li>
+<li><strong>TodoWrite（结构化任务清单）</strong>：把要做的事写成 checklist，适合长链路任务（排错&#x2F;重构&#x2F;发布）避免遗漏。</li>
+</ul>
+<h4 id="Claude-Code-的“记忆”怎么落地：用-CLAUDE-md-把项目规则写给它"><a href="#Claude-Code-的“记忆”怎么落地：用-CLAUDE-md-把项目规则写给它" class="headerlink" title="Claude Code 的“记忆”怎么落地：用 CLAUDE.md 把项目规则写给它"></a>Claude Code 的“记忆”怎么落地：用 <code>CLAUDE.md</code> 把项目规则写给它</h4><p>Claude Code 的 <strong>Memory</strong> 本质不是“玄学记忆”，而是<strong>把你希望它遵循的规则&#x2F;上下文写成文件</strong>，让它在每次工作前都能读到同一份“项目说明书”。官方推荐的做法是用 <code>CLAUDE.md</code> 系列文件来承载这些信息（下图）。</p>
+<p><img src="/images/cc-4.png"></p>
+<p>结合图里的三种常见位置，可以这样理解：</p>
+<ul>
+<li><p><strong><code>./CLAUDE.md</code>（项目级、共享）</strong></p>
+<ul>
+<li><strong>用途</strong>：写“团队共识”和“仓库约定”（代码风格、目录结构、分支策略、测试&#x2F;运行方式、PR 规范等）</li>
+<li><strong>建议</strong>：<strong>提交到 Git</strong>，让所有协作者与 Claude Code 得到同样的规则</li>
+<li><strong>典型内容</strong>：如何启动项目、如何跑测试、哪些目录不要动、提交信息格式、接口变更需要同步哪些文档</li>
+</ul>
+</li>
+<li><p><strong><code>./CLAUDE.local.md</code>（项目级、个人不共享）</strong></p>
+<ul>
+<li><strong>用途</strong>：写个人偏好或本机差异（本地端口、个人工具链、调试习惯、仅你需要的快捷命令）</li>
+<li><strong>建议</strong>：<strong>不要提交到 Git</strong>（通常加到 <code>.gitignore</code>），避免把个人配置“污染”团队规则</li>
+</ul>
+</li>
+<li><p><strong><code>~/.claude/CLAUDE.md</code>（全局级、对所有项目生效）</strong></p>
+<ul>
+<li><strong>用途</strong>：写你希望 Claude Code 在所有仓库都遵循的通用规则（输出风格、默认语言、偏好的工程习惯）</li>
+<li><strong>建议</strong>：把它当成“你的默认工作方式”，例如：先解释计划再改代码、改动前先搜索、任何修改都给出验证步骤</li>
+</ul>
+</li>
+</ul>
+<h5 id="一个可直接复用的-CLAUDE-md-模板（适合放进仓库）"><a href="#一个可直接复用的-CLAUDE-md-模板（适合放进仓库）" class="headerlink" title="一个可直接复用的 CLAUDE.md 模板（适合放进仓库）"></a>一个可直接复用的 <code>CLAUDE.md</code> 模板（适合放进仓库）</h5><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="section"># Project rules for Claude Code</span></span><br><span class="line"></span><br><span class="line"><span class="section">## Goal</span></span><br><span class="line"><span class="bullet">-</span> What this repo does (1-3 sentences).</span><br><span class="line"></span><br><span class="line"><span class="section">## Repo map</span></span><br><span class="line"><span class="bullet">-</span> Key directories and what they contain.</span><br><span class="line"></span><br><span class="line"><span class="section">## How to run</span></span><br><span class="line"><span class="bullet">-</span> Install: <span class="language-xml"><span class="tag">&lt;<span class="name">commands</span>&gt;</span></span></span><br><span class="line"><span class="bullet">-</span> Dev: <span class="language-xml"><span class="tag">&lt;<span class="name">commands</span>&gt;</span></span></span><br><span class="line"><span class="bullet">-</span> Build: <span class="language-xml"><span class="tag">&lt;<span class="name">commands</span>&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="section">## Testing</span></span><br><span class="line"><span class="bullet">-</span> Unit tests: <span class="language-xml"><span class="tag">&lt;<span class="name">commands</span>&gt;</span></span></span><br><span class="line"><span class="bullet">-</span> Integration/E2E: <span class="language-xml"><span class="tag">&lt;<span class="name">commands</span>&gt;</span></span></span><br><span class="line"><span class="bullet">-</span> Lint/format: <span class="language-xml"><span class="tag">&lt;<span class="name">commands</span>&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="section">## Change rules</span></span><br><span class="line"><span class="bullet">-</span> Prefer small, reviewable PRs.</span><br><span class="line"><span class="bullet">-</span> Update docs when changing public APIs.</span><br><span class="line"><span class="bullet">-</span> Never modify: <span class="language-xml"><span class="tag">&lt;<span class="name">paths</span>&gt;</span></span> (explain why).</span><br><span class="line"></span><br><span class="line"><span class="section">## Output expectations</span></span><br><span class="line"><span class="bullet">-</span> Before coding: summarize plan + files to touch.</span><br><span class="line"><span class="bullet">-</span> After coding: list verification steps + any risks.</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>小结：把“你希望它遵循的规则”写进 <code>CLAUDE.md</code>，比在聊天里反复强调更稳定；而 <code>local</code>&#x2F;<code>global</code> 两层则分别解决“个人偏好”和“跨项目一致性”。</p>
+</blockquote>
+<h2 id="如何使用-Claude-Code-理解大型仓库？（从“迷路”到“建立心智模型”）"><a href="#如何使用-Claude-Code-理解大型仓库？（从“迷路”到“建立心智模型”）" class="headerlink" title="如何使用 Claude Code 理解大型仓库？（从“迷路”到“建立心智模型”）"></a>如何使用 Claude Code 理解大型仓库？（从“迷路”到“建立心智模型”）</h2><p>大型仓库的难点往往不是“看不懂某个文件”，而是<strong>缺一张地图</strong>：入口在哪里、核心链路怎么走、边界如何划分、哪些约定不能破。Claude Code 的优势在于它会做 <strong>agentic search</strong>（带目标地检索与跳转），把“碎片信息”拼成结构化结论。</p>
+<h3 id="1-先让它产出-Repo-Map（5–10-分钟建立全局视图）"><a href="#1-先让它产出-Repo-Map（5–10-分钟建立全局视图）" class="headerlink" title="1) 先让它产出 Repo Map（5–10 分钟建立全局视图）"></a>1) 先让它产出 Repo Map（5–10 分钟建立全局视图）</h3><p>你可以先问一个足够宽的问题，让它输出“可以拿来导航”的结果：</p>
+<ul>
+<li><p>示例提问：</p>
+<ul>
+<li>“给我一个 codebase overview：这个仓库的模块边界、目录职责、关键依赖（DB&#x2F;消息队列&#x2F;第三方）、以及主要的运行入口分别在哪里？”</li>
+<li>“请列出最重要的 10 个文件&#x2F;目录，并说明它们对业务&#x2F;系统的作用；同时标注你不确定的地方以及你依据的证据（文件路径&#x2F;关键函数名）。”</li>
+</ul>
+</li>
+<li><p>你希望它输出的格式（建议你明确要求）：</p>
+<ul>
+<li><strong>Repo map（目录 → 职责）</strong></li>
+<li><strong>入口点</strong>（CLI&#x2F;HTTP handler&#x2F;worker&#x2F;cron）</li>
+<li><strong>关键领域对象&#x2F;数据结构</strong></li>
+<li><strong>关键依赖与配置位置</strong></li>
+<li><strong>风险点</strong>（耦合、隐藏约定、容易踩坑处）</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-让它“走一遍链路”：用数据流问题替代“这个文件干嘛的”"><a href="#2-让它“走一遍链路”：用数据流问题替代“这个文件干嘛的”" class="headerlink" title="2) 让它“走一遍链路”：用数据流问题替代“这个文件干嘛的”"></a>2) 让它“走一遍链路”：用数据流问题替代“这个文件干嘛的”</h3><p>理解大型系统最有效的是沿着一次真实请求&#x2F;任务把数据流走通：</p>
+<ul>
+<li><p>通用数据流提问模板（前后端&#x2F;AI 都适用）：</p>
+<ul>
+<li>“以【用户触发 X】为例：从入口开始，按时间顺序列出调用链（函数&#x2F;类&#x2F;模块），每一步输入输出是什么？哪些地方会读写 DB&#x2F;缓存&#x2F;外部服务？”</li>
+<li>“请画出（用文字也行）数据流：Request → Validation → Domain logic → Persistence → Response，并给出对应代码位置（文件+函数名）。”</li>
+</ul>
+</li>
+<li><p>AI &#x2F; RAG &#x2F; Pipeline 场景示例：</p>
+<ul>
+<li>“以【一次检索增强问答】为例：query 如何被改写、embedding 在哪里算、检索在哪里做、rerank&#x2F;过滤规则在哪里、最终 prompt 如何拼、日志与评估指标在哪里记录？”</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-“找证据”的高效用法：让它带着关键词-模式去定位"><a href="#3-“找证据”的高效用法：让它带着关键词-模式去定位" class="headerlink" title="3) “找证据”的高效用法：让它带着关键词&#x2F;模式去定位"></a>3) “找证据”的高效用法：让它带着关键词&#x2F;模式去定位</h3><p>大型仓库常见入口并不显眼（注册表&#x2F;路由表&#x2F;依赖注入&#x2F;配置驱动）。可以让它按模式找：</p>
+<ul>
+<li>示例提问：<ul>
+<li>“这个服务的 HTTP 路由是在哪里注册的？请告诉我注册点文件、路由到 handler 的映射方式，以及新增一个 endpoint 应该改哪些地方。”</li>
+<li>“后台任务&#x2F;worker 是如何调度的？入口在哪里？任务定义和重试策略在哪里配置？”</li>
+<li>“配置是如何加载的（env&#x2F;config 文件&#x2F;远端配置）？优先级是什么？哪些配置对本地运行是必须的？”</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-把你的“理解”固化：用-Git-提交信息当作长期记忆"><a href="#4-把你的“理解”固化：用-Git-提交信息当作长期记忆" class="headerlink" title="4) 把你的“理解”固化：用 Git 提交信息当作长期记忆"></a>4) 把你的“理解”固化：用 Git 提交信息当作长期记忆</h3><p>你在 <code>git add/commit</code> 时写&#x2F;用claude code 写清楚动机与影响面，后续 Claude Code（以及你自己）会更快恢复上下文：</p>
+<ul>
+<li><p>推荐的 commit message&#x2F;描述要包含：</p>
+<ul>
+<li><strong>Why</strong>：为什么改（背景&#x2F;问题）</li>
+<li><strong>What</strong>：改了什么（要点）</li>
+<li><strong>Impact</strong>：影响面（模块&#x2F;接口&#x2F;风险）</li>
+<li><strong>Verify</strong>：如何验证（命令&#x2F;步骤）</li>
+</ul>
+</li>
+<li><p>示例（更利于后续检索与理解）：</p>
+<ul>
+<li><code>refactor(auth): clarify token validation flow; add doc + tests</code></li>
+<li>commit body：<code>Why/What/Impact/Verify</code> 四段式</li>
+</ul>
+</li>
+</ul>
+<h3 id="5-一个“上手大仓库”的实战流程（你可以照着做）"><a href="#5-一个“上手大仓库”的实战流程（你可以照着做）" class="headerlink" title="5) 一个“上手大仓库”的实战流程（你可以照着做）"></a>5) 一个“上手大仓库”的实战流程（你可以照着做）</h3><ul>
+<li>“先输出 repo map + 入口清单”</li>
+<li>“选一条关键业务链路（登录&#x2F;下单&#x2F;训练&#x2F;检索）走完数据流”</li>
+<li>“把关键点补成文档&#x2F;注释（或写入 CLAUDE.md）”</li>
+<li>“每次改动都写清楚 commit&#x2F;PR 描述，持续加深‘可检索的记忆’”</li>
+</ul>
+<h2 id="如何使用-Claude-Code-撰写大型仓库？（从”写代码”到”可控交付”）"><a href="#如何使用-Claude-Code-撰写大型仓库？（从”写代码”到”可控交付”）" class="headerlink" title="如何使用 Claude Code 撰写大型仓库？（从”写代码”到”可控交付”）"></a>如何使用 Claude Code 撰写大型仓库？（从”写代码”到”可控交付”）</h2><hr>
+<h3 id="案例一：端到端-RAG-Agent-添加-Feature"><a href="#案例一：端到端-RAG-Agent-添加-Feature" class="headerlink" title="案例一：端到端 RAG Agent 添加 Feature"></a>案例一：端到端 RAG Agent 添加 Feature</h3><p>以下是一个典型的”给现有系统加功能”的完整流程，适用于 AI pipeline &#x2F; Web 后端 &#x2F; 前端组件等场景。</p>
+<h4 id="第-1-步：定位要改的文件（你知道-让它猜）"><a href="#第-1-步：定位要改的文件（你知道-让它猜）" class="headerlink" title="第 1 步：定位要改的文件（你知道 &gt; 让它猜）"></a>第 1 步：定位要改的文件（你知道 &gt; 让它猜）</h4><ul>
+<li><p><strong>如果你知道入口&#x2F;改动点</strong>：直接用 <code>@</code> 标识文件，减少 Claude Code 的探索时间。</p>
+<p>示例提问：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">我要在 RAG pipeline 里加一个&quot;检索后 rerank&quot;的步骤。</span><br><span class="line">相关文件是 @src/retrieval/pipeline.py 和 @src/retrieval/reranker.py。</span><br><span class="line">请先告诉我你理解的当前流程，再给出改动方案。</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>如果你不确定改哪里</strong>：让它先做 agentic search，但要求它”带着目标找”而不是漫游。</p>
+<p>示例提问：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">我想给 RAG pipeline 加 rerank 能力。</span><br><span class="line">请帮我定位：1) 当前检索结果在哪里返回；2) 最适合插入 rerank 的位置；3) 需要改动的文件清单。</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="第-2-步：生成计划（Plan-Mode，Shift-Tab）"><a href="#第-2-步：生成计划（Plan-Mode，Shift-Tab）" class="headerlink" title="第 2 步：生成计划（Plan Mode，Shift + Tab）"></a>第 2 步：生成计划（Plan Mode，<code>Shift + Tab</code>）</h4><p>在动手前让 Claude Code 输出一份<strong>可 review 的计划</strong>，而不是直接改代码。</p>
+<ul>
+<li><p><strong>如何触发</strong>：在 claude code 中按 <code>Shift + Tab</code> 进入 Plan Mode，或在提问时明确要求：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">请先输出一份改动计划，包含：</span><br><span class="line">1. 要新增/修改的文件</span><br><span class="line">2. 每个文件的改动要点</span><br><span class="line">3. 预期的调用链变化</span><br><span class="line">4. 需要新增的测试/验证点</span><br><span class="line">暂时不要写代码，等我确认后再执行。</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>Review 计划时关注</strong>：</p>
+<ul>
+<li>是否遗漏了关联文件（配置&#x2F;测试&#x2F;文档）</li>
+<li>是否破坏了现有接口&#x2F;契约</li>
+<li>回滚成本是否可控（改动范围是否过大）</li>
+</ul>
+</li>
+</ul>
+<h4 id="第-3-步：执行计划（确认后再动手）"><a href="#第-3-步：执行计划（确认后再动手）" class="headerlink" title="第 3 步：执行计划（确认后再动手）"></a>第 3 步：执行计划（确认后再动手）</h4><p>确认计划合理后，让它按步骤执行：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">计划看起来合理，请按上述方案执行。每完成一个文件后暂停，让我 review diff。</span><br></pre></td></tr></table></figure>
+
+<p>或者如果你信任度较高：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">请执行上述计划，完成后输出所有 diff 摘要，并告诉我如何本地验证。</span><br></pre></td></tr></table></figure>
+
+<h4 id="第-4-步：人工-Review（前端-UI-可用截图反馈）"><a href="#第-4-步：人工-Review（前端-UI-可用截图反馈）" class="headerlink" title="第 4 步：人工 Review（前端 UI 可用截图反馈）"></a>第 4 步：人工 Review（前端 UI 可用截图反馈）</h4><ul>
+<li><p><strong>对于逻辑&#x2F;接口改动</strong>：看 diff、跑测试、检查日志。</p>
+</li>
+<li><p><strong>对于前端 UI</strong>：直接截图贴给 Claude Code 是最直观的反馈方式。</p>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[截图]</span><br><span class="line">按钮位置不对，应该左对齐，并且去掉边框。请修复。</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="第-5-步：用-MCP-工具替代”人工截图→反馈”循环（进阶）"><a href="#第-5-步：用-MCP-工具替代”人工截图→反馈”循环（进阶）" class="headerlink" title="第 5 步：用 MCP 工具替代”人工截图→反馈”循环（进阶）"></a>第 5 步：用 MCP 工具替代”人工截图→反馈”循环（进阶）</h4><p>如果你发现自己在<strong>反复截图→贴图→等修复→再截图</strong>，说明这个环节可以自动化。</p>
+<h5 id="什么是-MCP（Model-Context-Protocol）工具？"><a href="#什么是-MCP（Model-Context-Protocol）工具？" class="headerlink" title="什么是 MCP（Model Context Protocol）工具？"></a>什么是 MCP（Model Context Protocol）工具？</h5><p>MCP 是一种让 Claude Code 调用外部工具的协议。常见的 MCP 工具包括：</p>
+<ul>
+<li><strong>Playwright MCP</strong>：让 Claude Code 自己打开浏览器、访问页面、截图、检查元素。</li>
+<li><strong>Terminal MCP</strong>：让它执行命令并读取输出。</li>
+<li><strong>Database MCP</strong>：让它查询数据库状态。</li>
+</ul>
+<h5 id="示例指令解析（Playwright-MCP）"><a href="#示例指令解析（Playwright-MCP）" class="headerlink" title="示例指令解析（Playwright MCP）"></a>示例指令解析（Playwright MCP）</h5><p>原始指令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Using the playwright MCP server visit 127.0.0.1:8000 and view the new chat button.</span><br><span class="line">I want that button to look the same as the other links below for Courses and Try Asking.</span><br><span class="line">Make sure this is left aligned and that the border is removed.</span><br></pre></td></tr></table></figure>
+
+<p><strong>结构拆解</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>部分</th>
+<th>作用</th>
+<th>你要写的内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>工具声明</strong></td>
+<td>告诉 Claude Code 用哪个 MCP</td>
+<td><code>Using the playwright MCP server</code></td>
+</tr>
+<tr>
+<td><strong>动作</strong></td>
+<td>访问 + 定位目标</td>
+<td><code>visit 127.0.0.1:8000 and view the new chat button</code></td>
+</tr>
+<tr>
+<td><strong>参照物</strong></td>
+<td>给出”正确”的样式参考</td>
+<td><code>look the same as the other links below for Courses and Try Asking</code></td>
+</tr>
+<tr>
+<td><strong>具体约束</strong></td>
+<td>明确要求（可验证）</td>
+<td><code>left aligned</code> &#x2F; <code>border is removed</code></td>
+</tr>
+</tbody></table>
+<p><strong>省去人工截图的原理</strong>：<br>Claude Code 通过 Playwright MCP 自己打开页面 → 截图 → 分析 → 修改代码 → 再截图验证，形成闭环。</p>
+<h5 id="MCP-的优缺点"><a href="#MCP-的优缺点" class="headerlink" title="MCP 的优缺点"></a>MCP 的优缺点</h5><table>
+<thead>
+<tr>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>省去人工截图反馈循环</td>
+<td>需要提前配置 MCP 工具（一次性成本）</td>
+</tr>
+<tr>
+<td>可自动化 UI 回归验证</td>
+<td>复杂交互（拖拽、动画）可能不如人眼准</td>
+</tr>
+<tr>
+<td>适合高频迭代场景</td>
+<td>对本地环境有要求（浏览器&#x2F;端口）</td>
+</tr>
+</tbody></table>
+<h5 id="什么时候该考虑用-MCP？"><a href="#什么时候该考虑用-MCP？" class="headerlink" title="什么时候该考虑用 MCP？"></a>什么时候该考虑用 MCP？</h5><p>问自己一个问题：<strong>“这个操作我今天会重复超过 3 次吗？”</strong></p>
+<ul>
+<li><p><strong>适合用 MCP</strong>：</p>
+<ul>
+<li>前端样式反复微调（截图→反馈→截图）</li>
+<li>需要检查多个页面&#x2F;状态的 UI 一致性</li>
+<li>需要自动化验证某个流程（如登录→跳转→展示）</li>
+</ul>
+</li>
+<li><p><strong>不需要用 MCP</strong>：</p>
+<ul>
+<li>一次性改动，改完就走</li>
+<li>逻辑改动，跑测试比截图更有效</li>
+<li>MCP 工具本身还没配好（先完成任务，再优化流程）</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h4 id="小结：Feature-添加的”可控交付”心法"><a href="#小结：Feature-添加的”可控交付”心法" class="headerlink" title="小结：Feature 添加的”可控交付”心法"></a>小结：Feature 添加的”可控交付”心法</h4><table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>你要做的</th>
+<th>Claude Code 负责的</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>定位</strong></td>
+<td>给入口&#x2F;文件（如果知道）</td>
+<td>agentic search（如果你不确定）</td>
+</tr>
+<tr>
+<td><strong>计划</strong></td>
+<td>Review 计划、补充约束</td>
+<td>输出可执行方案</td>
+</tr>
+<tr>
+<td><strong>执行</strong></td>
+<td>控制节奏（分步&#x2F;一次性）</td>
+<td>按计划改代码</td>
+</tr>
+<tr>
+<td><strong>验证</strong></td>
+<td>跑测试 &#x2F; 截图 &#x2F; 用 MCP</td>
+<td>根据反馈修复</td>
+</tr>
+<tr>
+<td><strong>固化</strong></td>
+<td>写 commit&#x2F;PR 描述</td>
+<td>生成变更摘要</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>一句话总结：<strong>让 Claude Code 先出计划、再动手、最后验证</strong>——把”写代码”变成”可 review 的流程”，才是大型仓库里”改得稳”的关键。</p>
+</blockquote>
+<h3 id="代码测试与-Debug：让-Claude-Code-帮你”找问题”而不是”猜问题”"><a href="#代码测试与-Debug：让-Claude-Code-帮你”找问题”而不是”猜问题”" class="headerlink" title="代码测试与 Debug：让 Claude Code 帮你”找问题”而不是”猜问题”"></a>代码测试与 Debug：让 Claude Code 帮你”找问题”而不是”猜问题”</h3><p>Debug 的核心难点是<strong>定位</strong>：到底是哪一层出了问题？Claude Code 的优势在于它可以帮你<strong>系统性地排查</strong>，但你需要用正确的方式引导它。</p>
+<hr>
+<h4 id="Trick-1：用-“Think-a-lot-Think-hard”-触发深度推理"><a href="#Trick-1：用-“Think-a-lot-Think-hard”-触发深度推理" class="headerlink" title="Trick 1：用 “Think a lot &#x2F; Think hard” 触发深度推理"></a>Trick 1：用 “Think a lot &#x2F; Think hard” 触发深度推理</h4><p><strong>原理</strong>：Claude Code 默认会尽快给出答案。对于复杂问题（多层调用、隐藏状态、竞态条件），你需要它分配更多”推理预算”。</p>
+<p><strong>方法</strong>：在 prompt 末尾加上 <code>Think a lot</code> &#x2F; <code>Think hard</code> &#x2F; <code>Think step by step</code>，让模型在回答前做更长的内部推理。</p>
+<p><strong>示例（RAG 系统排错）</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">The RAG chatbot returns &#x27;query failed&#x27; for any content-related questions.</span><br><span class="line">I need you to:</span><br><span class="line"></span><br><span class="line">1. Write tests to evaluate the outputs of the execute method of the CourseSearchTool in @backend/search_tools.py</span><br><span class="line">2. Write tests to evaluate if @backend/ai_generator.py correctly calls for the CourseSearchTool</span><br><span class="line">3. Write tests to evaluate how the RAG system is handling the content-query related questions.</span><br><span class="line"></span><br><span class="line">Save the tests in a tests folder within @backend.</span><br><span class="line">Run those tests against the current system to identify which components are failing.</span><br><span class="line">Propose fixes based on what the tests reveal is broken.</span><br><span class="line"></span><br><span class="line">Think a lot.</span><br></pre></td></tr></table></figure>
+
+<p><strong>结构拆解</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>部分</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>现象描述</strong></td>
+<td>告诉它”什么坏了”（query failed）</td>
+</tr>
+<tr>
+<td><strong>分层测试要求</strong></td>
+<td>让它从底层到顶层逐层验证（Tool → Caller → System）</td>
+</tr>
+<tr>
+<td><strong>输出约束</strong></td>
+<td>测试放哪里、跑完要干什么（定位 → 修复）</td>
+</tr>
+<tr>
+<td><strong>深度推理触发</strong></td>
+<td><code>Think a lot</code> 让它不要急着下结论</td>
+</tr>
+</tbody></table>
+<p><strong>见解</strong>：</p>
+<ul>
+<li>不要只说”帮我 debug”，要<strong>拆成分层测试任务</strong>——让它先定位到底是哪一层挂了。</li>
+<li><code>Think a lot</code> 对”症状模糊、可能原因多”的问题特别有效（例如：偶发失败、性能下降、数据不一致）。</li>
+</ul>
+<hr>
+<h4 id="Trick-2：功能修改时，给出”行为对比示例”（区分哪些该变、哪些不该变）"><a href="#Trick-2：功能修改时，给出”行为对比示例”（区分哪些该变、哪些不该变）" class="headerlink" title="Trick 2：功能修改时，给出”行为对比示例”（区分哪些该变、哪些不该变）"></a>Trick 2：功能修改时，给出”行为对比示例”（区分哪些该变、哪些不该变）</h4><p><strong>原理</strong>：功能修改往往会改变部分行为，但也有些行为不能被”误伤”。<strong>给 Claude Code 一份 Before&#x2F;After 的行为对比表</strong>，明确标注哪些行为要变、变成什么样、哪些行为必须保持不变，它就能用这些作为验证标准。</p>
+<p><strong>方法</strong>：在修改请求里附上”用户操作 → 修改前结果 → 修改后预期结果”的对照表，用 ✅ &#x2F; ⚠️ 标记区分。</p>
+<p><strong>示例（功能修改导致部分行为变化）</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">我要修改 @src/auth/login.py，新增&quot;同账号最多 3 个设备同时在线&quot;的限制。</span><br><span class="line">超出限制时，踢掉最早登录的设备。</span><br><span class="line"></span><br><span class="line">修改前后的行为对比：</span><br><span class="line"></span><br><span class="line">| 用户操作 | 修改前结果 | 修改后结果（预期变化） |</span><br><span class="line">|----------|------------|------------------------|</span><br><span class="line">| 正常登录 | 返回 200 + session | ✅ 不变 |</span><br><span class="line">| 重复登录（同设备） | 刷新 session | ✅ 不变 |</span><br><span class="line">| 第 1-3 个设备登录 | 全部共存 | ✅ 不变 |</span><br><span class="line">| 第 4 个设备登录 | 全部共存 | ⚠️ 变化：踢掉最早的设备，返回 200 |</span><br><span class="line">| 被踢设备访问 | 正常访问 | ⚠️ 变化：返回 401 + 提示&quot;已在其他设备登录&quot; |</span><br><span class="line">| 主动登出后重新登录 | 正常登录 | ✅ 不变 |</span><br><span class="line"></span><br><span class="line">请基于以上行为表：</span><br><span class="line">1. 先写测试覆盖这 6 个场景（区分&quot;应该变&quot;和&quot;不应该变&quot;）</span><br><span class="line">2. 再实现功能修改</span><br><span class="line">3. 跑测试确认：✅ 行保持不变，⚠️ 行按预期变化</span><br></pre></td></tr></table></figure>
+
+<p><strong>这个表的关键设计</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>标记</th>
+<th>含义</th>
+<th>测试策略</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>✅ 不变</td>
+<td>这个行为必须和以前一样</td>
+<td>回归测试：确保没被误伤</td>
+</tr>
+<tr>
+<td>⚠️ 变化</td>
+<td>这个行为要按新需求改变</td>
+<td>新功能测试：确保变成预期的样子</td>
+</tr>
+</tbody></table>
+<p><strong>见解</strong>：</p>
+<ul>
+<li><strong>不是所有修改都追求”行为不变”</strong>——功能迭代本来就是要改变行为。</li>
+<li>行为对比表的真正价值是：<strong>显式区分”哪些该变、哪些不该变”</strong>，避免改 A 误伤 B。</li>
+<li>让 Claude Code 看到 ✅ &#x2F; ⚠️ 标记后，它会自动把测试分成两类：回归测试 + 新功能测试。</li>
+</ul>
+<hr>
+<h4 id="Trick-3：不确定目标时，用多-Agent-头脑风暴"><a href="#Trick-3：不确定目标时，用多-Agent-头脑风暴" class="headerlink" title="Trick 3：不确定目标时，用多 Agent 头脑风暴"></a>Trick 3：不确定目标时，用多 Agent 头脑风暴</h4><p><strong>原理</strong>：当你自己也不确定”该怎么做”时，让 Claude Code 启动<strong>多个并行子代理</strong>，各自独立产出方案，再由你挑选&#x2F;合并。</p>
+<p><strong>方法</strong>：用 <code>subagents</code> &#x2F; <code>parallel</code> 关键词触发（需要在非 Plan 模式下，claude code 中按 Tab 进入 Shortcut 模式）。</p>
+<p><strong>示例（方案探索）</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Use two parallel subagents to brainstorm possible plans for:</span><br><span class="line">- Adding a caching layer to the RAG retrieval step</span><br><span class="line">- Goal: reduce latency by 50% without sacrificing recall</span><br><span class="line"></span><br><span class="line">Each subagent should propose a different approach (e.g., embedding cache vs. result cache vs. hybrid).</span><br><span class="line">Do not implement any code. Output a comparison table at the end.</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出预期</strong>：</p>
+<ul>
+<li>Agent A：方案一（embedding cache）+ 优缺点</li>
+<li>Agent B：方案二（result cache）+ 优缺点</li>
+<li>对比表：延迟、命中率、实现复杂度、回滚成本</li>
+</ul>
+<p><strong>见解</strong>：</p>
+<ul>
+<li>头脑风暴阶段<strong>不要让它写代码</strong>（<code>Do not implement</code>），否则它会过早收敛到一个方案。</li>
+<li>多 Agent 的价值是”看到不同视角”，最终决策权在你。</li>
+</ul>
+<hr>
+<h4 id="Trick-4：选定方案后，用-Plan-模式细化执行计划"><a href="#Trick-4：选定方案后，用-Plan-模式细化执行计划" class="headerlink" title="Trick 4：选定方案后，用 Plan 模式细化执行计划"></a>Trick 4：选定方案后，用 Plan 模式细化执行计划</h4><p><strong>原理</strong>：头脑风暴产出的是”方向”，Plan 模式产出的是”可执行步骤”。两者配合使用。</p>
+<p><strong>方法</strong>：<code>Shift + Tab</code> 进入 Plan 模式，把选定的方案细化成任务清单。</p>
+<p><strong>示例（从方案到计划）</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">我选择方案 A（embedding cache）。</span><br><span class="line">请进入 Plan 模式，输出详细的执行计划：</span><br><span class="line"></span><br><span class="line">1. 需要新增/修改的文件</span><br><span class="line">2. 每个文件的改动要点</span><br><span class="line">3. 缓存的 key 设计、TTL 策略、失效机制</span><br><span class="line">4. 需要新增的配置项</span><br><span class="line">5. 测试计划（单测 + 集成测试）</span><br><span class="line">6. 回滚方案</span><br><span class="line"></span><br><span class="line">暂不执行，等我确认。</span><br></pre></td></tr></table></figure>
+
+<p><strong>见解</strong>：</p>
+<ul>
+<li><strong>先发散（Trick 3）→ 再收敛（Trick 4）</strong> 是处理”目标模糊”问题的标准流程。</li>
+<li>Plan 模式的输出可以直接作为 PR 描述或技术文档的骨架。</li>
+</ul>
+<hr>
+<h4 id="小结：Debug-测试的-4-个心法"><a href="#小结：Debug-测试的-4-个心法" class="headerlink" title="小结：Debug &amp; 测试的 4 个心法"></a>小结：Debug &amp; 测试的 4 个心法</h4><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>方法</th>
+<th>关键词 &#x2F; 触发方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>复杂问题定位</td>
+<td>分层测试 + 深度推理</td>
+<td><code>Think a lot</code> &#x2F; <code>Think hard</code></td>
+</tr>
+<tr>
+<td>功能修改</td>
+<td>行为对比表（✅ 不变 &#x2F; ⚠️ 变化）</td>
+<td>Before&#x2F;After 行为示例</td>
+</tr>
+<tr>
+<td>目标不确定</td>
+<td>多 Agent 头脑风暴</td>
+<td><code>parallel subagents</code> &#x2F; Shortcut 模式</td>
+</tr>
+<tr>
+<td>方案细化</td>
+<td>Plan 模式</td>
+<td><code>Shift + Tab</code> &#x2F; <code>暂不执行</code></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>一句话总结：Debug 的本质是”缩小怀疑范围”——让 Claude Code 帮你<strong>分层验证、对比行为、探索方案、细化计划</strong>，比直接问”为什么挂了”有效 10 倍。</p>
+</blockquote>
+<h3 id="进阶技巧：用-Git-Worktrees-实现多任务并行（不冲突、不覆盖）"><a href="#进阶技巧：用-Git-Worktrees-实现多任务并行（不冲突、不覆盖）" class="headerlink" title="进阶技巧：用 Git Worktrees 实现多任务并行（不冲突、不覆盖）"></a>进阶技巧：用 Git Worktrees 实现多任务并行（不冲突、不覆盖）</h3><p>当你有多个独立任务要同时推进（比如 UI 改版、测试补全、代码质量优化），<strong>开多个终端窗口是不够的</strong>——它们共享同一份代码，Claude Code 改 A 任务的文件可能覆盖 B 任务的改动。</p>
+<p><strong>正确做法</strong>：用 Git Worktrees，让每个任务在独立的工作目录（独立分支）中运行，互不干扰。</p>
+<p><img src="/images/cc-5.png"></p>
+<hr>
+<h4 id="第-1-步：创建-Worktrees（一次性操作）"><a href="#第-1-步：创建-Worktrees（一次性操作）" class="headerlink" title="第 1 步：创建 Worktrees（一次性操作）"></a>第 1 步：创建 Worktrees（一次性操作）</h4><p>在项目根目录执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建 .trees 目录存放所有 worktree</span></span><br><span class="line"><span class="built_in">mkdir</span> -p .trees</span><br><span class="line"></span><br><span class="line"><span class="comment"># 为每个任务创建独立的 worktree + 分支</span></span><br><span class="line">git worktree add .trees/ui_feature</span><br><span class="line">git worktree add .trees/testing_feature</span><br><span class="line">git worktree add .trees/quality_feature</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看所有分支（确认 worktree 创建成功）</span></span><br><span class="line">git branch -a</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出示例</strong>（如图中底部终端）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">* main</span><br><span class="line">+ quality_feature</span><br><span class="line">+ testing_feature</span><br><span class="line">+ ui_feature</span><br><span class="line">  remotes/origin/main</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="第-2-步：在每个-Worktree-中启动-Claude-Code"><a href="#第-2-步：在每个-Worktree-中启动-Claude-Code" class="headerlink" title="第 2 步：在每个 Worktree 中启动 Claude Code"></a>第 2 步：在每个 Worktree 中启动 Claude Code</h4><p>在 VS Code 中：</p>
+<ol>
+<li>打开 <code>.trees/ui_feature</code> 目录（或右键点击该目录 → “在集成终端中打开”）</li>
+<li>在该终端中启动 Claude Code</li>
+<li>对 <code>testing_feature</code>、<code>quality_feature</code> 重复上述操作</li>
+</ol>
+<p><strong>结果</strong>：你会得到 3 个并行的 Claude Code 会话（如图所示），每个会话：</p>
+<ul>
+<li>工作在独立的目录（<code>cwd</code> 不同）</li>
+<li>对应独立的 Git 分支</li>
+<li>文件修改互不覆盖</li>
+</ul>
+<hr>
+<h4 id="第-3-步：各自完成任务后提交"><a href="#第-3-步：各自完成任务后提交" class="headerlink" title="第 3 步：各自完成任务后提交"></a>第 3 步：各自完成任务后提交</h4><p>每个 worktree 中的任务完成后，让 Claude Code 提交：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Add and commit with a descriptive message.</span><br></pre></td></tr></table></figure>
+
+<p>或者更具体：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Please commit the changes with message: &quot;feat(ui): add new chat button with updated styling&quot;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="第-4-步：合并所有-Worktrees（可能有冲突）"><a href="#第-4-步：合并所有-Worktrees（可能有冲突）" class="headerlink" title="第 4 步：合并所有 Worktrees（可能有冲突）"></a>第 4 步：合并所有 Worktrees（可能有冲突）</h4><p>回到主分支，让 Claude Code 帮你合并：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Use the git merge command to merge in all of the worktrees in the .trees folder.</span><br><span class="line">Fix any conflicts if there are any.</span><br></pre></td></tr></table></figure>
+
+<p>Claude Code 会：</p>
+<ol>
+<li>依次合并 <code>ui_feature</code>、<code>testing_feature</code>、<code>quality_feature</code></li>
+<li>如果有冲突，自动分析并修复（或给你选择）</li>
+<li>输出合并结果摘要</li>
+</ol>
+<hr>
+<h4 id="小结：Worktrees-的价值"><a href="#小结：Worktrees-的价值" class="headerlink" title="小结：Worktrees 的价值"></a>小结：Worktrees 的价值</h4><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>不用 Worktrees</th>
+<th>用 Worktrees</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>多任务并行</td>
+<td>文件冲突、互相覆盖</td>
+<td>完全隔离、互不干扰</td>
+</tr>
+<tr>
+<td>切换任务</td>
+<td>需要 stash&#x2F;commit</td>
+<td>直接切目录</td>
+</tr>
+<tr>
+<td>合并结果</td>
+<td>手动解决冲突</td>
+<td>Claude Code 辅助合并</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>一句话总结：<strong>Worktrees 让”一个人同时做多件事”变得安全</strong>——每个任务有独立的工作空间，最后再统一合并。</p>
+</blockquote>
+<hr>
+<h3 id="进阶技巧：自定义-Claude-Code-命令（-your-command）"><a href="#进阶技巧：自定义-Claude-Code-命令（-your-command）" class="headerlink" title="进阶技巧：自定义 Claude Code 命令（/your_command）"></a>进阶技巧：自定义 Claude Code 命令（<code>/your_command</code>）</h3><p>除了内置命令（如 <code>/help</code>、<code>/compact</code>），你可以<strong>自定义常用操作</strong>，用 <code>/命令名</code> 一键触发。</p>
+<h4 id="方法：在项目根目录创建-claude-commands-目录"><a href="#方法：在项目根目录创建-claude-commands-目录" class="headerlink" title="方法：在项目根目录创建 .claude/commands/ 目录"></a>方法：在项目根目录创建 <code>.claude/commands/</code> 目录</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> -p .claude/commands</span><br></pre></td></tr></table></figure>
+
+<p>然后在该目录下创建 <code>.md</code> 文件，每个文件就是一个命令。</p>
+<h4 id="示例：创建-implement-feature-命令"><a href="#示例：创建-implement-feature-命令" class="headerlink" title="示例：创建 /implement_feature 命令"></a>示例：创建 <code>/implement_feature</code> 命令</h4><p>创建文件 <code>.claude/commands/implement_feature.md</code>：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="section"># Implement Feature</span></span><br><span class="line"></span><br><span class="line">Please implement the feature described below:</span><br><span class="line"></span><br><span class="line"><span class="bullet">1.</span> First, analyze the current codebase to understand the existing patterns</span><br><span class="line"><span class="bullet">2.</span> Create a plan for implementation</span><br><span class="line"><span class="bullet">3.</span> Implement the feature following existing code style</span><br><span class="line"><span class="bullet">4.</span> Add appropriate tests</span><br><span class="line"><span class="bullet">5.</span> Update documentation if needed</span><br><span class="line"></span><br><span class="line">Feature to implement: $ARGUMENTS</span><br></pre></td></tr></table></figure>
+
+<p>使用时：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/implement_feature Add a dark mode toggle to the settings page</span><br></pre></td></tr></table></figure>
+
+<h4 id="常用自定义命令示例"><a href="#常用自定义命令示例" class="headerlink" title="常用自定义命令示例"></a>常用自定义命令示例</h4><table>
+<thead>
+<tr>
+<th>命令名</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>/review</code></td>
+<td>对当前 diff 做代码审查</td>
+</tr>
+<tr>
+<td><code>/test</code></td>
+<td>为指定文件生成测试</td>
+</tr>
+<tr>
+<td><code>/doc</code></td>
+<td>为函数&#x2F;模块生成文档</td>
+</tr>
+<tr>
+<td><code>/refactor</code></td>
+<td>按指定目标重构代码</td>
+</tr>
+<tr>
+<td><code>/fix_lint</code></td>
+<td>修复所有 lint 错误</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>见解：把你<strong>反复做的操作</strong>封装成命令，既省打字，也能保证每次执行的 prompt 质量一致。</p>
+</blockquote>
+<h3 id="进阶技巧：让-Claude-Code-直接与-GitHub-交互（Review-PR-Fix-Issues）"><a href="#进阶技巧：让-Claude-Code-直接与-GitHub-交互（Review-PR-Fix-Issues）" class="headerlink" title="进阶技巧：让 Claude Code 直接与 GitHub 交互（Review PR &#x2F; Fix Issues）"></a>进阶技巧：让 Claude Code 直接与 GitHub 交互（Review PR &#x2F; Fix Issues）</h3><p>Claude Code 不仅能在本地终端里写代码，还能<strong>直接与 GitHub 集成</strong>——帮你 Review PR、修复 Issues、甚至在你不在电脑前时自动响应。</p>
+<hr>
+<h4 id="第-1-步：安装-GitHub-App-完成集成"><a href="#第-1-步：安装-GitHub-App-完成集成" class="headerlink" title="第 1 步：安装 GitHub App 完成集成"></a>第 1 步：安装 GitHub App 完成集成</h4><p>在 Claude Code 中执行：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/install-github-app</span><br></pre></td></tr></table></figure>
+<hr>
+<h4 id="使用场景-1：Review-Pull-Requests"><a href="#使用场景-1：Review-Pull-Requests" class="headerlink" title="使用场景 1：Review Pull Requests"></a>使用场景 1：Review Pull Requests</h4><p>让 Claude Code 帮你审查 PR，找出潜在问题：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Review PR #42 in this repository.</span><br><span class="line">Focus on:</span><br><span class="line">1. Logic errors or bugs</span><br><span class="line">2. Security concerns</span><br><span class="line">3. Performance issues</span><br><span class="line">4. Code style consistency</span><br><span class="line">Give specific line-by-line feedback.</span><br></pre></td></tr></table></figure>
+
+<p><strong>Claude Code 会</strong>：</p>
+<ul>
+<li>读取 PR 的所有文件变更</li>
+<li>逐文件分析改动</li>
+<li>输出具体的 review 意见（带行号）</li>
+<li>可以直接在 GitHub 上提交 review comments</li>
+</ul>
+<hr>
+<h4 id="使用场景-2：Fix-Issues"><a href="#使用场景-2：Fix-Issues" class="headerlink" title="使用场景 2：Fix Issues"></a>使用场景 2：Fix Issues</h4><p>让 Claude Code 根据 Issue 描述自动修复问题：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Look at issue #15 in this repository.</span><br><span class="line">Understand the problem, locate the relevant code, and implement a fix.</span><br><span class="line">Create a PR with the fix when done.</span><br></pre></td></tr></table></figure>
+
+<p><strong>Claude Code 会</strong>：</p>
+<ul>
+<li>读取 Issue 的描述和讨论</li>
+<li>在代码库中定位相关文件</li>
+<li>实现修复</li>
+<li>自动创建 PR 并关联 Issue</li>
+</ul>
+<hr>
+<h4 id="使用场景-3：恢复之前的对话（-resume）"><a href="#使用场景-3：恢复之前的对话（-resume）" class="headerlink" title="使用场景 3：恢复之前的对话（--resume）"></a>使用场景 3：恢复之前的对话（<code>--resume</code>）</h4><p>如果你之前在处理某个任务，中途关闭了终端，可以用 <code>--resume</code> 恢复：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 恢复最近一次对话</span></span><br><span class="line">claude --resume</span><br><span class="line"></span><br><span class="line"><span class="comment"># 恢复指定的对话（按 ID）</span></span><br><span class="line">claude --resume &lt;conversation_id&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>适用场景</strong>：</p>
+<ul>
+<li>长时间任务中途断开</li>
+<li>想继续之前的 PR review 或 Issue 修复</li>
+<li>切换设备后继续工作</li>
+</ul>
+<hr>
+<h4 id="进阶功能：Hooks（自动化触发）"><a href="#进阶功能：Hooks（自动化触发）" class="headerlink" title="进阶功能：Hooks（自动化触发）"></a>进阶功能：Hooks（自动化触发）</h4><p>暂无说明</p>
+<hr>
+<h4 id="小结：GitHub-集成的价值"><a href="#小结：GitHub-集成的价值" class="headerlink" title="小结：GitHub 集成的价值"></a>小结：GitHub 集成的价值</h4><table>
+<thead>
+<tr>
+<th>能力</th>
+<th>传统方式</th>
+<th>Claude Code + GitHub</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Review PR</td>
+<td>人工逐行看</td>
+<td>AI 辅助 + 自动输出意见</td>
+</tr>
+<tr>
+<td>Fix Issues</td>
+<td>手动定位 + 修复</td>
+<td>读 Issue → 定位 → 修复 → 创建 PR</td>
+</tr>
+<tr>
+<td>持续响应</td>
+<td>需要人在线</td>
+<td>Hooks 自动触发</td>
+</tr>
+<tr>
+<td>上下文恢复</td>
+<td>从头开始</td>
+<td><code>--resume</code> 继续</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>一句话总结：<strong>把 Claude Code 当成你的 GitHub 助手</strong>——它可以帮你 Review、修 Bug、响应 Issue，甚至在你不在的时候自动干活。</p>
+</blockquote>
+<hr>
+<h2 id="Claude-Code-与-Jupyter-的结合用法：从混乱-Notebook-到专业-Dashboard"><a href="#Claude-Code-与-Jupyter-的结合用法：从混乱-Notebook-到专业-Dashboard" class="headerlink" title="Claude Code 与 Jupyter 的结合用法：从混乱 Notebook 到专业 Dashboard"></a>Claude Code 与 Jupyter 的结合用法：从混乱 Notebook 到专业 Dashboard</h2><p>数据分析师的日常痛点：Jupyter Notebook 写着写着就变成了”一次性脚本”——代码混乱、没有文档、图表难看、换个时间段就要改一堆地方。</p>
+<p>Claude Code 可以帮你<strong>系统性地重构 Notebook</strong>，甚至进一步<strong>转换成可交互的 Dashboard</strong>。</p>
+<hr>
+<h3 id="第-1-步：重构-Jupyter-Notebook（从混乱到专业）"><a href="#第-1-步：重构-Jupyter-Notebook（从混乱到专业）" class="headerlink" title="第 1 步：重构 Jupyter Notebook（从混乱到专业）"></a>第 1 步：重构 Jupyter Notebook（从混乱到专业）</h3><p><strong>目标</strong>：保留原有分析逻辑，但让 Notebook 变得：</p>
+<ul>
+<li>结构清晰（有目录、有分节）</li>
+<li>代码可复用（抽成函数&#x2F;模块）</li>
+<li>可配置（换个时间段不用改代码）</li>
+<li>图表专业（标题、坐标轴、配色）</li>
+</ul>
+<h4 id="Prompt-示例（可直接复用）"><a href="#Prompt-示例（可直接复用）" class="headerlink" title="Prompt 示例（可直接复用）"></a>Prompt 示例（可直接复用）</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">The @EDA.ipynb contains exploratory data analysis on e-commerce data in @ecommerce_data, focusing on sales metrics for 2023. Keep the same analysis and graphs, and improve the structure and documentation of the notebook.</span><br><span class="line"></span><br><span class="line">Review the existing notebook and identify:</span><br><span class="line">- What business metrics are currently calculated</span><br><span class="line">- What visualizations are created</span><br><span class="line">- What data transformations are performed</span><br><span class="line">- Any code quality issues or inefficiencies</span><br><span class="line">  </span><br><span class="line">**Refactoring Requirements**</span><br><span class="line"></span><br><span class="line">1. Notebook Structure &amp; Documentation</span><br><span class="line">    - Add proper documentation and markdown cells with clear header and a brief explanation for the section</span><br><span class="line">    - Organize into logical sections:</span><br><span class="line">        - Introduction &amp; Business Objectives</span><br><span class="line">        - Data Loading &amp; Configuration</span><br><span class="line">        - Data Preparation &amp; Transformation</span><br><span class="line">        - Business Metrics Calculation (revenue, product, geographic, customer experience analysis)</span><br><span class="line">        - Summary of observations</span><br><span class="line">    - Add table of contents at the beginning</span><br><span class="line">    - Include data dictionary explaining key columns and business terms</span><br><span class="line">   </span><br><span class="line">2. Code Quality Improvements</span><br><span class="line">   - Create reusable functions with docstrings</span><br><span class="line">   - Implement consistent naming and formatting</span><br><span class="line">   - Create separate Python files:</span><br><span class="line">        - business_metrics.py containing business metric calculations only</span><br><span class="line">        - data_loader.py loading, processing and cleaning the data  </span><br><span class="line">        </span><br><span class="line">3. Enhanced Visualizations</span><br><span class="line">    - Improve all plots with:</span><br><span class="line">        - Clear and descriptive titles </span><br><span class="line">        - Proper axis labels with units</span><br><span class="line">        - Legends where needed</span><br><span class="line">        - Appropriate chart types for the data</span><br><span class="line">        - Include date range in plot titles or captions</span><br><span class="line">        - Use consistent color business-oriented color schemes</span><br><span class="line">          </span><br><span class="line">4. Configurable Analysis Framework</span><br><span class="line">   The notebook shows the computation of metrics for a specific date range (entire year of 2023 compared to 2022). Refactor the code so that the data is first filtered according to configurable month and year &amp; implement general-purpose metric calculations. </span><br><span class="line"></span><br><span class="line">**Deliverables Expected**</span><br><span class="line">- Refactored Jupyter notebook (EDA_Refactored.ipynb) with all improvements</span><br><span class="line">- Business metrics module (business_metrics.py) with documented functions</span><br><span class="line">- Requirements file (requirements.txt) listing all dependencies</span><br><span class="line">- README section explaining how to use the refactored analysis</span><br><span class="line"></span><br><span class="line">**Success Criteria**</span><br><span class="line">- Easy-to-read code &amp; notebook (do not use icons in the printing statements or markdown cells)</span><br><span class="line">- Configurable analysis that works for any date range</span><br><span class="line">- Reusable code that can be applied to future datasets</span><br><span class="line">- Maintainable structure that other analysts can easily understand and extend</span><br><span class="line">- Maintain all existing analyses while improving the quality, structure, and usability of the notebook</span><br><span class="line">- Do not assume any business thresholds</span><br></pre></td></tr></table></figure>
+
+<h4 id="Prompt-结构分析"><a href="#Prompt-结构分析" class="headerlink" title="Prompt 结构分析"></a>Prompt 结构分析</h4><table>
+<thead>
+<tr>
+<th>部分</th>
+<th>作用</th>
+<th>你可以改的地方</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>上下文</strong></td>
+<td>告诉它 Notebook 是什么、数据在哪</td>
+<td>改成你的文件路径和业务场景</td>
+</tr>
+<tr>
+<td><strong>Review 要求</strong></td>
+<td>让它先理解现状再动手</td>
+<td>根据你的 Notebook 特点调整</td>
+</tr>
+<tr>
+<td><strong>Refactoring Requirements</strong></td>
+<td>具体的重构标准</td>
+<td>按你的需求增减</td>
+</tr>
+<tr>
+<td><strong>Deliverables Expected</strong></td>
+<td>明确输出物</td>
+<td>确保它不遗漏</td>
+</tr>
+<tr>
+<td><strong>Success Criteria</strong></td>
+<td>验收标准</td>
+<td>加入你的偏好（如配色、风格）</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="第-2-步：将-Notebook-转换为-Streamlit-Dashboard"><a href="#第-2-步：将-Notebook-转换为-Streamlit-Dashboard" class="headerlink" title="第 2 步：将 Notebook 转换为 Streamlit Dashboard"></a>第 2 步：将 Notebook 转换为 Streamlit Dashboard</h3><p><strong>目标</strong>：把静态的分析结果变成<strong>可交互的 Dashboard</strong>，让非技术人员也能用。</p>
+<h4 id="Prompt-示例（可直接复用）-1"><a href="#Prompt-示例（可直接复用）-1" class="headerlink" title="Prompt 示例（可直接复用）"></a>Prompt 示例（可直接复用）</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">Convert `@EDA_Refactored.ipynb` into a professional Streamlit dashboard with this exact layout:</span><br><span class="line"></span><br><span class="line">## Layout Structure</span><br><span class="line">- **Header**: Title + date range filter (applies globally)</span><br><span class="line">    - Title: left</span><br><span class="line">    - Date range filter: right</span><br><span class="line">- **KPI Row**: 4 cards (Total Revenue, Monthly Growth, Average Order Value, Total Orders)</span><br><span class="line">    - Trend indicators for Total Revenue, Average Order Value and Total Orders</span><br><span class="line">    - Use red for negative trends and green for positive trend</span><br><span class="line">- **Charts Grid**: 2x2 layout</span><br><span class="line">    - Revenue trend line chart:</span><br><span class="line">        - Solid line for the current period</span><br><span class="line">        - Dashed line for the previous period</span><br><span class="line">        - Add grid lines for easier reading</span><br><span class="line">        - Y-axis formatting - show values as $300K instead of $300,000</span><br><span class="line">    - Top 10 categories bar chart sorted descending:</span><br><span class="line">        - Use blue gradient (light shade for lower values)</span><br><span class="line">        - Format values as $300K and $2M  </span><br><span class="line">    - Revenue by state: US choropleth map color-coded by revenue amount</span><br><span class="line">        - Use blue gradient</span><br><span class="line">    - Bar chart showing satisfaction vs delivery time:</span><br><span class="line">        - x-axis: Delivery time buckets (1-3 days, 4-7 days, etc.)</span><br><span class="line">        - y-axis: Average review score</span><br><span class="line">- **Bottom Row**: 2 cards </span><br><span class="line">    - Average delivery time with trend indicator</span><br><span class="line">    - Review Score:</span><br><span class="line">        - Large number with stars</span><br><span class="line">        - Subtitle: &quot;Average Review Score&quot;</span><br><span class="line"></span><br><span class="line">## Key Requirements</span><br><span class="line">- Use Plotly for all charts</span><br><span class="line">- Filter updates charts correctly</span><br><span class="line">- Professional styling with trend arrows/colors</span><br><span class="line">- Do not use icons</span><br><span class="line">- Use uniform card heights for each row</span><br><span class="line">- Show two decimal places for each trend indicator</span><br><span class="line">- Include requirements.txt and README.md</span><br></pre></td></tr></table></figure>
+
+<h4 id="Prompt-结构分析-1"><a href="#Prompt-结构分析-1" class="headerlink" title="Prompt 结构分析"></a>Prompt 结构分析</h4><table>
+<thead>
+<tr>
+<th>部分</th>
+<th>作用</th>
+<th>你可以改的地方</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Layout Structure</strong></td>
+<td>精确描述布局</td>
+<td>改成你想要的布局（几行几列）</td>
+</tr>
+<tr>
+<td><strong>KPI Row</strong></td>
+<td>关键指标卡片</td>
+<td>换成你的业务指标</td>
+</tr>
+<tr>
+<td><strong>Charts Grid</strong></td>
+<td>图表类型和细节</td>
+<td>换成你需要的图表</td>
+</tr>
+<tr>
+<td><strong>Key Requirements</strong></td>
+<td>技术约束</td>
+<td>加入你的偏好（图表库、样式）</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="方法论：为什么这样写-Prompt-效果好？"><a href="#方法论：为什么这样写-Prompt-效果好？" class="headerlink" title="方法论：为什么这样写 Prompt 效果好？"></a>方法论：为什么这样写 Prompt 效果好？</h3><table>
+<thead>
+<tr>
+<th>技巧</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>先 Review 再改</strong></td>
+<td>让它理解现状，避免丢失原有逻辑</td>
+</tr>
+<tr>
+<td><strong>分层要求</strong></td>
+<td>结构、代码、可视化、可配置性分开说</td>
+</tr>
+<tr>
+<td><strong>明确 Deliverables</strong></td>
+<td>不只是”重构”，而是”输出哪些文件”</td>
+</tr>
+<tr>
+<td><strong>Success Criteria</strong></td>
+<td>给它验收标准，减少返工</td>
+</tr>
+<tr>
+<td><strong>精确描述布局</strong></td>
+<td>Dashboard 要”画”出来，不能只说”好看”</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="小结：从-Notebook-到-Dashboard-的完整链路"><a href="#小结：从-Notebook-到-Dashboard-的完整链路" class="headerlink" title="小结：从 Notebook 到 Dashboard 的完整链路"></a>小结：从 Notebook 到 Dashboard 的完整链路</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">混乱的 EDA.ipynb</span><br><span class="line">       ↓ Claude Code 重构</span><br><span class="line">结构化的 EDA_Refactored.ipynb + business_metrics.py + data_loader.py</span><br><span class="line">       ↓ Claude Code 转换</span><br><span class="line">可交互的 Streamlit Dashboard</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>输入</th>
+<th>输出</th>
+<th>Claude Code 做的事</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>重构</td>
+<td>混乱 Notebook</td>
+<td>专业 Notebook + 模块</td>
+<td>加结构、抽函数、改图表、加配置</td>
+</tr>
+<tr>
+<td>转换</td>
+<td>重构后 Notebook</td>
+<td>Streamlit 代码</td>
+<td>按布局生成 Dashboard</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>见解：<strong>Prompt 的详细程度决定输出质量</strong>——对于 Dashboard 这类”视觉产品”，布局&#x2F;配色&#x2F;格式要写得越具体越好，否则 Claude Code 会按默认风格来（往往不是你想要的）。</p>
+</blockquote>
+<h2 id="claude-code-基于-Figma-原型创建-web-应用"><a href="#claude-code-基于-Figma-原型创建-web-应用" class="headerlink" title="claude code 基于 Figma 原型创建 web 应用"></a>claude code 基于 Figma 原型创建 web 应用</h2><p>TO BE COUNTINUED</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ol>
+<li><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1VuxezvE6d?spm_id_from=333.788.videopod.sections&vd_source=387401c193115a31f1066878e5ac9851">https://www.bilibili.com/video/BV1VuxezvE6d?spm_id_from=333.788.videopod.sections&amp;vd_source=387401c193115a31f1066878e5ac9851</a></li>
+</ol>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://zyxian31.github.io/2026/01/06/claude-code-usage/" data-id="cmk24i4eu0004bnud8i99gfbu" data-title="claude-code usage" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://zyxian31.github.io/2026/01/06/claude-code-usage/" data-id="cmk2hgxdq000ampud47b2deve" data-title="claude-code usage" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
@@ -306,7 +1062,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://zyxian31.github.io/2025/07/05/CS336-Spring2025-Lec2/" data-id="cmk24i4eo0000bnudczkm38oa" data-title="CS336 Language Modeling: Tensors, Operations &amp; Training" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://zyxian31.github.io/2025/07/05/CS336-Spring2025-Lec2/" data-id="cmk2hgxdi0000mpud03anazuy" data-title="CS336 Language Modeling: Tensors, Operations &amp; Training" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
@@ -553,7 +1309,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://zyxian31.github.io/2025/07/05/CS336-Spring2025-Lec3/" data-id="cmk24i4er0001bnudepix0t3m" data-title="CS336 Lecture 3: LM架构与训练 - 学习笔记" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://zyxian31.github.io/2025/07/05/CS336-Spring2025-Lec3/" data-id="cmk2hgxdr000bmpudgv82c8tm" data-title="CS336 Lecture 3: LM架构与训练 - 学习笔记" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
@@ -606,7 +1362,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://zyxian31.github.io/1970/01/01/hello-world/" data-id="cmk24i4eu0005bnudcnus2agc" data-title="Hello World" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://zyxian31.github.io/1970/01/01/hello-world/" data-id="cmk2hgxdm0001mpudcoz5do75" data-title="Hello World" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
