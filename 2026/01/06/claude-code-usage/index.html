@@ -52,9 +52,9 @@
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
 
-  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" />
 
-  <link  rel="stylesheet" href="https://lib.baomitu.com/KaTeX/0.16.2/katex.min.css" />
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
 
 
@@ -95,7 +95,7 @@
 
 
   
-<meta name="generator" content="Hexo 7.3.0"></head>
+<!-- hexo injector head_end start --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
 
 
 <body>
@@ -396,7 +396,32 @@
 </li>
 </ul>
 <h5 id="一个可直接复用的-CLAUDE-md-模板（适合放进仓库）">一个可直接复用的 <code>CLAUDE.md</code> 模板（适合放进仓库）</h5>
-<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs markdown"><span class="hljs-section"># Project rules for Claude Code</span><br><br><span class="hljs-section">## Goal</span><br><span class="hljs-bullet">-</span> What this repo does (1-3 sentences).<br><br><span class="hljs-section">## Repo map</span><br><span class="hljs-bullet">-</span> Key directories and what they contain.<br><br><span class="hljs-section">## How to run</span><br><span class="hljs-bullet">-</span> Install: <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">commands</span>&gt;</span></span><br><span class="hljs-bullet">-</span> Dev: <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">commands</span>&gt;</span></span><br><span class="hljs-bullet">-</span> Build: <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">commands</span>&gt;</span></span><br><br><span class="hljs-section">## Testing</span><br><span class="hljs-bullet">-</span> Unit tests: <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">commands</span>&gt;</span></span><br><span class="hljs-bullet">-</span> Integration/E2E: <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">commands</span>&gt;</span></span><br><span class="hljs-bullet">-</span> Lint/format: <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">commands</span>&gt;</span></span><br><br><span class="hljs-section">## Change rules</span><br><span class="hljs-bullet">-</span> Prefer small, reviewable PRs.<br><span class="hljs-bullet">-</span> Update docs when changing public APIs.<br><span class="hljs-bullet">-</span> Never modify: <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">paths</span>&gt;</span></span> (explain why).<br><br><span class="hljs-section">## Output expectations</span><br><span class="hljs-bullet">-</span> Before coding: summarize plan + files to touch.<br><span class="hljs-bullet">-</span> After coding: list verification steps + any risks.<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-markdown" data-language="markdown"><code class="language-markdown"><span class="token title important"><span class="token punctuation">#</span> Project rules for Claude Code</span>
+
+<span class="token title important"><span class="token punctuation">##</span> Goal</span>
+<span class="token list punctuation">-</span> What this repo does (1-3 sentences).
+
+<span class="token title important"><span class="token punctuation">##</span> Repo map</span>
+<span class="token list punctuation">-</span> Key directories and what they contain.
+
+<span class="token title important"><span class="token punctuation">##</span> How to run</span>
+<span class="token list punctuation">-</span> Install: <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>commands</span><span class="token punctuation">></span></span>
+<span class="token list punctuation">-</span> Dev: <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>commands</span><span class="token punctuation">></span></span>
+<span class="token list punctuation">-</span> Build: <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>commands</span><span class="token punctuation">></span></span>
+
+<span class="token title important"><span class="token punctuation">##</span> Testing</span>
+<span class="token list punctuation">-</span> Unit tests: <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>commands</span><span class="token punctuation">></span></span>
+<span class="token list punctuation">-</span> Integration/E2E: <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>commands</span><span class="token punctuation">></span></span>
+<span class="token list punctuation">-</span> Lint/format: <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>commands</span><span class="token punctuation">></span></span>
+
+<span class="token title important"><span class="token punctuation">##</span> Change rules</span>
+<span class="token list punctuation">-</span> Prefer small, reviewable PRs.
+<span class="token list punctuation">-</span> Update docs when changing public APIs.
+<span class="token list punctuation">-</span> Never modify: <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>paths</span><span class="token punctuation">></span></span> (explain why).
+
+<span class="token title important"><span class="token punctuation">##</span> Output expectations</span>
+<span class="token list punctuation">-</span> Before coding: summarize plan + files to touch.
+<span class="token list punctuation">-</span> After coding: list verification steps + any risks.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 <blockquote>
 <p>小结：把“你希望它遵循的规则”写进 <code>CLAUDE.md</code>，比在聊天里反复强调更稳定；而 <code>local</code>/<code>global</code> 两层则分别解决“个人偏好”和“跨项目一致性”。</p>
 </blockquote>
@@ -487,12 +512,15 @@
 <li>
 <p><strong>如果你知道入口/改动点</strong>：直接用 <code>@</code> 标识文件，减少 Claude Code 的探索时间。</p>
 <p>示例提问：</p>
-<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs swift">我要在 <span class="hljs-type">RAG</span> pipeline 里加一个<span class="hljs-string">&quot;检索后 rerank&quot;</span>的步骤<span class="hljs-operator">。</span><br>相关文件是 <span class="hljs-meta">@src</span><span class="hljs-regexp">/retrieval/</span>pipeline.py 和 <span class="hljs-meta">@src</span><span class="hljs-regexp">/retrieval/</span>reranker.py<span class="hljs-operator">。</span><br>请先告诉我你理解的当前流程，再给出改动方案<span class="hljs-operator">。</span><br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">我要在 RAG pipeline 里加一个&quot;检索后 rerank&quot;的步骤。
+相关文件是 @src&#x2F;retrieval&#x2F;pipeline.py 和 @src&#x2F;retrieval&#x2F;reranker.py。
+请先告诉我你理解的当前流程，再给出改动方案。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre></div></figure>
 </li>
 <li>
 <p><strong>如果你不确定改哪里</strong>：让它先做 agentic search，但要求它&quot;带着目标找&quot;而不是漫游。</p>
 <p>示例提问：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs">我想给 RAG pipeline 加 rerank 能力。<br>请帮我定位：1) 当前检索结果在哪里返回；2) 最适合插入 rerank 的位置；3) 需要改动的文件清单。<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">我想给 RAG pipeline 加 rerank 能力。
+请帮我定位：1) 当前检索结果在哪里返回；2) 最适合插入 rerank 的位置；3) 需要改动的文件清单。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></div></figure>
 </li>
 </ul>
 <h4 id="第-2-步：生成计划（Plan-Mode，Shift-Tab）">第 2 步：生成计划（Plan Mode，<code>Shift + Tab</code>）</h4>
@@ -500,7 +528,12 @@
 <ul>
 <li>
 <p><strong>如何触发</strong>：在 claude code 中按 <code>Shift + Tab</code> 进入 Plan Mode，或在提问时明确要求：</p>
-<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs markdown">请先输出一份改动计划，包含：<br><span class="hljs-bullet">1.</span> 要新增/修改的文件<br><span class="hljs-bullet">2.</span> 每个文件的改动要点<br><span class="hljs-bullet">3.</span> 预期的调用链变化<br><span class="hljs-bullet">4.</span> 需要新增的测试/验证点<br>暂时不要写代码，等我确认后再执行。<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">请先输出一份改动计划，包含：
+1. 要新增&#x2F;修改的文件
+2. 每个文件的改动要点
+3. 预期的调用链变化
+4. 需要新增的测试&#x2F;验证点
+暂时不要写代码，等我确认后再执行。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 </li>
 <li>
 <p><strong>Review 计划时关注</strong>：</p>
@@ -513,9 +546,9 @@
 </ul>
 <h4 id="第-3-步：执行计划（确认后再动手）">第 3 步：执行计划（确认后再动手）</h4>
 <p>确认计划合理后，让它按步骤执行：</p>
-<figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs maxima">计划看起来合理，请按上述方案执行。每完成一个文件后暂停，让我 review <span class="hljs-built_in">diff</span>。<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">计划看起来合理，请按上述方案执行。每完成一个文件后暂停，让我 review diff。<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
 <p>或者如果你信任度较高：</p>
-<figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs maxima">请执行上述计划，完成后输出所有 <span class="hljs-built_in">diff</span> 摘要，并告诉我如何本地验证。<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">请执行上述计划，完成后输出所有 diff 摘要，并告诉我如何本地验证。<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
 <h4 id="第-4-步：人工-Review（前端-UI-可用截图反馈）">第 4 步：人工 Review（前端 UI 可用截图反馈）</h4>
 <ul>
 <li>
@@ -524,7 +557,8 @@
 <li>
 <p><strong>对于前端 UI</strong>：直接截图贴给 Claude Code 是最直观的反馈方式。</p>
 <p>示例：</p>
-<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs angelscript"><span class="hljs-string">[截图]</span><br>按钮位置不对，应该左对齐，并且去掉边框。请修复。<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">[截图]
+按钮位置不对，应该左对齐，并且去掉边框。请修复。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></div></figure>
 </li>
 </ul>
 <h4 id="第-5-步：用-MCP-工具替代-人工截图→反馈-循环（进阶）">第 5 步：用 MCP 工具替代&quot;人工截图→反馈&quot;循环（进阶）</h4>
@@ -538,7 +572,9 @@
 </ul>
 <h5 id="示例指令解析（Playwright-MCP）">示例指令解析（Playwright MCP）</h5>
 <p>原始指令：</p>
-<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs livecodeserver">Using <span class="hljs-keyword">the</span> playwright MCP server visit <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>:<span class="hljs-number">8000</span> <span class="hljs-keyword">and</span> view <span class="hljs-keyword">the</span> <span class="hljs-built_in">new</span> chat button.<br>I want that button <span class="hljs-built_in">to</span> look <span class="hljs-keyword">the</span> same <span class="hljs-keyword">as</span> <span class="hljs-keyword">the</span> other links below <span class="hljs-keyword">for</span> Courses <span class="hljs-keyword">and</span> Try Asking.<br>Make sure this is left aligned <span class="hljs-keyword">and</span> that <span class="hljs-keyword">the</span> border is removed.<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">Using the playwright MCP server visit 127.0.0.1:8000 and view the new chat button.
+I want that button to look the same as the other links below for Courses and Try Asking.
+Make sure this is left aligned and that the border is removed.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre></div></figure>
 <p><strong>结构拆解</strong>：</p>
 <table>
 <thead>
@@ -664,7 +700,18 @@ Claude Code 通过 Playwright MCP 自己打开页面 → 截图 → 分析 → �
 <p><strong>原理</strong>：Claude Code 默认会尽快给出答案。对于复杂问题（多层调用、隐藏状态、竞态条件），你需要它分配更多&quot;推理预算&quot;。</p>
 <p><strong>方法</strong>：在 prompt 末尾加上 <code>Think a lot</code> / <code>Think hard</code> / <code>Think step by step</code>，让模型在回答前做更长的内部推理。</p>
 <p><strong>示例（RAG 系统排错）</strong>：</p>
-<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs livecodeserver">The RAG chatbot returns <span class="hljs-string">&#x27;query failed&#x27;</span> <span class="hljs-keyword">for</span> <span class="hljs-keyword">any</span> content-related questions.<br>I need you <span class="hljs-built_in">to</span>:<br><br><span class="hljs-number">1.</span> Write tests <span class="hljs-built_in">to</span> evaluate <span class="hljs-keyword">the</span> outputs <span class="hljs-keyword">of</span> <span class="hljs-keyword">the</span> execute method <span class="hljs-keyword">of</span> <span class="hljs-keyword">the</span> CourseSearchTool <span class="hljs-keyword">in</span> @backend/search_tools.py<br><span class="hljs-number">2.</span> Write tests <span class="hljs-built_in">to</span> evaluate <span class="hljs-keyword">if</span> @backend/ai_generator.py correctly calls <span class="hljs-keyword">for</span> <span class="hljs-keyword">the</span> CourseSearchTool<br><span class="hljs-number">3.</span> Write tests <span class="hljs-built_in">to</span> evaluate how <span class="hljs-keyword">the</span> RAG <span class="hljs-keyword">system</span> is handling <span class="hljs-keyword">the</span> content-query related questions.<br><br>Save <span class="hljs-keyword">the</span> tests <span class="hljs-keyword">in</span> <span class="hljs-keyword">a</span> tests <span class="hljs-built_in">folder</span> <span class="hljs-keyword">within</span> @backend.<br>Run those tests against <span class="hljs-keyword">the</span> current <span class="hljs-keyword">system</span> <span class="hljs-built_in">to</span> identify which components are failing.<br>Propose fixes based <span class="hljs-keyword">on</span> <span class="hljs-title">what</span> <span class="hljs-title">the</span> <span class="hljs-title">tests</span> <span class="hljs-title">reveal</span> <span class="hljs-title">is</span> <span class="hljs-title">broken</span>.<br><br>Think <span class="hljs-keyword">a</span> lot.<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">The RAG chatbot returns &#39;query failed&#39; for any content-related questions.
+I need you to:
+
+1. Write tests to evaluate the outputs of the execute method of the CourseSearchTool in @backend&#x2F;search_tools.py
+2. Write tests to evaluate if @backend&#x2F;ai_generator.py correctly calls for the CourseSearchTool
+3. Write tests to evaluate how the RAG system is handling the content-query related questions.
+
+Save the tests in a tests folder within @backend.
+Run those tests against the current system to identify which components are failing.
+Propose fixes based on what the tests reveal is broken.
+
+Think a lot.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 <p><strong>结构拆解</strong>：</p>
 <table>
 <thead>
@@ -702,7 +749,24 @@ Claude Code 通过 Playwright MCP 自己打开页面 → 截图 → 分析 → �
 <p><strong>原理</strong>：功能修改往往会改变部分行为，但也有些行为不能被&quot;误伤&quot;。<strong>给 Claude Code 一份 Before/After 的行为对比表</strong>，明确标注哪些行为要变、变成什么样、哪些行为必须保持不变，它就能用这些作为验证标准。</p>
 <p><strong>方法</strong>：在修改请求里附上&quot;用户操作 → 修改前结果 → 修改后预期结果&quot;的对照表，用 ✅ / ⚠️ 标记区分。</p>
 <p><strong>示例（功能修改导致部分行为变化）</strong>：</p>
-<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs 1c">我要修改 @src/auth/login.py，新增<span class="hljs-string">&quot;同账号最多 3 个设备同时在线&quot;</span>的限制。<br>超出限制时，踢掉最早登录的设备。<br><br>修改前后的行为对比：<br><br><span class="hljs-string">| 用户操作 | 修改前结果 | 修改后结果（预期变化） |</span><br><span class="hljs-string">|----------|------------|------------------------|</span><br><span class="hljs-string">| 正常登录 | 返回 200 + session | ✅ 不变 |</span><br><span class="hljs-string">| 重复登录（同设备） | 刷新 session | ✅ 不变 |</span><br><span class="hljs-string">| 第 1-3 个设备登录 | 全部共存 | ✅ 不变 |</span><br><span class="hljs-string">| 第 4 个设备登录 | 全部共存 | ⚠️ 变化：踢掉最早的设备，返回 200 |</span><br><span class="hljs-string">| 被踢设备访问 | 正常访问 | ⚠️ 变化：返回 401 + 提示&quot;</span>已在其他设备登录<span class="hljs-string">&quot; |</span><br><span class="hljs-string">| 主动登出后重新登录 | 正常登录 | ✅ 不变 |</span><br><br>请基于以上行为表：<br><span class="hljs-number">1</span>. 先写测试覆盖这 <span class="hljs-number">6</span> 个场景（区分<span class="hljs-string">&quot;应该变&quot;</span>和<span class="hljs-string">&quot;不应该变&quot;</span>）<br><span class="hljs-number">2</span>. 再实现功能修改<br><span class="hljs-number">3</span>. 跑测试确认：✅ 行保持不变，⚠️ 行按预期变化<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">我要修改 @src&#x2F;auth&#x2F;login.py，新增&quot;同账号最多 3 个设备同时在线&quot;的限制。
+超出限制时，踢掉最早登录的设备。
+
+修改前后的行为对比：
+
+| 用户操作 | 修改前结果 | 修改后结果（预期变化） |
+|----------|------------|------------------------|
+| 正常登录 | 返回 200 + session | ✅ 不变 |
+| 重复登录（同设备） | 刷新 session | ✅ 不变 |
+| 第 1-3 个设备登录 | 全部共存 | ✅ 不变 |
+| 第 4 个设备登录 | 全部共存 | ⚠️ 变化：踢掉最早的设备，返回 200 |
+| 被踢设备访问 | 正常访问 | ⚠️ 变化：返回 401 + 提示&quot;已在其他设备登录&quot; |
+| 主动登出后重新登录 | 正常登录 | ✅ 不变 |
+
+请基于以上行为表：
+1. 先写测试覆盖这 6 个场景（区分&quot;应该变&quot;和&quot;不应该变&quot;）
+2. 再实现功能修改
+3. 跑测试确认：✅ 行保持不变，⚠️ 行按预期变化<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 <p><strong>这个表的关键设计</strong>：</p>
 <table>
 <thead>
@@ -736,7 +800,12 @@ Claude Code 通过 Playwright MCP 自己打开页面 → 截图 → 分析 → �
 <p><strong>原理</strong>：当你自己也不确定&quot;该怎么做&quot;时，让 Claude Code 启动<strong>多个并行子代理</strong>，各自独立产出方案，再由你挑选/合并。</p>
 <p><strong>方法</strong>：用 <code>subagents</code> / <code>parallel</code> 关键词触发（需要在非 Plan 模式下，claude code 中按 Tab 进入 Shortcut 模式）。</p>
 <p><strong>示例（方案探索）</strong>：</p>
-<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs livecodeserver">Use <span class="hljs-literal">two</span> parallel subagents <span class="hljs-built_in">to</span> brainstorm possible plans <span class="hljs-keyword">for</span>:<br>- Adding <span class="hljs-keyword">a</span> caching layer <span class="hljs-built_in">to</span> <span class="hljs-keyword">the</span> RAG retrieval step<br>- Goal: reduce latency <span class="hljs-keyword">by</span> <span class="hljs-number">50</span>% <span class="hljs-keyword">without</span> sacrificing recall<br><br>Each subagent should propose <span class="hljs-keyword">a</span> different approach (e.g., embedding cache vs. <span class="hljs-built_in">result</span> cache vs. hybrid).<br>Do <span class="hljs-keyword">not</span> implement <span class="hljs-keyword">any</span> code. Output <span class="hljs-keyword">a</span> comparison table <span class="hljs-keyword">at</span> <span class="hljs-keyword">the</span> <span class="hljs-keyword">end</span>.<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">Use two parallel subagents to brainstorm possible plans for:
+- Adding a caching layer to the RAG retrieval step
+- Goal: reduce latency by 50% without sacrificing recall
+
+Each subagent should propose a different approach (e.g., embedding cache vs. result cache vs. hybrid).
+Do not implement any code. Output a comparison table at the end.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 <p><strong>输出预期</strong>：</p>
 <ul>
 <li>Agent A：方案一（embedding cache）+ 优缺点</li>
@@ -753,7 +822,17 @@ Claude Code 通过 Playwright MCP 自己打开页面 → 截图 → 分析 → �
 <p><strong>原理</strong>：头脑风暴产出的是&quot;方向&quot;，Plan 模式产出的是&quot;可执行步骤&quot;。两者配合使用。</p>
 <p><strong>方法</strong>：<code>Shift + Tab</code> 进入 Plan 模式，把选定的方案细化成任务清单。</p>
 <p><strong>示例（从方案到计划）</strong>：</p>
-<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs markdown">我选择方案 A（embedding cache）。<br>请进入 Plan 模式，输出详细的执行计划：<br><br><span class="hljs-bullet">1.</span> 需要新增/修改的文件<br><span class="hljs-bullet">2.</span> 每个文件的改动要点<br><span class="hljs-bullet">3.</span> 缓存的 key 设计、TTL 策略、失效机制<br><span class="hljs-bullet">4.</span> 需要新增的配置项<br><span class="hljs-bullet">5.</span> 测试计划（单测 + 集成测试）<br><span class="hljs-bullet">6.</span> 回滚方案<br><br>暂不执行，等我确认。<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">我选择方案 A（embedding cache）。
+请进入 Plan 模式，输出详细的执行计划：
+
+1. 需要新增&#x2F;修改的文件
+2. 每个文件的改动要点
+3. 缓存的 key 设计、TTL 策略、失效机制
+4. 需要新增的配置项
+5. 测试计划（单测 + 集成测试）
+6. 回滚方案
+
+暂不执行，等我确认。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 <p><strong>见解</strong>：</p>
 <ul>
 <li><strong>先发散（Trick 3）→ 再收敛（Trick 4）</strong> 是处理&quot;目标模糊&quot;问题的标准流程。</li>
@@ -802,9 +881,22 @@ Claude Code 通过 Playwright MCP 自己打开页面 → 截图 → 分析 → �
 <hr>
 <h4 id="第-1-步：创建-Worktrees（一次性操作）">第 1 步：创建 Worktrees（一次性操作）</h4>
 <p>在项目根目录执行：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 创建 .trees 目录存放所有 worktree</span><br><span class="hljs-built_in">mkdir</span> -p .trees<br><br><span class="hljs-comment"># 为每个任务创建独立的 worktree + 分支</span><br>git worktree add .trees/ui_feature<br>git worktree add .trees/testing_feature<br>git worktree add .trees/quality_feature<br><br><span class="hljs-comment"># 查看所有分支（确认 worktree 创建成功）</span><br>git branch -a<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># 创建 .trees 目录存放所有 worktree</span>
+<span class="token function">mkdir</span> <span class="token parameter variable">-p</span> .trees
+
+<span class="token comment"># 为每个任务创建独立的 worktree + 分支</span>
+<span class="token function">git</span> worktree <span class="token function">add</span> .trees/ui_feature
+<span class="token function">git</span> worktree <span class="token function">add</span> .trees/testing_feature
+<span class="token function">git</span> worktree <span class="token function">add</span> .trees/quality_feature
+
+<span class="token comment"># 查看所有分支（确认 worktree 创建成功）</span>
+<span class="token function">git</span> branch <span class="token parameter variable">-a</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 <p><strong>输出示例</strong>（如图中底部终端）：</p>
-<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs markdown"><span class="hljs-bullet">*</span> main<br><span class="hljs-bullet">+</span> quality<span class="hljs-emphasis">_feature</span><br><span class="hljs-emphasis">+ testing_</span>feature<br><span class="hljs-bullet">+</span> ui<span class="hljs-emphasis">_feature</span><br><span class="hljs-emphasis">  remotes/origin/main</span><br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">* main
++ quality_feature
++ testing_feature
++ ui_feature
+  remotes&#x2F;origin&#x2F;main<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 <hr>
 <h4 id="第-2-步：在每个-Worktree-中启动-Claude-Code">第 2 步：在每个 Worktree 中启动 Claude Code</h4>
 <p>在 VS Code 中：</p>
@@ -822,13 +914,14 @@ Claude Code 通过 Playwright MCP 自己打开页面 → 截图 → 分析 → �
 <hr>
 <h4 id="第-3-步：各自完成任务后提交">第 3 步：各自完成任务后提交</h4>
 <p>每个 worktree 中的任务完成后，让 Claude Code 提交：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">Add</span> <span class="hljs-keyword">and</span> <span class="hljs-keyword">commit</span> <span class="hljs-keyword">with</span> a descriptive message.<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">Add and commit with a descriptive message.<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
 <p>或者更具体：</p>
-<figure class="highlight gml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs gml">Please commit the changes <span class="hljs-keyword">with</span> <span class="hljs-variable language_">message</span>: <span class="hljs-string">&quot;feat(ui): add new chat button with updated styling&quot;</span><br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">Please commit the changes with message: &quot;feat(ui): add new chat button with updated styling&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
 <hr>
 <h4 id="第-4-步：合并所有-Worktrees（可能有冲突）">第 4 步：合并所有 Worktrees（可能有冲突）</h4>
 <p>回到主分支，让 Claude Code 帮你合并：</p>
-<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs fortran"><span class="hljs-keyword">Use</span> the git <span class="hljs-built_in">merge</span> command to <span class="hljs-built_in">merge</span> <span class="hljs-keyword">in</span> <span class="hljs-built_in">all</span> of the worktrees <span class="hljs-keyword">in</span> the .trees folder.<br>Fix <span class="hljs-built_in">any</span> conflicts <span class="hljs-keyword">if</span> there are <span class="hljs-built_in">any</span>.<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">Use the git merge command to merge in all of the worktrees in the .trees folder.
+Fix any conflicts if there are any.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></div></figure>
 <p>Claude Code 会：</p>
 <ol>
 <li>依次合并 <code>ui_feature</code>、<code>testing_feature</code>、<code>quality_feature</code></li>
@@ -870,13 +963,23 @@ Claude Code 通过 Playwright MCP 自己打开页面 → 截图 → 分析 → �
 <h3 id="进阶技巧：自定义-Claude-Code-命令（-your-command）">进阶技巧：自定义 Claude Code 命令（<code>/your_command</code>）</h3>
 <p>除了内置命令（如 <code>/help</code>、<code>/compact</code>），你可以<strong>自定义常用操作</strong>，用 <code>/命令名</code> 一键触发。</p>
 <h4 id="方法：在项目根目录创建-claude-commands-目录">方法：在项目根目录创建 <code>.claude/commands/</code> 目录</h4>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">mkdir</span> -p .claude/commands<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">mkdir</span> <span class="token parameter variable">-p</span> .claude/commands<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
 <p>然后在该目录下创建 <code>.md</code> 文件，每个文件就是一个命令。</p>
 <h4 id="示例：创建-implement-feature-命令">示例：创建 <code>/implement_feature</code> 命令</h4>
 <p>创建文件 <code>.claude/commands/implement_feature.md</code>：</p>
-<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs markdown"><span class="hljs-section"># Implement Feature</span><br><br>Please implement the feature described below:<br><br><span class="hljs-bullet">1.</span> First, analyze the current codebase to understand the existing patterns<br><span class="hljs-bullet">2.</span> Create a plan for implementation<br><span class="hljs-bullet">3.</span> Implement the feature following existing code style<br><span class="hljs-bullet">4.</span> Add appropriate tests<br><span class="hljs-bullet">5.</span> Update documentation if needed<br><br>Feature to implement: $ARGUMENTS<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-markdown" data-language="markdown"><code class="language-markdown"><span class="token title important"><span class="token punctuation">#</span> Implement Feature</span>
+
+Please implement the feature described below:
+
+<span class="token list punctuation">1.</span> First, analyze the current codebase to understand the existing patterns
+<span class="token list punctuation">2.</span> Create a plan for implementation
+<span class="token list punctuation">3.</span> Implement the feature following existing code style
+<span class="token list punctuation">4.</span> Add appropriate tests
+<span class="token list punctuation">5.</span> Update documentation if needed
+
+Feature to implement: $ARGUMENTS<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 <p>使用时：</p>
-<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros">/implement_feature <span class="hljs-built_in">Add</span> a dark mode toggle <span class="hljs-keyword">to</span> the<span class="hljs-built_in"> settings </span>page<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">&#x2F;implement_feature Add a dark mode toggle to the settings page<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
 <h4 id="常用自定义命令示例">常用自定义命令示例</h4>
 <table>
 <thead>
@@ -916,11 +1019,17 @@ Claude Code 通过 Playwright MCP 自己打开页面 → 截图 → 分析 → �
 <hr>
 <h4 id="第-1-步：安装-GitHub-App-完成集成">第 1 步：安装 GitHub App 完成集成</h4>
 <p>在 Claude Code 中执行：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">/install-github-app<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">&#x2F;install-github-app<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
 <hr>
 <h4 id="使用场景-1：Review-Pull-Requests">使用场景 1：Review Pull Requests</h4>
 <p>让 Claude Code 帮你审查 PR，找出潜在问题：</p>
-<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs livecodeserver">Review PR <span class="hljs-comment">#42 in this repository.</span><br>Focus <span class="hljs-keyword">on</span>:<br><span class="hljs-number">1.</span> Logic errors <span class="hljs-keyword">or</span> bugs<br><span class="hljs-number">2.</span> Security concerns<br><span class="hljs-number">3.</span> Performance issues<br><span class="hljs-number">4.</span> Code style consistency<br>Give specific <span class="hljs-built_in">line</span>-<span class="hljs-keyword">by</span>-<span class="hljs-built_in">line</span> feedback.<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">Review PR #42 in this repository.
+Focus on:
+1. Logic errors or bugs
+2. Security concerns
+3. Performance issues
+4. Code style consistency
+Give specific line-by-line feedback.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 <p><strong>Claude Code 会</strong>：</p>
 <ul>
 <li>读取 PR 的所有文件变更</li>
@@ -931,7 +1040,9 @@ Claude Code 通过 Playwright MCP 自己打开页面 → 截图 → 分析 → �
 <hr>
 <h4 id="使用场景-2：Fix-Issues">使用场景 2：Fix Issues</h4>
 <p>让 Claude Code 根据 Issue 描述自动修复问题：</p>
-<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs livecodeserver">Look <span class="hljs-keyword">at</span> issue <span class="hljs-comment">#15 in this repository.</span><br>Understand <span class="hljs-keyword">the</span> problem, locate <span class="hljs-keyword">the</span> relevant code, <span class="hljs-keyword">and</span> implement <span class="hljs-keyword">a</span> fix.<br>Create <span class="hljs-keyword">a</span> PR <span class="hljs-keyword">with</span> <span class="hljs-keyword">the</span> fix when done.<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">Look at issue #15 in this repository.
+Understand the problem, locate the relevant code, and implement a fix.
+Create a PR with the fix when done.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre></div></figure>
 <p><strong>Claude Code 会</strong>：</p>
 <ul>
 <li>读取 Issue 的描述和讨论</li>
@@ -942,7 +1053,11 @@ Claude Code 通过 Playwright MCP 自己打开页面 → 截图 → 分析 → �
 <hr>
 <h4 id="使用场景-3：恢复之前的对话（-resume）">使用场景 3：恢复之前的对话（<code>--resume</code>）</h4>
 <p>如果你之前在处理某个任务，中途关闭了终端，可以用 <code>--resume</code> 恢复：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 恢复最近一次对话</span><br>claude --resume<br><br><span class="hljs-comment"># 恢复指定的对话（按 ID）</span><br>claude --resume &lt;conversation_id&gt;<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># 恢复最近一次对话</span>
+claude <span class="token parameter variable">--resume</span>
+
+<span class="token comment"># 恢复指定的对话（按 ID）</span>
+claude <span class="token parameter variable">--resume</span> <span class="token operator">&lt;</span>conversation_id<span class="token operator">></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 <p><strong>适用场景</strong>：</p>
 <ul>
 <li>长时间任务中途断开</li>
@@ -1002,7 +1117,59 @@ Claude Code 通过 Playwright MCP 自己打开页面 → 截图 → 分析 → �
 <li>图表专业（标题、坐标轴、配色）</li>
 </ul>
 <h4 id="Prompt-示例（可直接复用）">Prompt 示例（可直接复用）</h4>
-<figure class="highlight sas"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><code class="hljs sas">The @EDA.ipynb contains exploratory data analysis <span class="hljs-keyword">on</span> e-commerce data <span class="hljs-keyword">in</span> @ecommerce_data, focusing <span class="hljs-keyword">on</span> sales metrics for 2023. <span class="hljs-keyword">Keep</span> the same analysis <span class="hljs-keyword">and</span> graphs, <span class="hljs-keyword">and</span> improve the structure <span class="hljs-keyword">and</span> documentation of the notebook.<br><br>Review the existing notebook <span class="hljs-keyword">and</span> identify:<br>- What business metrics are currently calculated<br>- What visualizations are created<br>- What data transformations are performed<br>- Any code quality issues <span class="hljs-keyword">or</span> inefficiencies<br>  <br><span class="hljs-comment">**Refactoring Requirements**</span><br><span class="hljs-comment"></span><br><span class="hljs-comment">1. Notebook Structure &amp; Documentation</span><br><span class="hljs-comment">    - Add proper documentation and markdown cells with clear header and a brief explanation for the section</span><br><span class="hljs-comment">    - Organize into logical sections:</span><br><span class="hljs-comment">        - Introduction &amp; Business Objectives</span><br><span class="hljs-comment">        - Data Loading &amp; Configuration</span><br><span class="hljs-comment">        - Data Preparation &amp; Transformation</span><br><span class="hljs-comment">        - Business Metrics Calculation (revenue, product, geographic, customer experience analysis)</span><br><span class="hljs-comment">        - Summary of observations</span><br><span class="hljs-comment">    - Add table of contents at the beginning</span><br><span class="hljs-comment">    - Include data dictionary explaining key columns and business terms</span><br><span class="hljs-comment">   </span><br><span class="hljs-comment">2. Code Quality Improvements</span><br><span class="hljs-comment">   - Create reusable functions with docstrings</span><br><span class="hljs-comment">   - Implement consistent naming and formatting</span><br><span class="hljs-comment">   - Create separate Python files:</span><br><span class="hljs-comment">        - business_metrics.py containing business metric calculations only</span><br><span class="hljs-comment">        - data_loader.py loading, processing and cleaning the data  </span><br><span class="hljs-comment">        </span><br><span class="hljs-comment">3. Enhanced Visualizations</span><br><span class="hljs-comment">    - Improve all plots with:</span><br><span class="hljs-comment">        - Clear and descriptive titles </span><br><span class="hljs-comment">        - Proper axis labels with units</span><br><span class="hljs-comment">        - Legends where needed</span><br><span class="hljs-comment">        - Appropriate chart types for the data</span><br><span class="hljs-comment">        - Include date range in plot titles or captions</span><br><span class="hljs-comment">        - Use consistent color business-oriented color schemes</span><br><span class="hljs-comment">          </span><br><span class="hljs-comment">4. Configurable Analysis Framework</span><br><span class="hljs-comment">   The notebook shows the computation of metrics for a specific date range (entire year of 2023 compared to 2022). Refactor the code so that the data is first filtered according to configurable month and year &amp; implement general-purpose metric calculations. </span><br><span class="hljs-comment"></span><br><span class="hljs-comment">**Deliverables Expected**</span><br><span class="hljs-comment">- Refactored Jupyter notebook (EDA_Refactored.ipynb) with all improvements</span><br><span class="hljs-comment">- Business metrics module (business_metrics.py) with documented functions</span><br><span class="hljs-comment">- Requirements file (requirements.txt) listing all dependencies</span><br><span class="hljs-comment">- README section explaining how to use the refactored analysis</span><br><span class="hljs-comment"></span><br><span class="hljs-comment">**Success Criteria**</span><br><span class="hljs-comment">- Easy-to-read code &amp; notebook (do not use icons in the printing statements or markdown cells)</span><br><span class="hljs-comment">- Configurable analysis that works for any date range</span><br><span class="hljs-comment">- Reusable code that can be applied to future datasets</span><br><span class="hljs-comment">- Maintainable structure that other analysts can easily understand and extend</span><br><span class="hljs-comment">- Maintain all existing analyses while improving the quality, structure, and usability of the notebook</span><br><span class="hljs-comment">- Do not assume any business thresholds</span><br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">The @EDA.ipynb contains exploratory data analysis on e-commerce data in @ecommerce_data, focusing on sales metrics for 2023. Keep the same analysis and graphs, and improve the structure and documentation of the notebook.
+
+Review the existing notebook and identify:
+- What business metrics are currently calculated
+- What visualizations are created
+- What data transformations are performed
+- Any code quality issues or inefficiencies
+  
+**Refactoring Requirements**
+
+1. Notebook Structure &amp; Documentation
+    - Add proper documentation and markdown cells with clear header and a brief explanation for the section
+    - Organize into logical sections:
+        - Introduction &amp; Business Objectives
+        - Data Loading &amp; Configuration
+        - Data Preparation &amp; Transformation
+        - Business Metrics Calculation (revenue, product, geographic, customer experience analysis)
+        - Summary of observations
+    - Add table of contents at the beginning
+    - Include data dictionary explaining key columns and business terms
+   
+2. Code Quality Improvements
+   - Create reusable functions with docstrings
+   - Implement consistent naming and formatting
+   - Create separate Python files:
+        - business_metrics.py containing business metric calculations only
+        - data_loader.py loading, processing and cleaning the data  
+        
+3. Enhanced Visualizations
+    - Improve all plots with:
+        - Clear and descriptive titles 
+        - Proper axis labels with units
+        - Legends where needed
+        - Appropriate chart types for the data
+        - Include date range in plot titles or captions
+        - Use consistent color business-oriented color schemes
+          
+4. Configurable Analysis Framework
+   The notebook shows the computation of metrics for a specific date range (entire year of 2023 compared to 2022). Refactor the code so that the data is first filtered according to configurable month and year &amp; implement general-purpose metric calculations. 
+
+**Deliverables Expected**
+- Refactored Jupyter notebook (EDA_Refactored.ipynb) with all improvements
+- Business metrics module (business_metrics.py) with documented functions
+- Requirements file (requirements.txt) listing all dependencies
+- README section explaining how to use the refactored analysis
+
+**Success Criteria**
+- Easy-to-read code &amp; notebook (do not use icons in the printing statements or markdown cells)
+- Configurable analysis that works for any date range
+- Reusable code that can be applied to future datasets
+- Maintainable structure that other analysts can easily understand and extend
+- Maintain all existing analyses while improving the quality, structure, and usability of the notebook
+- Do not assume any business thresholds<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 <h4 id="Prompt-结构分析">Prompt 结构分析</h4>
 <table>
 <thead>
@@ -1044,7 +1211,43 @@ Claude Code 通过 Playwright MCP 自己打开页面 → 截图 → 分析 → �
 <h3 id="第-2-步：将-Notebook-转换为-Streamlit-Dashboard">第 2 步：将 Notebook 转换为 Streamlit Dashboard</h3>
 <p><strong>目标</strong>：把静态的分析结果变成<strong>可交互的 Dashboard</strong>，让非技术人员也能用。</p>
 <h4 id="Prompt-示例（可直接复用）-2">Prompt 示例（可直接复用）</h4>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">Convert</span> `<span class="hljs-variable">@EDA_Refactored</span>.ipynb` <span class="hljs-keyword">into</span> a professional Streamlit dashboard <span class="hljs-keyword">with</span> this exact layout:<br><br>## Layout Structure<br><span class="hljs-operator">-</span> <span class="hljs-operator">*</span><span class="hljs-operator">*</span>Header<span class="hljs-operator">*</span><span class="hljs-operator">*</span>: Title <span class="hljs-operator">+</span> <span class="hljs-type">date</span> <span class="hljs-keyword">range</span> <span class="hljs-keyword">filter</span> (applies globally)<br>    <span class="hljs-operator">-</span> Title: <span class="hljs-keyword">left</span><br>    <span class="hljs-operator">-</span> <span class="hljs-type">Date</span> <span class="hljs-keyword">range</span> <span class="hljs-keyword">filter</span>: <span class="hljs-keyword">right</span><br><span class="hljs-operator">-</span> <span class="hljs-operator">*</span><span class="hljs-operator">*</span>KPI <span class="hljs-type">Row</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span>: <span class="hljs-number">4</span> cards (Total Revenue, Monthly Growth, Average <span class="hljs-keyword">Order</span> <span class="hljs-keyword">Value</span>, Total Orders)<br>    <span class="hljs-operator">-</span> Trend indicators <span class="hljs-keyword">for</span> Total Revenue, Average <span class="hljs-keyword">Order</span> <span class="hljs-keyword">Value</span> <span class="hljs-keyword">and</span> Total Orders<br>    <span class="hljs-operator">-</span> Use red <span class="hljs-keyword">for</span> negative trends <span class="hljs-keyword">and</span> green <span class="hljs-keyword">for</span> positive trend<br><span class="hljs-operator">-</span> <span class="hljs-operator">*</span><span class="hljs-operator">*</span>Charts Grid<span class="hljs-operator">*</span><span class="hljs-operator">*</span>: <span class="hljs-number">2</span>x2 layout<br>    <span class="hljs-operator">-</span> Revenue trend line chart:<br>        <span class="hljs-operator">-</span> Solid line <span class="hljs-keyword">for</span> the <span class="hljs-keyword">current</span> <span class="hljs-keyword">period</span><br>        <span class="hljs-operator">-</span> Dashed line <span class="hljs-keyword">for</span> the previous <span class="hljs-keyword">period</span><br>        <span class="hljs-operator">-</span> <span class="hljs-keyword">Add</span> grid lines <span class="hljs-keyword">for</span> easier reading<br>        <span class="hljs-operator">-</span> Y<span class="hljs-operator">-</span>axis formatting <span class="hljs-operator">-</span> <span class="hljs-keyword">show</span> <span class="hljs-keyword">values</span> <span class="hljs-keyword">as</span> $<span class="hljs-number">300</span>K instead <span class="hljs-keyword">of</span> $<span class="hljs-number">300</span>,<span class="hljs-number">000</span><br>    <span class="hljs-operator">-</span> Top <span class="hljs-number">10</span> categories bar chart sorted descending:<br>        <span class="hljs-operator">-</span> Use blue gradient (light shade <span class="hljs-keyword">for</span> lower <span class="hljs-keyword">values</span>)<br>        <span class="hljs-operator">-</span> Format <span class="hljs-keyword">values</span> <span class="hljs-keyword">as</span> $<span class="hljs-number">300</span>K <span class="hljs-keyword">and</span> $<span class="hljs-number">2</span>M  <br>    <span class="hljs-operator">-</span> Revenue <span class="hljs-keyword">by</span> state: US choropleth map color<span class="hljs-operator">-</span>coded <span class="hljs-keyword">by</span> revenue amount<br>        <span class="hljs-operator">-</span> Use blue gradient<br>    <span class="hljs-operator">-</span> Bar chart showing satisfaction vs delivery <span class="hljs-type">time</span>:<br>        <span class="hljs-operator">-</span> x<span class="hljs-operator">-</span>axis: Delivery <span class="hljs-type">time</span> buckets (<span class="hljs-number">1</span><span class="hljs-number">-3</span> days, <span class="hljs-number">4</span><span class="hljs-number">-7</span> days, etc.)<br>        <span class="hljs-operator">-</span> y<span class="hljs-operator">-</span>axis: Average review score<br><span class="hljs-operator">-</span> <span class="hljs-operator">*</span><span class="hljs-operator">*</span>Bottom <span class="hljs-type">Row</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span>: <span class="hljs-number">2</span> cards <br>    <span class="hljs-operator">-</span> Average delivery <span class="hljs-type">time</span> <span class="hljs-keyword">with</span> trend <span class="hljs-keyword">indicator</span><br>    <span class="hljs-operator">-</span> Review Score:<br>        <span class="hljs-operator">-</span> <span class="hljs-keyword">Large</span> number <span class="hljs-keyword">with</span> stars<br>        <span class="hljs-operator">-</span> Subtitle: &quot;Average Review Score&quot;<br><br>## Key Requirements<br><span class="hljs-operator">-</span> Use Plotly <span class="hljs-keyword">for</span> <span class="hljs-keyword">all</span> charts<br><span class="hljs-operator">-</span> <span class="hljs-keyword">Filter</span> updates charts correctly<br><span class="hljs-operator">-</span> Professional styling <span class="hljs-keyword">with</span> trend arrows<span class="hljs-operator">/</span>colors<br><span class="hljs-operator">-</span> Do <span class="hljs-keyword">not</span> use icons<br><span class="hljs-operator">-</span> Use uniform card heights <span class="hljs-keyword">for</span> <span class="hljs-keyword">each</span> <span class="hljs-type">row</span><br><span class="hljs-operator">-</span> <span class="hljs-keyword">Show</span> two <span class="hljs-type">decimal</span> places <span class="hljs-keyword">for</span> <span class="hljs-keyword">each</span> trend <span class="hljs-keyword">indicator</span><br><span class="hljs-operator">-</span> Include requirements.txt <span class="hljs-keyword">and</span> README.md<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">Convert &#96;@EDA_Refactored.ipynb&#96; into a professional Streamlit dashboard with this exact layout:
+
+## Layout Structure
+- **Header**: Title + date range filter (applies globally)
+    - Title: left
+    - Date range filter: right
+- **KPI Row**: 4 cards (Total Revenue, Monthly Growth, Average Order Value, Total Orders)
+    - Trend indicators for Total Revenue, Average Order Value and Total Orders
+    - Use red for negative trends and green for positive trend
+- **Charts Grid**: 2x2 layout
+    - Revenue trend line chart:
+        - Solid line for the current period
+        - Dashed line for the previous period
+        - Add grid lines for easier reading
+        - Y-axis formatting - show values as $300K instead of $300,000
+    - Top 10 categories bar chart sorted descending:
+        - Use blue gradient (light shade for lower values)
+        - Format values as $300K and $2M  
+    - Revenue by state: US choropleth map color-coded by revenue amount
+        - Use blue gradient
+    - Bar chart showing satisfaction vs delivery time:
+        - x-axis: Delivery time buckets (1-3 days, 4-7 days, etc.)
+        - y-axis: Average review score
+- **Bottom Row**: 2 cards 
+    - Average delivery time with trend indicator
+    - Review Score:
+        - Large number with stars
+        - Subtitle: &quot;Average Review Score&quot;
+
+## Key Requirements
+- Use Plotly for all charts
+- Filter updates charts correctly
+- Professional styling with trend arrows&#x2F;colors
+- Do not use icons
+- Use uniform card heights for each row
+- Show two decimal places for each trend indicator
+- Include requirements.txt and README.md<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 <h4 id="Prompt-结构分析-2">Prompt 结构分析</h4>
 <table>
 <thead>
@@ -1111,7 +1314,11 @@ Claude Code 通过 Playwright MCP 自己打开页面 → 截图 → 分析 → �
 </table>
 <hr>
 <h3 id="小结：从-Notebook-到-Dashboard-的完整链路">小结：从 Notebook 到 Dashboard 的完整链路</h3>
-<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">混乱的 EDA<span class="hljs-selector-class">.ipynb</span><br>       ↓ Claude Code 重构<br>结构化的 EDA_Refactored<span class="hljs-selector-class">.ipynb</span> + business_metrics<span class="hljs-selector-class">.py</span> + data_loader<span class="hljs-selector-class">.py</span><br>       ↓ Claude Code 转换<br>可交互的 Streamlit Dashboard<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">混乱的 EDA.ipynb
+       ↓ Claude Code 重构
+结构化的 EDA_Refactored.ipynb + business_metrics.py + data_loader.py
+       ↓ Claude Code 转换
+可交互的 Streamlit Dashboard<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 <table>
 <thead>
 <tr>
@@ -1277,11 +1484,6 @@ Claude Code 通过 Playwright MCP 自己打开页面 → 截图 → 分析 → �
   
 
 
-  
-  
-
-
-
 
 
 
@@ -1420,6 +1622,8 @@ Claude Code 通过 Playwright MCP 自己打开页面 → 截图 → 分析 → �
 </script>
 
 
+  <script  src="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
+
   <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
 
   <script>Fluid.plugins.codeWidget();</script>
@@ -1489,5 +1693,9 @@ Claude Code 通过 Playwright MCP 自己打开页面 → 截图 → 分析 → �
   <noscript>
     <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
   </noscript>
-</body>
+<!-- hexo injector body_end start -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script src="/js/katex-init.js"></script>
+<!-- hexo injector body_end end --></body>
 </html>

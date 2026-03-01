@@ -79,7 +79,7 @@
 
 
   
-<meta name="generator" content="Hexo 7.3.0"></head>
+<!-- hexo injector head_end start --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
 
 
 <body>
@@ -240,7 +240,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2026/03/01/from-gradient-to-rlhf_2/" target="_self">
         <div>
-          3. 策略梯度对于动作概率的影响 本节解决三个问题：  数学上：策略梯度更新如何导致“被采样动作概率上升/下降” 数值上：用具体数字展示概率变化 统计上：解释“策略梯度方差为什么大”，并落到 LLM/RLHF + PPO/KL   3.1 数学推导：动作概率变化与策略梯度的关系 为了严谨起见，先写出带期望的策略梯度形式。策略梯度定理给出： ∇θJ(θ)=Es∼dπθ, a∼πθ(⋅∣s)[Aπθ(
+          3. 策略梯度对于动作概率的影响 本节解决三个问题：  数学上：策略梯度更新如何导致“被采样动作概率上升/下降” 数值上：用具体数字展示概率变化 统计上：解释“策略梯度方差为什么大”，并落到 LLM/RLHF + PPO/KL   3.1 数学推导：动作概率变化与策略梯度的关系 为了严谨起见，先写出带期望的策略梯度形式。策略梯度定理给出： $$ \nabla_\theta J(\theta) \m
         </div>
       </a>
 
@@ -407,7 +407,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/07/05/CS336-Spring2025-Lec2/" target="_self">
         <div>
-          课程概述 本讲座深入探讨了语言模型训练的核心组件，从底层的张量操作到完整的训练循环。重点关注资源利用（内存和计算）的精确计算。 主要内容结构  张量基础 → 模型构建 → 优化器 → 训练循环 资源核算：内存（GB）+ 计算（FLOPs）   💡 动机：快速计算题 问题1：训练时间估算 70B参数模型，15T tokens，1024 H100s需要多长时间？ 1234total_flops =
+          课程概述 本讲座深入探讨了语言模型训练的核心组件，从底层的张量操作到完整的训练循环。重点关注资源利用（内存和计算）的精确计算。 主要内容结构  张量基础 → 模型构建 → 优化器 → 训练循环 资源核算：内存（GB）+ 计算（FLOPs）   💡 动机：快速计算题 问题1：训练时间估算 70B参数模型，15T tokens，1024 H100s需要多长时间？ total_flops = 6 *
         </div>
       </a>
 
@@ -676,5 +676,9 @@
   <noscript>
     <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
   </noscript>
-</body>
+<!-- hexo injector body_end start -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script src="/js/katex-init.js"></script>
+<!-- hexo injector body_end end --></body>
 </html>
