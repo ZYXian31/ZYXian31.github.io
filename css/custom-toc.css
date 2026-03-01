@@ -1,0 +1,60 @@
+/* ===== Custom TOC: Image-1 style ===== */
+
+/* Header: article title + left golden border + light warm bg */
+#toc .toc-header {
+  display: block !important;
+  background: rgba(180, 148, 80, 0.09) !important;
+  border-left: 3px solid #b8934a !important;
+  border-radius: 0 4px 4px 0 !important;
+  padding: 10px 14px !important;
+  margin-bottom: 14px !important;
+  font-size: 0.88em !important;
+  font-weight: 600 !important;
+  line-height: 1.55 !important;
+  color: #4a3c28 !important;
+  word-break: break-all;
+}
+
+/* Hide the list icon — only article title remains */
+#toc .toc-header .iconfont {
+  display: none !important;
+}
+
+/* Remove ALL text truncation on TOC links */
+.tocbot-link,
+#toc .tocbot-link {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  max-width: none !important;
+  display: block !important;
+  line-height: 1.55 !important;
+  padding-top: 3px !important;
+  padding-bottom: 3px !important;
+  color: #555 !important;
+  font-size: 0.875em;
+}
+
+/* Active / current section: golden accent */
+.tocbot-active-link,
+#toc .tocbot-active-link {
+  color: #b8934a !important;
+  border-left-color: #b8934a !important;
+  font-weight: 600 !important;
+}
+
+/* Hover */
+.tocbot-link:hover,
+#toc .tocbot-link:hover {
+  color: #b8934a !important;
+}
+
+/* List indent */
+.tocbot-list,
+#toc .tocbot-list {
+  padding-left: 14px !important;
+}
+
+#toc .tocbot-list:first-child {
+  padding-left: 0 !important;
+}
