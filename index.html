@@ -80,6 +80,1111 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-from-gradient-to-rlhf_2" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2026/03/01/from-gradient-to-rlhf_2/" class="article-date">
+  <time class="dt-published" datetime="2026-03-01T06:47:00.000Z" itemprop="datePublished">2026-03-01</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2026/03/01/from-gradient-to-rlhf_2/">从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part II）</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="从梯度到-RLHF：策略梯度的数学本质、方差来源与工程控制（Part-II）"><a href="#从梯度到-RLHF：策略梯度的数学本质、方差来源与工程控制（Part-II）" class="headerlink" title="从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part II）"></a>从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part II）</h1><h2 id="3-策略梯度对于动作概率的影响"><a href="#3-策略梯度对于动作概率的影响" class="headerlink" title="3. 策略梯度对于动作概率的影响"></a>3. 策略梯度对于动作概率的影响</h2><p>本节解决三个问题：</p>
+<ol>
+<li><strong>数学上</strong>：策略梯度更新如何导致“被采样动作概率上升&#x2F;下降”</li>
+<li><strong>数值上</strong>：用具体数字展示概率变化</li>
+<li><strong>统计上</strong>：解释“策略梯度方差为什么大”，并落到 LLM&#x2F;RLHF + PPO&#x2F;KL</li>
+</ol>
+<hr>
+<h3 id="3-1-数学推导：动作概率变化与策略梯度的关系"><a href="#3-1-数学推导：动作概率变化与策略梯度的关系" class="headerlink" title="3.1 数学推导：动作概率变化与策略梯度的关系"></a>3.1 数学推导：动作概率变化与策略梯度的关系</h3><p>为了严谨起见，先写出<strong>带期望的策略梯度形式</strong>。策略梯度定理给出：</p>
+<h1 id="nabla-theta-J-theta"><a href="#nabla-theta-J-theta" class="headerlink" title="$$\nabla_\theta J(\theta)"></a>$$<br>\nabla_\theta J(\theta)</h1><p>\mathbb{E}<em>{s\sim d^{\pi</em>\theta},,a\sim \pi_\theta(\cdot|s)}<br>\big[<br>A^{\pi_\theta}(s,a),\nabla_\theta \log \pi_\theta(a|s)<br>\big]<br>$$</p>
+<p>其中：</p>
+<ul>
+<li>($d^{\pi_\theta}(s)$) 是当前策略诱导的状态分布</li>
+<li>($A^{\pi_\theta}(s,a)$) 是 advantage（可以用 ($Q^\pi-V^\pi$) 或采样回报减 baseline 估计）</li>
+</ul>
+<p>训练时我们无法计算这个期望，只能通过采样构造一个<strong>无偏随机梯度估计器</strong>：</p>
+<h1 id="widehat-nabla-theta-J"><a href="#widehat-nabla-theta-J" class="headerlink" title="$$\widehat{\nabla_\theta J}"></a>$$<br>\widehat{\nabla_\theta J}</h1><p>\hat A(s,a),\nabla_\theta \log \pi_\theta(a|s)<br>,\quad (s,a)\sim \pi_\theta<br>$$</p>
+<p>然后进行一次随机梯度上升更新：</p>
+<h1 id="theta-leftarrow-theta-alpha-widehat-nabla-theta-J"><a href="#theta-leftarrow-theta-alpha-widehat-nabla-theta-J" class="headerlink" title="$$\theta \leftarrow \theta + \alpha, \widehat{\nabla_\theta J}"></a>$$<br>\theta \leftarrow \theta + \alpha, \widehat{\nabla_\theta J}</h1><p>\theta + \alpha, \hat A(s,a),\nabla_\theta \log \pi_\theta(a|s)<br>$$</p>
+<blockquote>
+<p>下面的“概率变化分析”，指的是<strong>单次采样更新对概率的局部影响方向</strong>。</p>
+</blockquote>
+<hr>
+<h4 id="在-logit-空间分析概率变化"><a href="#在-logit-空间分析概率变化" class="headerlink" title="在 logit 空间分析概率变化"></a>在 logit 空间分析概率变化</h4><p>为了看“概率怎么变”，最直接方式是分析 softmax 的 logit。</p>
+<p>设策略为：</p>
+<p>$$<br>\pi_\theta(i|s)&#x3D;\frac{e^{z_i}}{\sum_j e^{z_j}}<br>$$</p>
+<p>其中 ($z_i&#x3D;z_i(\theta,s)$) 是动作 ($i$) 的 logit。</p>
+<p>为了研究更新方向，固定某个状态 ($s$)，把 ($z$) 当作参数（暂时忽略 ($\theta$) 到 ($z$) 的链式关系），考察：</p>
+<h1 id="frac-partial-partial-z-i-log-pi-a-s"><a href="#frac-partial-partial-z-i-log-pi-a-s" class="headerlink" title="$$\frac{\partial}{\partial z_i}\log \pi(a|s)"></a>$$<br>\frac{\partial}{\partial z_i}\log \pi(a|s)</h1><p>\begin{cases}<br>1-\pi(a|s) &amp; i&#x3D;a\<br>-\pi(i|s) &amp; i\neq a<br>\end{cases}<br>$$</p>
+<p>因此，在一次采样到动作 ($a$) 并得到 advantage 估计 ($\hat A(s,a)$) 后，对应的 logit 更新方向为：</p>
+<ul>
+<li><strong>选中动作 ($a$)</strong>：</li>
+</ul>
+<p>$$<br>\Delta z_a&#x3D;\alpha,\hat A(s,a),(1-\pi(a|s))<br>$$</p>
+<ul>
+<li><strong>其他动作 ($i\neq a$)</strong>：</li>
+</ul>
+<p>$$<br>\Delta z_i&#x3D;-\alpha,\hat A(s,a),\pi(i|s)<br>$$</p>
+<p>（这里忽略了从 ($\theta$) 到 ($z$) 的链式法则系数，只保留方向与比例结构。）</p>
+<blockquote>
+<p>旁注：</p>
+<ul>
+<li><strong>如果你用的是 ($R$)（没有 baseline &#x2F; advantage），并且 ($R\ge 0$) 总是成立，那么每次采样都会“强化”采样到的动作</strong>（提高其概率），这点没错。</li>
+<li>你可能会进一步问：既然这里的增减看起来与 ($A$) 的正负有关，那在没有 ($A$) 的算法里（直接用 ($R$)），而且通常 ($R\ge 0$)，是不是就意味着“无论采到好动作还是坏动作，只要采样到就一定增加它的概率”？</li>
+<li>但这并不意味着“学不到坏动作会被压下去”。原因是：<strong>softmax 的更新是耦合的</strong>，你提高某个动作的概率，会压低其他动作的概率；而“好动作被强化得更快”，“坏动作虽然也被强化但强化得更慢”，长期看坏动作会被挤出去。</li>
+<li>另外，实际算法里通常会用 baseline&#x2F;advantage 的一个重要原因就是：<strong>如果 reward 永远非负，你永远只能做正向强化，方差大、学习慢、并且很容易出现错误 credit assignment</strong>。baseline 让你得到“相对好坏”（正负）信号，更新更有效。</li>
+</ul>
+<p>下面将逻辑分 4 层讲透，并给一个数值例子证明“即便 ($R\ge 0$)，坏动作仍会下降”。</p>
+<hr>
+<h5 id="1-没有-advantage-时，更新确实由-R-的正负决定"><a href="#1-没有-advantage-时，更新确实由-R-的正负决定" class="headerlink" title="1) 没有 advantage 时，更新确实由 ($R$) 的正负决定"></a>1) 没有 advantage 时，更新确实由 ($R$) 的正负决定</h5><p>没有 baseline&#x2F;advantage 的 REINFORCE 单步更新是：</p>
+<p>$$<br>\theta \leftarrow \theta + \alpha, R,\nabla_\theta \log \pi_\theta(a|s)<br>$$</p>
+<p>在 logit 空间（固定 ($s$)，把 ($z$) 当参数）：</p>
+<ul>
+<li>选中动作 ($a$)：</li>
+</ul>
+<p>$$<br>\Delta z_a &#x3D; \alpha R(1-\pi(a|s))<br>$$</p>
+<ul>
+<li>其他动作 ($i\neq a$)：</li>
+</ul>
+<p>$$<br>\Delta z_i &#x3D; -\alpha R,\pi(i|s)<br>$$</p>
+<p>所以如果 <strong>($R&gt;0$)</strong>：</p>
+<ul>
+<li>选中动作的 logit 上升</li>
+<li>其他动作的 logit 下降</li>
+</ul>
+<p>这意味着：<strong>每次采样到哪个动作，就把它往上推。</strong></p>
+<p>你这一点判断完全正确。</p>
+<hr>
+<h5 id="2-那“坏动作”怎么会被压下去？关键在于“好动作推得更快”"><a href="#2-那“坏动作”怎么会被压下去？关键在于“好动作推得更快”" class="headerlink" title="2) 那“坏动作”怎么会被压下去？关键在于“好动作推得更快”"></a>2) 那“坏动作”怎么会被压下去？关键在于“好动作推得更快”</h5><p>虽然每次采样到的动作都会被推上去，但不同动作被采样到的频率、以及推上去的力度（由 ($R$) 决定）是不一样的。</p>
+<p>直观地讲：</p>
+<ul>
+<li>好动作采样到时 ($R$) 大 ⇒ 每次推得猛</li>
+<li>坏动作采样到时 ($R$) 小（虽然仍 $\ge 0$）⇒ 每次推得弱</li>
+<li>同时好动作在推高后概率会变大 ⇒ 被采样到更频繁 ⇒ 形成正反馈</li>
+<li>坏动作概率相对减少 ⇒ 被采样到更少 ⇒ 被推高的机会更少</li>
+</ul>
+<p>因此即便所有 ($R\ge 0$)，你依然会得到“相对选择”：好动作越来越占概率质量，坏动作被挤压到很小。</p>
+<hr>
+<h5 id="3-一个具体数值例子：-R-ge-0-但坏动作概率仍然下降"><a href="#3-一个具体数值例子：-R-ge-0-但坏动作概率仍然下降" class="headerlink" title="3) 一个具体数值例子：($R\ge 0$) 但坏动作概率仍然下降"></a>3) 一个具体数值例子：($R\ge 0$) 但坏动作概率仍然下降</h5><p>单状态，两动作 ($A,B$)：</p>
+<ul>
+<li>若选 ($A$)：奖励 ($R_A &#x3D; 10$)</li>
+<li>若选 ($B$)：奖励 ($R_B &#x3D; 1$)（始终正的“坏动作”）</li>
+</ul>
+<p>初始概率设为：</p>
+<p>$$<br>\pi(A)&#x3D;\pi(B)&#x3D;0.5<br>$$</p>
+<p>学习率 ($\alpha&#x3D;0.1$)。</p>
+<h6 id="第-1-次采样：假设采到-B（坏动作），-R-1"><a href="#第-1-次采样：假设采到-B（坏动作），-R-1" class="headerlink" title="第 1 次采样：假设采到 B（坏动作），($R&#x3D;1$)"></a>第 1 次采样：假设采到 B（坏动作），($R&#x3D;1$)</h6><p>logit 更新（用上面公式）：</p>
+<ul>
+<li>($\Delta z_B &#x3D; 0.1\times 1 \times (1-0.5)&#x3D;0.05$)</li>
+<li>($\Delta z_A &#x3D; -0.1\times 1 \times 0.5&#x3D;-0.05$)</li>
+</ul>
+<p>这次确实“强化”了 B。</p>
+<h6 id="第-2-次采样：若之后采到-A（好动作），-R-10"><a href="#第-2-次采样：若之后采到-A（好动作），-R-10" class="headerlink" title="第 2 次采样：若之后采到 A（好动作），($R&#x3D;10$)"></a>第 2 次采样：若之后采到 A（好动作），($R&#x3D;10$)</h6><p>此时 ($A$) 的更新力度是 B 的 10 倍：</p>
+<ul>
+<li>($\Delta z_A \approx 0.1\times 10 \times (1-\pi(A))$)（接近 0.5 时大约 0.5）</li>
+<li>其它动作被压下去的幅度也更大</li>
+</ul>
+<p>结果通常是：只要 A 被采到几次，A 的概率会迅速接近 1，B 接近 0。</p>
+<blockquote>
+<p>也就是说：坏动作不是因为“负奖励”才下降，而是因为“好动作得到更大的正奖励 + 更频繁被采样”，从而把概率质量挤走了。</p>
+</blockquote>
+<hr>
+<h5 id="4-那-advantage-baseline-的价值是什么？——不是“让坏动作才会下降”，而是“让更新更高效、更低方差”"><a href="#4-那-advantage-baseline-的价值是什么？——不是“让坏动作才会下降”，而是“让更新更高效、更低方差”" class="headerlink" title="4) 那 advantage&#x2F;baseline 的价值是什么？——不是“让坏动作才会下降”，而是“让更新更高效、更低方差”"></a>4) 那 advantage&#x2F;baseline 的价值是什么？——不是“让坏动作才会下降”，而是“让更新更高效、更低方差”</h5><p>你发现了一个事实：如果 ($R\ge 0$)，更新方向只会“强化采样到的动作”。那为什么大家还要引入 advantage（允许为负）？</p>
+<p>核心原因有两个：</p>
+<h6 id="1-把“绝对好坏”变成“相对好坏”，提高学习效率"><a href="#1-把“绝对好坏”变成“相对好坏”，提高学习效率" class="headerlink" title="(1) 把“绝对好坏”变成“相对好坏”，提高学习效率"></a>(1) 把“绝对好坏”变成“相对好坏”，提高学习效率</h6><p>用 ($R$) 时，你在学的是：</p>
+<ul>
+<li>“只要有奖励就加强”</li>
+</ul>
+<p>但用 advantage：</p>
+<p>$$<br>A(s,a)&#x3D;R-b(s)<br>$$</p>
+<p>你学的是：</p>
+<ul>
+<li>“比平均水平好就加强”</li>
+<li>“比平均水平差就削弱”</li>
+</ul>
+<p>这在 <strong>同一状态下区分动作</strong>时更直接，学习更快。</p>
+<h6 id="2-降低方差（这是最重要的工程原因）"><a href="#2-降低方差（这是最重要的工程原因）" class="headerlink" title="(2) 降低方差（这是最重要的工程原因）"></a>(2) 降低方差（这是最重要的工程原因）</h6><p>即便 ($R\ge 0$)，你仍然会有很大噪声：同一个动作在不同轨迹里回报可能波动很大。baseline 把回报做中心化，显著降低估计器方差，同时不改变期望梯度。</p>
+<hr>
+<h5 id="5-关于提到的“那不就总是提升采样到的动作吗？”——补一句更精确的话"><a href="#5-关于提到的“那不就总是提升采样到的动作吗？”——补一句更精确的话" class="headerlink" title="5) 关于提到的“那不就总是提升采样到的动作吗？”——补一句更精确的话"></a>5) 关于提到的“那不就总是提升采样到的动作吗？”——补一句更精确的话</h5><p>更精确的说法是：</p>
+<ul>
+<li>在 <strong>没有 baseline 且 ($R\ge 0$)</strong> 的情况下，每次采样确实会提高采样到动作的 logit（局部方向为正）。</li>
+<li>但从<strong>期望意义</strong>上看，策略会更偏向“带来更高期望回报的动作”，因为它们带来的更新幅度更大、发生更频繁。</li>
+</ul>
+<p>而 baseline&#x2F;advantage 的作用是把这种“靠长期挤压形成的相对选择”变成“单步就有相对方向”的更新，提高样本效率并降低方差。</p>
+<p><strong>没有 advantage 时也能学到</strong>：只要好动作回报更高，它会被更强更频繁地强化，最终挤压坏动作的概率。<br><strong>但 advantage 能更快更稳</strong>：把“绝对回报”变成“相对回报”，产生正负信号并降低方差。</p>
+</blockquote>
+<hr>
+<h4 id="严格结论"><a href="#严格结论" class="headerlink" title="严格结论"></a>严格结论</h4><ol>
+<li><p>若 ($\hat A(s,a)&gt;0$)（该动作优于基线）：</p>
+<ul>
+<li>($\Delta z_a&gt;0$)，选中动作 logit 上升</li>
+<li>其余动作 logit 下降</li>
+<li>因 softmax 归一化，选中动作概率上升</li>
+</ul>
+</li>
+<li><p>若 ($\hat A(s,a)&lt;0$)（该动作劣于基线）：</p>
+<ul>
+<li>($\Delta z_a&lt;0$)，选中动作 logit 下降</li>
+<li>其余动作 logit 上升</li>
+<li>选中动作概率下降</li>
+</ul>
+</li>
+<li><p>变化幅度与 ($\hat A(s,a)$) 成正比</p>
+<ul>
+<li>($\hat A$) 越大，推动越强</li>
+<li>($\hat A$) 越接近 0，更新越小</li>
+<li>不存在“阈值”——只要 ($\hat A\neq 0$)，概率就会发生连续变化</li>
+</ul>
+</li>
+</ol>
+<hr>
+<blockquote>
+<p>在我们之前的讨论中有一个关键问题：<br>“奖励高到底多高才会提升概率？奖励低到底多低才会降低？”</p>
+<p>数学上的答案非常直接：<br><strong>由 advantage 的大小线性决定，没有阈值机制。</strong></p>
+<p>策略梯度不是分类决策规则，而是一个连续的梯度系统。</p>
+</blockquote>
+<hr>
+<h3 id="3-2-数值案例说明：概率变化的可计算示例"><a href="#3-2-数值案例说明：概率变化的可计算示例" class="headerlink" title="3.2 数值案例说明：概率变化的可计算示例"></a>3.2 数值案例说明：概率变化的可计算示例</h3><h4 id="3-2-1-场景设定"><a href="#3-2-1-场景设定" class="headerlink" title="3.2.1 场景设定"></a>3.2.1 场景设定</h4><ul>
+<li>两动作 (A,B)</li>
+<li>初始概率：($\pi(B)&#x3D;0.3,;\pi(A)&#x3D;0.7$)</li>
+<li>用两个 logit 表示：令 (z_A&#x3D;0)，则</li>
+</ul>
+<p>$$<br>\pi(B)&#x3D;\frac{e^{z_B}}{e^{z_A}+e^{z_B}}&#x3D;0.3<br>\Rightarrow z_B&#x3D;\log\frac{0.3}{0.7}\approx -0.8473<br>$$</p>
+<p>学习率 ($\alpha&#x3D;0.1$)。</p>
+<hr>
+<h4 id="3-2-2-情况-1：采样到-B，advantage-A-10"><a href="#3-2-2-情况-1：采样到-B，advantage-A-10" class="headerlink" title="3.2.2 情况 1：采样到 B，advantage (A&#x3D;+10)"></a>3.2.2 情况 1：采样到 B，advantage (A&#x3D;+10)</h4><p>softmax 导数给出：</p>
+<p>$$<br>\Delta z_B&#x3D;\alpha A(1-\pi(B))&#x3D;0.1\times 10\times 0.7&#x3D;+0.7<br>$$<br>$$<br>\Delta z_A&#x3D;\alpha A(-\pi(A))&#x3D;0.1\times 10\times (-0.7)&#x3D;-0.7<br>$$</p>
+<p>更新后：</p>
+<ul>
+<li>($z_A’&#x3D;-0.7$)</li>
+<li>($z_B’&#x3D;-0.8473+0.7&#x3D;-0.1473$)</li>
+</ul>
+<p>新概率：</p>
+<p>$$<br>\pi’(B)&#x3D;\frac{e^{-0.1473}}{e^{-0.7}+e^{-0.1473}}\approx 0.6348<br>$$</p>
+<p><strong>B 从 0.3 → 0.635，上升；A 从 0.7 → 0.365，下降。</strong></p>
+<hr>
+<h4 id="3-2-3-情况-2：采样到-B，advantage-A-10"><a href="#3-2-3-情况-2：采样到-B，advantage-A-10" class="headerlink" title="3.2.3 情况 2：采样到 B，advantage (A&#x3D;-10)"></a>3.2.3 情况 2：采样到 B，advantage (A&#x3D;-10)</h4><p>$$<br>\Delta z_B&#x3D;0.1\times(-10)\times 0.7&#x3D;-0.7<br>$$<br>$$<br>\Delta z_A&#x3D;0.1\times(-10)\times (-0.7)&#x3D;+0.7<br>$$</p>
+<p>更新后：</p>
+<ul>
+<li>($z_A’&#x3D;+0.7$)</li>
+<li>($z_B’&#x3D;-0.8473-0.7&#x3D;-1.5473$)</li>
+</ul>
+<p>新概率：</p>
+<p>$$<br>\pi’(B)&#x3D;\frac{e^{-1.5473}}{e^{0.7}+e^{-1.5473}}\approx 0.0956<br>$$</p>
+<p><strong>B 从 0.3 → 0.096，显著下降。</strong></p>
+<blockquote>
+<p>这例子直接回答了你在对话里第 3 点疑问：<br>“为什么 B 奖励正就上升、奖励负就下降？”——因为 ($\Delta z_B$) 的符号由 (A) 的符号决定，而 $\pi$ 是 $z$ 的单调函数。</p>
+</blockquote>
+<hr>
+<h3 id="3-3-策略梯度方差（LLM-RLHF-场景下的推导-案例）"><a href="#3-3-策略梯度方差（LLM-RLHF-场景下的推导-案例）" class="headerlink" title="3.3 策略梯度方差（LLM RLHF 场景下的推导 + 案例）"></a>3.3 策略梯度方差（LLM RLHF 场景下的推导 + 案例）</h3><h4 id="3-3-1-RLHF-的策略梯度估计器"><a href="#3-3-1-RLHF-的策略梯度估计器" class="headerlink" title="3.3.1 RLHF 的策略梯度估计器"></a>3.3.1 RLHF 的策略梯度估计器</h4><p>对单个 prompt (x)，生成序列 ($y&#x3D;(y_1,\dots,y_T)$)：</p>
+<p>$$<br>y_t\sim \pi_\theta(\cdot|y_{&lt;t},x)<br>$$</p>
+<p>回报（通常是 reward model + KL penalty 的组合）记为 (R(y))。</p>
+<p>REINFORCE 形式（省略 baseline）：</p>
+<p>$$<br>g(y)&#x3D;R(y)\sum_{t&#x3D;1}^{T}\nabla_\theta \log \pi_\theta(y_t|y_{&lt;t},x)<br>$$</p>
+<p>这是一个随机变量，因为 ($y\sim \pi_\theta$)。</p>
+<hr>
+<h4 id="3-3-2-梯度方差为什么会随长度累积（核心机制）"><a href="#3-3-2-梯度方差为什么会随长度累积（核心机制）" class="headerlink" title="3.3.2 梯度方差为什么会随长度累积（核心机制）"></a>3.3.2 梯度方差为什么会随长度累积（核心机制）</h4><p>定义：</p>
+<p>$$<br>u_t&#x3D;\nabla_\theta \log \pi_\theta(y_t|y_{&lt;t},x)<br>\quad,\quad<br>S&#x3D;\sum_{t&#x3D;1}^{T}u_t<br>$$</p>
+<p>则 ($g&#x3D;R\cdot S$)。</p>
+<p>即便暂时假设 (R) 为常数 1，为了看长度效应：</p>
+<p>$$<br>g&#x3D;S&#x3D;\sum_{t&#x3D;1}^{T}u_t<br>$$</p>
+<p>如果简化假设（只用于展示数量级）：</p>
+<ul>
+<li>$u_t$ 近似独立</li>
+<li>$\mathbb{E}[u_t]&#x3D;0$（常见情形，且与 baseline 推导一致）</li>
+<li>$\mathrm{Var}(u_t)&#x3D;\sigma^2$</li>
+</ul>
+<p>则：</p>
+<p>$$<br>\mathrm{Var}(g)&#x3D;\mathrm{Var}\Big(\sum_{t&#x3D;1}^{T}u_t\Big)&#x3D;T\sigma^2<br>$$</p>
+<p><strong>结论：token 级 log-prob 梯度的随机性会线性累积。</strong></p>
+<blockquote>
+<p>旁注：为什么 $\mathbb{E}[u_t]&#x3D;0$？以及这个假设是否合理？</p>
+<p><strong>一、为什么 $\mathbb{E}[u_t]&#x3D;0$？</strong></p>
+<p>定义</p>
+<p>$$<br>u_t&#x3D;\nabla_\theta \log \pi_\theta\big(y_t\mid y_{&lt;t},x\big)<br>$$</p>
+<p>这里的期望必须明确：是对当前策略的 <strong>条件分布</strong> $y_t\sim \pi_\theta(\cdot\mid y_{&lt;t},x)$ 取期望。</p>
+<p>核心恒等式（score function identity）：对任意归一化的分布 $p_\theta(y)$，都有</p>
+<p>$$<br>\mathbb{E}<em>{y\sim p</em>\theta}\big[\nabla_\theta\log p_\theta(y)\big]&#x3D;0<br>$$</p>
+<p>证明：</p>
+<p>$$<br>\mathbb{E}<em>{y\sim p</em>\theta}\big[\nabla_\theta\log p_\theta(y)\big]<br>&#x3D;\sum_y p_\theta(y)\nabla_\theta\log p_\theta(y)<br>&#x3D;\sum_y \nabla_\theta p_\theta(y)<br>&#x3D;\nabla_\theta\sum_y p_\theta(y)<br>&#x3D;\nabla_\theta 1<br>&#x3D;0<br>$$</p>
+<p>把它用到 token 的条件分布上同样成立：</p>
+<p>$$<br>\mathbb{E}<em>{y_t\sim \pi</em>\theta(\cdot\mid y_{&lt;t},x)}\big[\nabla_\theta\log \pi_\theta(y_t\mid y_{&lt;t},x)\big]&#x3D;0<br>$$</p>
+<p>因为对任意给定的 $(y_{&lt;t},x)$，都有</p>
+<p>$$<br>\sum_{y_t}\pi_\theta(y_t\mid y_{&lt;t},x)&#x3D;1<br>$$</p>
+<p>对 $\theta$ 求导仍为 0。</p>
+<p><strong>二、这个假设是否合理？</strong></p>
+<p>关键是：你在这里是在分析方差的数量级，而不是在说真实训练中“均值为 0”。在 REINFORCE 中</p>
+<p>$$<br>g&#x3D;R\sum_{t&#x3D;1}^{T}u_t<br>$$</p>
+<p>真正的梯度期望</p>
+<p>$$<br>\mathbb{E}[g]&#x3D;\mathbb{E}\Big[R\sum_{t&#x3D;1}^{T}u_t\Big]<br>$$</p>
+<p>一般不为 0，因为 $R$ 与 $u_t$ 相关。</p>
+<p>这里用 $\mathbb{E}[u_t]&#x3D;0$ 更像是一种“中心化近似”：只想把注意力放在 score term 本身的内在随机性上，从而得到 $\mathrm{Var}(\sum_t u_t)$ 随长度 $T$ 线性增长的量级结论。</p>
+</blockquote>
+<hr>
+<h4 id="3-3-3-“末尾-reward”导致的-SNR-随-T-下降"><a href="#3-3-3-“末尾-reward”导致的-SNR-随-T-下降" class="headerlink" title="3.3.3 “末尾 reward”导致的 SNR 随 $T$ 下降"></a>3.3.3 “末尾 reward”导致的 SNR 随 $T$ 下降</h4><p>当 reward 只在末尾给（典型 RLHF：整段文本一个分数），但梯度要分摊到每个 token：</p>
+<ul>
+<li>只有少数 token 真正对 reward 有“可预测贡献”</li>
+<li>其余 token 的 $u_t$ 对最终 $R$ 的相关性弱</li>
+</ul>
+<p>形式化地，如果</p>
+<p>$$<br>\mathbb{E}[g]&#x3D;\mu \quad,\quad \mathrm{Var}(g)\approx T\sigma^2<br>$$</p>
+<p>则信噪比：</p>
+<p>$$<br>\mathrm{SNR}&#x3D;\frac{|\mathbb{E}[g]|^2}{\mathrm{Var}(g)}<br>\propto \frac{1}{T}<br>$$</p>
+<p><strong>长度越长，单位样本的有效学习信号越稀释，训练就越依赖大 batch、critic、GAE 等降方差手段。</strong></p>
+<h5 id="额外说明：SNR-高低对模型训练会产生什么影响？"><a href="#额外说明：SNR-高低对模型训练会产生什么影响？" class="headerlink" title="额外说明：SNR 高低对模型训练会产生什么影响？"></a>额外说明：SNR 高低对模型训练会产生什么影响？</h5><p>这个问题本质上是：</p>
+<blockquote>
+<p><strong>梯度估计的信噪比（SNR）如何影响优化动力学？</strong></p>
+</blockquote>
+<p>我们分三层讲清楚：</p>
+<ol>
+<li>SNR 在随机优化中的数学含义</li>
+<li>SNR 下降对训练动态的直接影响</li>
+<li>在“末尾 reward”场景下为什么问题会特别严重</li>
+</ol>
+<hr>
+<h5 id="一、SNR-在梯度估计里的精确定义"><a href="#一、SNR-在梯度估计里的精确定义" class="headerlink" title="一、SNR 在梯度估计里的精确定义"></a>一、SNR 在梯度估计里的精确定义</h5><p>设随机梯度（随机估计量）：</p>
+<p>$$<br>g &#x3D; \nabla_\theta J(\theta)<br>$$</p>
+<p>其期望为</p>
+<p>$$<br>\mathbb{E}[g] &#x3D; \mu<br>$$</p>
+<p>方差为</p>
+<p>$$<br>\mathrm{Var}(g) &#x3D; \Sigma<br>$$</p>
+<p>定义</p>
+<p>$$<br>\mathrm{SNR} &#x3D; \frac{|\mu|^2}{\mathrm{Tr}(\Sigma)}<br>$$</p>
+<p>它衡量的是：</p>
+<blockquote>
+<p><strong>有效梯度强度 &#x2F; 随机噪声强度</strong></p>
+</blockquote>
+<p>优化更新是：</p>
+<p>$$<br>\theta_{k+1} &#x3D; \theta_k + \eta g<br>$$</p>
+<p>把 $g$ 分解为：</p>
+<p>$$<br>g &#x3D; \mu + \varepsilon<br>$$</p>
+<p>其中：</p>
+<ul>
+<li>$\mu$ &#x3D; 真正有方向性的改进信号</li>
+<li>$\varepsilon$ &#x3D; 纯噪声</li>
+</ul>
+<hr>
+<h5 id="二、SNR-高低对训练的影响"><a href="#二、SNR-高低对训练的影响" class="headerlink" title="二、SNR 高低对训练的影响"></a>二、SNR 高低对训练的影响</h5><h6 id="情况-1：SNR-高（-mu-远大于噪声尺度）"><a href="#情况-1：SNR-高（-mu-远大于噪声尺度）" class="headerlink" title="情况 1：SNR 高（$|\mu|$ 远大于噪声尺度）"></a>情况 1：SNR 高（$|\mu|$ 远大于噪声尺度）</h6><ul>
+<li>更新方向稳定</li>
+<li>每步都朝近似一致方向移动</li>
+<li>收敛速度快</li>
+<li>不容易震荡</li>
+<li>不需要极大 batch</li>
+</ul>
+<p>等价于：</p>
+<blockquote>
+<p>“梯度指向明确”</p>
+</blockquote>
+<h6 id="情况-2：SNR-低（噪声远大于有效信号）"><a href="#情况-2：SNR-低（噪声远大于有效信号）" class="headerlink" title="情况 2：SNR 低（噪声远大于有效信号）"></a>情况 2：SNR 低（噪声远大于有效信号）</h6><p>更新变成：</p>
+<p>$$<br>\theta_{k+1} &#x3D; \theta_k + \eta(\mu + \varepsilon)<br>$$</p>
+<p>问题：</p>
+<ol>
+<li>方向抖动严重</li>
+<li>有效更新被随机波动淹没</li>
+<li>需要更小学习率</li>
+<li>需要更大 batch</li>
+<li>收敛速度显著变慢</li>
+</ol>
+<p>一个更直观的量化：单步“有效进展”的数量级可以写成</p>
+<p>$$<br>\mathbb{E}[\Delta J] \approx \eta,|\mu|^2 - c,\eta^2,\mathrm{Tr}(\Sigma)<br>$$</p>
+<p>当 $\mathrm{Tr}(\Sigma)$ 很大时：</p>
+<ul>
+<li>二阶噪声项变大</li>
+<li>实际收益可能被抵消</li>
+</ul>
+<p>这就是：</p>
+<blockquote>
+<p>低 SNR $\Rightarrow$ 优化效率下降</p>
+</blockquote>
+<hr>
+<h5 id="三、在“末尾-reward”场景下为什么问题特别严重？"><a href="#三、在“末尾-reward”场景下为什么问题特别严重？" class="headerlink" title="三、在“末尾 reward”场景下为什么问题特别严重？"></a>三、在“末尾 reward”场景下为什么问题特别严重？</h5><p>你上面的推导是：</p>
+<p>$$<br>\mathrm{Var}(g) \approx T\sigma^2<br>$$</p>
+<p>而</p>
+<p>$$<br>\mathbb{E}[g] &#x3D; \mu \quad (\text{通常不随 } T \text{ 强正比增长})<br>$$</p>
+<p>因此：</p>
+<p>$$<br>\mathrm{SNR} \propto \frac{1}{T}<br>$$</p>
+<p>直观解释：假设</p>
+<ul>
+<li>$T&#x3D;100$ 个 token</li>
+<li>只有最后 $5$ 个 token 真正影响 reward</li>
+<li>前 $95$ 个 token 主要是噪声贡献</li>
+</ul>
+<p>那你在算</p>
+<p>$$<br>g &#x3D; R \sum_{t&#x3D;1}^{100} u_t<br>$$</p>
+<p>就近似等价于：</p>
+<blockquote>
+<p>用 $95$ 个随机向量去稀释 $5$ 个有信息的向量</p>
+</blockquote>
+<hr>
+<h5 id="四、SNR-下降对-RLHF-的具体影响"><a href="#四、SNR-下降对-RLHF-的具体影响" class="headerlink" title="四、SNR 下降对 RLHF 的具体影响"></a>四、SNR 下降对 RLHF 的具体影响</h5><h6 id="1：训练更不稳定"><a href="#1：训练更不稳定" class="headerlink" title="1：训练更不稳定"></a>1：训练更不稳定</h6><p>长回答会导致：</p>
+<ul>
+<li>梯度波动巨大</li>
+<li>同样 prompt 多次采样方向不同</li>
+<li>loss 曲线抖动</li>
+</ul>
+<h6 id="2：学习速度变慢"><a href="#2：学习速度变慢" class="headerlink" title="2：学习速度变慢"></a>2：学习速度变慢</h6><p>因为</p>
+<p>$$<br>\text{有效梯度强度} \propto \frac{1}{T}<br>$$</p>
+<p>长文本样本：</p>
+<ul>
+<li>单样本贡献变小</li>
+<li>需要更多样本才能抵消噪声</li>
+</ul>
+<h6 id="3：更依赖大-batch"><a href="#3：更依赖大-batch" class="headerlink" title="3：更依赖大 batch"></a>3：更依赖大 batch</h6><p>Batch 平均后：</p>
+<p>$$<br>\mathrm{Var}(g_{\text{batch}}) &#x3D; \frac{1}{B},\mathrm{Var}(g)<br>$$</p>
+<p>所以：</p>
+<p>$$<br>\mathrm{SNR}_{\text{batch}} \propto \frac{B}{T}<br>$$</p>
+<p>这解释了：长序列 RL 训练必须增大 batch 才更稳定。</p>
+<h6 id="4：更依赖-critic-GAE"><a href="#4：更依赖-critic-GAE" class="headerlink" title="4：更依赖 critic &#x2F; GAE"></a>4：更依赖 critic &#x2F; GAE</h6><p>如果使用</p>
+<p>$$<br>g &#x3D; \sum_t A_t u_t<br>$$</p>
+<p>其中</p>
+<p>$$<br>A_t &#x3D; R - V(s_t)<br>$$</p>
+<p>则：</p>
+<ul>
+<li>不相关 token 的优势接近 0</li>
+<li>方差显著下降</li>
+</ul>
+<p>等价于：</p>
+<blockquote>
+<p>把噪声 token 的权重压低</p>
+</blockquote>
+<hr>
+<h5 id="五、极端情况：SNR-太低会发生什么？"><a href="#五、极端情况：SNR-太低会发生什么？" class="headerlink" title="五、极端情况：SNR 太低会发生什么？"></a>五、极端情况：SNR 太低会发生什么？</h5><p>当</p>
+<p>$$<br>|\mu|^2 \ll \mathrm{Tr}(\Sigma)<br>$$</p>
+<p>可能出现：</p>
+<h6 id="1：学习停滞"><a href="#1：学习停滞" class="headerlink" title="1：学习停滞"></a>1：学习停滞</h6><p>更新方向接近随机游走，模型性能不提升。</p>
+<h6 id="2：KL-爆炸"><a href="#2：KL-爆炸" class="headerlink" title="2：KL 爆炸"></a>2：KL 爆炸</h6><p>因为：</p>
+<ul>
+<li>噪声更新导致 policy 在错误方向大幅移动</li>
+<li>PPO clip 频繁触发</li>
+</ul>
+<h6 id="3：“奖励黑客”更容易发生"><a href="#3：“奖励黑客”更容易发生" class="headerlink" title="3：“奖励黑客”更容易发生"></a>3：“奖励黑客”更容易发生</h6><p>低 SNR 时：</p>
+<ul>
+<li>优化更像是高方差探索</li>
+<li>更容易偶然碰到 reward hacking 局部模式</li>
+</ul>
+<hr>
+<h5 id="六、一个直观类比"><a href="#六、一个直观类比" class="headerlink" title="六、一个直观类比"></a>六、一个直观类比</h5><p>想象：</p>
+<ul>
+<li>$\mu$ &#x3D; 你想走的方向</li>
+<li>$\varepsilon$ &#x3D; 每秒刮来的随机风</li>
+</ul>
+<p>如果风速比你走路速度大，你基本在原地打转。这就是低 SNR。</p>
+<hr>
+<h5 id="七、总结"><a href="#七、总结" class="headerlink" title="七、总结"></a>七、总结</h5><p>在“末尾 reward”+ 长序列情况下</p>
+<p>$$<br>\mathrm{SNR} \propto \frac{1}{T}<br>$$</p>
+<p>意味着：</p>
+<table>
+<thead>
+<tr>
+<th>现象</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>序列变长</td>
+<td>梯度噪声线性增长</td>
+</tr>
+<tr>
+<td>有效信号不随 $T$ 增长</td>
+<td>SNR 下降</td>
+</tr>
+<tr>
+<td>训练稳定性</td>
+<td>下降</td>
+</tr>
+<tr>
+<td>收敛速度</td>
+<td>变慢</td>
+</tr>
+<tr>
+<td>所需 batch</td>
+<td>增大</td>
+</tr>
+<tr>
+<td>需要 baseline &#x2F; GAE</td>
+<td>更强</td>
+</tr>
+</tbody></table>
+<p>一句话概括：</p>
+<blockquote>
+<p>低 SNR 不是“训练难一点”，而是直接决定优化是否可行。</p>
+</blockquote>
+<p>进一步：分析 token-level reward shaping 如何改变 SNR scaling（#TODO 下一篇博客）。</p>
+<hr>
+<h4 id="3-3-4-一个数值级案例（展示“方差大而信号小”）"><a href="#3-3-4-一个数值级案例（展示“方差大而信号小”）" class="headerlink" title="3.3.4 一个数值级案例（展示“方差大而信号小”）"></a>3.3.4 一个数值级案例（展示“方差大而信号小”）</h4><p>假设：</p>
+<ul>
+<li>$T&#x3D;200$</li>
+<li>单 token 的一维方差 $\sigma^2&#x3D;1$</li>
+<li>有效期望梯度（某一维）只有 $\mu&#x3D;0.5$</li>
+</ul>
+<p>则</p>
+<p>$$<br>\mathrm{Var}(g)&#x3D;200<br>$$<br>$$<br>\mathrm{SNR}&#x3D;\frac{0.5^2}{200}&#x3D;0.00125<br>$$</p>
+<p>这意味着：单条样本的梯度方向波动远大于平均方向，必须靠大量样本平均才能稳定。（大量样本可以降低方差，提升信噪比 #TODO 见下一篇博客）</p>
+<hr>
+<h3 id="3-4-LLM-训练中方差的来源（随机变量-三大“方差大头”）"><a href="#3-4-LLM-训练中方差的来源（随机变量-三大“方差大头”）" class="headerlink" title="3.4 LLM 训练中方差的来源（随机变量 + 三大“方差大头”）"></a>3.4 LLM 训练中方差的来源（随机变量 + 三大“方差大头”）</h3><p>这一节要非常明确：<strong>方差来自哪些随机变量</strong>，以及为何在 LLM 中尤其严重。</p>
+<h4 id="3-4-1-明确随机变量"><a href="#3-4-1-明确随机变量" class="headerlink" title="3.4.1 明确随机变量"></a>3.4.1 明确随机变量</h4><p>在 RLHF&#x2F;RLAIF 中，至少包括：</p>
+<ul>
+<li>token：$y_t \sim \pi_\theta(\cdot\mid y_{&lt;t},x)$</li>
+<li>序列长度 $T$（可能是随机或由 stopping 决定）</li>
+<li>回报：$R(y)&#x3D;r(y)$（reward model 给定 $y$ 通常确定，但因 $y$ 随机，$R$ 作为随机变量仍波动）</li>
+<li>PPO 里还会引入 importance ratio：$r(y)&#x3D;\frac{\pi_\theta(y)}{\pi_{\text{old}}(y)}$（见 3.5）</li>
+</ul>
+<hr>
+<h4 id="3-4-2-token-累积：-sum-t-u-t-的方差随-T-增长"><a href="#3-4-2-token-累积：-sum-t-u-t-的方差随-T-增长" class="headerlink" title="3.4.2 token 累积：$\sum_t u_t$ 的方差随 $T$ 增长"></a>3.4.2 token 累积：$\sum_t u_t$ 的方差随 $T$ 增长</h4><p>如 3.3 所示：即便 $R$ 不波动，$S&#x3D;\sum_t u_t$ 的方差也随长度增大。</p>
+<hr>
+<h4 id="3-4-3-高维放大：梯度向量的“能量”随维度增长"><a href="#3-4-3-高维放大：梯度向量的“能量”随维度增长" class="headerlink" title="3.4.3 高维放大：梯度向量的“能量”随维度增长"></a>3.4.3 高维放大：梯度向量的“能量”随维度增长</h4><p>设参数维度为 $d$。若每一维梯度方差约为 $T\sigma^2$，则平方范数的期望规模是：</p>
+<p>$$<br>\mathbb{E}|g|^2 \approx d\cdot T\sigma^2<br>$$</p>
+<p>当 $d$ 是 $10^9$ 量级、$T$ 是几百量级时，即使每维方差看起来不大，整体梯度能量也非常巨大，训练对 <strong>clip、归一化、KL 约束</strong>极为敏感。</p>
+<hr>
+<h4 id="3-4-4-importance-weight-爆炸：少量样本主导二阶矩"><a href="#3-4-4-importance-weight-爆炸：少量样本主导二阶矩" class="headerlink" title="3.4.4 importance weight 爆炸：少量样本主导二阶矩"></a>3.4.4 importance weight 爆炸：少量样本主导二阶矩</h4><p>在 PPO&#x2F;importance sampling 场景里，梯度会带上比率 $r$：</p>
+<p>$$<br>g \sim r(y),A(y),\nabla_\theta \log \pi_\theta(y)<br>$$</p>
+<p>如果 $r$ 有重尾（少量样本 $r\gg 1$），则二阶矩</p>
+<p>$$<br>\mathbb{E}[r^2 |u|^2]<br>$$</p>
+<p>会被尾部样本主导，引发训练不稳定（这一点直接引出 KL 的意义）。</p>
+<hr>
+<h4 id="3-4-5-“实际训练”层面的直观例子（可写成经验描述）"><a href="#3-4-5-“实际训练”层面的直观例子（可写成经验描述）" class="headerlink" title="3.4.5 “实际训练”层面的直观例子（可写成经验描述）"></a>3.4.5 “实际训练”层面的直观例子（可写成经验描述）</h4><p>同一个 prompt：</p>
+<ul>
+<li>有时采样到高 reward、但在旧策略下概率极低的回答（(r) 巨大）</li>
+<li>这条样本会让一次 update 的梯度尺度远大于其它样本</li>
+<li>于是出现：loss 抖动、KL 突增、reward 反复塌陷（典型 RLHF 不稳定现象）</li>
+</ul>
+<hr>
+<h3 id="3-5-PPO-中-KL-对方差的控制（importance-sampling-→-尾部控制-→-trust-region）"><a href="#3-5-PPO-中-KL-对方差的控制（importance-sampling-→-尾部控制-→-trust-region）" class="headerlink" title="3.5 PPO 中 KL 对方差的控制（importance sampling → 尾部控制 → trust region）"></a>3.5 PPO 中 KL 对方差的控制（importance sampling → 尾部控制 → trust region）</h3><h4 id="3-5-1-重要性采样（为什么会出现-ratio）"><a href="#3-5-1-重要性采样（为什么会出现-ratio）" class="headerlink" title="3.5.1 重要性采样（为什么会出现 ratio）"></a>3.5.1 重要性采样（为什么会出现 ratio）</h4><p>PPO 的常见形式用旧策略采样 ($y\sim \pi_{\text{old}}$)，再用新策略优化目标。会出现：</p>
+<p>$$<br>r(y)&#x3D;\frac{\pi_\theta(y)}{\pi_{\text{old}}(y)}<br>$$</p>
+<p>策略目标（简化写法）：</p>
+<p>$$<br>\mathbb{E}<em>{y\sim\pi</em>{\text{old}}}\big[r(y)A(y)\big]<br>$$</p>
+<p>梯度因此会被 (r(y)) 直接缩放，二阶矩对 ($r^2$) 敏感。</p>
+<hr>
+<h4 id="3-5-2-极端-ratio-的数值示例（方差爆炸的直观根源）"><a href="#3-5-2-极端-ratio-的数值示例（方差爆炸的直观根源）" class="headerlink" title="3.5.2 极端 ratio 的数值示例（方差爆炸的直观根源）"></a>3.5.2 极端 ratio 的数值示例（方差爆炸的直观根源）</h4><p>假设 batch 中：</p>
+<ul>
+<li>99% 样本 (r&#x3D;1)</li>
+<li>1% 样本 (r&#x3D;100)</li>
+</ul>
+<p>则</p>
+<p>$$<br>\mathbb{E}[r^2]&#x3D;0.99\cdot 1^2+0.01\cdot 100^2&#x3D;0.99+100&#x3D;100.99<br>$$</p>
+<p>也就是说：哪怕极端样本只占 1%，它对二阶矩（从而对梯度方差）贡献几乎是全部。</p>
+<hr>
+<h4 id="3-5-3-KL-为什么能限制尾部（核心逻辑）"><a href="#3-5-3-KL-为什么能限制尾部（核心逻辑）" class="headerlink" title="3.5.3 KL 为什么能限制尾部（核心逻辑）"></a>3.5.3 KL 为什么能限制尾部（核心逻辑）</h4><p>KL 正则（或 KL penalty）常写为：</p>
+<p>$$<br>\beta,\mathrm{KL}(\pi_\theta | \pi_{\text{ref}})<br>&#x3D;\beta,\mathbb{E}<em>{y\sim\pi</em>\theta}\left[\log\frac{\pi_\theta(y)}{\pi_{\text{ref}}(y)}\right]<br>$$</p>
+<p>当 KL 被压小，意味着 ($\log\frac{\pi_\theta}{\pi_{\text{ref}}}$) 不能出现大量大偏移，从经验上会抑制 (r) 的重尾（尤其是把新策略推到旧策略极低概率区域时）。</p>
+<p>PPO 的 clipping（常见实现）更直接地做了“硬截断”：</p>
+<p>$$<br>\min\big(rA,;\mathrm{clip}(r,1-\epsilon,1+\epsilon)A\big)<br>$$</p>
+<p>它等价于显式限制 (r) 的极端值，从而控制二阶矩。</p>
+<hr>
+<h4 id="3-5-4-与-trust-region-的联系（概念桥梁）"><a href="#3-5-4-与-trust-region-的联系（概念桥梁）" class="headerlink" title="3.5.4 与 trust region 的联系（概念桥梁）"></a>3.5.4 与 trust region 的联系（概念桥梁）</h4><p>TRPO 的思想是直接约束策略更新不要超过一个 KL “信任域”：</p>
+<p>$$<br>\max_\theta \ \mathbb{E}[rA]<br>\quad \text{s.t.}\quad<br>\mathbb{E}\big[\mathrm{KL}(\pi_{\text{old}}|\pi_\theta)\big]\le \delta<br>$$</p>
+<p>PPO 可以视为对 trust region 的可实现近似：通过 clipping&#x2F;KL penalty，让策略分布在每次更新中不要偏移过大。偏移小 → ratio 不重尾 → 梯度二阶矩更可控 → 训练更稳定。</p>
+<hr>
+<h2 id="4-baseline-对期望和方差的影响"><a href="#4-baseline-对期望和方差的影响" class="headerlink" title="4. baseline 对期望和方差的影响"></a>4. baseline 对期望和方差的影响</h2><p>本节要完成三个目标：</p>
+<ol>
+<li>证明：baseline <strong>不改变</strong>策略梯度的期望（不引入偏差），条件是什么</li>
+<li>说明：baseline <strong>为什么能显著降方差</strong>（用全方差公式拆解）</li>
+<li>给出：条件最优 baseline 与 batch-optimal baseline，并解释为什么 LLM 里不直接这么做</li>
+</ol>
+<hr>
+<h3 id="4-1-baseline-不改变期望（关键引理-结论）"><a href="#4-1-baseline-不改变期望（关键引理-结论）" class="headerlink" title="4.1 baseline 不改变期望（关键引理 + 结论）"></a>4.1 baseline 不改变期望（关键引理 + 结论）</h3><p>用 baseline (b(s)) 替换回报 (R)：</p>
+<p>$$<br>g’&#x3D;(R-b(s))\nabla_\theta \log \pi_\theta(a|s)<br>$$</p>
+<p>要证明 (\mathbb{E}[g’]&#x3D;\mathbb{E}[g])，关键引理是：</p>
+<p>$$<br>\boxed{<br>\mathbb{E}<em>{a\sim\pi</em>\theta(\cdot|s)}\big[\nabla_\theta \log \pi_\theta(a|s)\big]&#x3D;0<br>}<br>$$</p>
+<p>证明非常短：</p>
+<p>$$<br>\mathbb{E}[\nabla \log \pi(a|s)]<br>&#x3D;\sum_a \pi(a|s)\nabla \log \pi(a|s)<br>&#x3D;\sum_a \nabla \pi(a|s)<br>&#x3D;\nabla \sum_a \pi(a|s)<br>&#x3D;\nabla 1&#x3D;0<br>$$</p>
+<p>因此，只要 baseline <strong>不依赖动作 (a)</strong>（可以依赖状态 (s)、时间步 (t)、prompt (x)），就有：</p>
+<p>$$<br>\mathbb{E}[b(s)\nabla\log\pi(a|s)]&#x3D;b(s)\cdot 0 &#x3D; 0<br>\Rightarrow \mathbb{E}[g’]&#x3D;\mathbb{E}[g]<br>$$</p>
+<blockquote>
+<p>结论：baseline 不改变期望，只改变方差。<br>条件：baseline 不能依赖当下采样动作（否则会引入偏差风险）。</p>
+</blockquote>
+<hr>
+<h3 id="4-2-baseline-对方差的影响（全方差拆解视角）"><a href="#4-2-baseline-对方差的影响（全方差拆解视角）" class="headerlink" title="4.2 baseline 对方差的影响（全方差拆解视角）"></a>4.2 baseline 对方差的影响（全方差拆解视角）</h3><p>用全方差公式（工具箱）：</p>
+<p>$$<br>\mathrm{Var}(X)&#x3D;\mathbb{E}[\mathrm{Var}(X|Y)]+\mathrm{Var}(\mathbb{E}[X|Y])<br>$$</p>
+<p>令</p>
+<p>$$<br>X&#x3D;g&#x3D;(R-b)u,\quad u&#x3D;\nabla_\theta\log\pi(a|s),\quad Y&#x3D;a<br>$$</p>
+<p>则</p>
+<h1 id="mathrm-Var-g"><a href="#mathrm-Var-g" class="headerlink" title="$$\mathrm{Var}(g)"></a>$$<br>\mathrm{Var}(g)</h1><p>\underbrace{\mathbb{E}[\mathrm{Var}(g|a)]}<em>{\text{回报噪声&#x2F;环境随机性}}<br>+<br>\underbrace{\mathrm{Var}(\mathbb{E}[g|a])}</em>{\text{不同动作平均效果差异}}<br>$$</p>
+<p>减去 baseline 不会改变第一项中的“条件方差”（因为减常数不改变 (R) 的条件方差），但可以显著缩小第二项，让不同动作的条件均值更接近，从而减少总体方差。</p>
+<p>这解释了一个常见现象：即使 reward 本身非常 noisy，baseline 也只能消除其中“可解释的那部分结构性波动”，噪声底座仍然存在。</p>
+<hr>
+<h3 id="4-3-条件最优-baseline（公式-含义）"><a href="#4-3-条件最优-baseline（公式-含义）" class="headerlink" title="4.3 条件最优 baseline（公式 + 含义）"></a>4.3 条件最优 baseline（公式 + 含义）</h3><p>对标量参数（或把向量梯度用范数处理），令 $u&#x3D;\nabla_\theta\log\pi$。在给定状态下，使 $\mathrm{Var}((R-b)u)$ 最小的 baseline 满足：</p>
+<p>$$<br>\boxed{<br>b^*(s)&#x3D;\frac{\mathbb{E}[R,u^2|s]}{\mathbb{E}[u^2|s]}<br>}<br>$$</p>
+<p>这说明最优 baseline 不是简单的 $\mathbb{E}[R|s]$，而是按 $u^2$ 加权——也就是更关注“对参数影响更大的样本”。</p>
+<p>在工程中常用的 $b(s)&#x3D;V(s)\approx \mathbb{E}[R|s]$ 是一个强近似，优势在于易学、易泛化。</p>
+<hr>
+<h3 id="4-4-为什么-LLM-不直接用-batch-optimal-baseline"><a href="#4-4-为什么-LLM-不直接用-batch-optimal-baseline" class="headerlink" title="4.4 为什么 LLM 不直接用 batch-optimal baseline"></a>4.4 为什么 LLM 不直接用 batch-optimal baseline</h3><p>既然存在最优 baseline，是否可以在每个 batch 用样本直接估它，让方差最小？</p>
+<h4 id="4-4-1-batch-下的数学形式"><a href="#4-4-1-batch-下的数学形式" class="headerlink" title="4.4.1 batch 下的数学形式"></a>4.4.1 batch 下的数学形式</h4><p>给定 batch 的 (N) 个样本 ((R_i,u_i))，可以构造样本版：</p>
+<h1 id="hat-b-text-opt"><a href="#hat-b-text-opt" class="headerlink" title="$$\hat b_{\text{opt}}"></a>$$<br>\hat b_{\text{opt}}</h1><p>\frac{\sum_{i&#x3D;1}^{N}R_i|u_i|^2}{\sum_{i&#x3D;1}^{N}|u_i|^2}<br>$$</p>
+<p>然后用：</p>
+<p>$$<br>g_i&#x3D;(R_i-\hat b_{\text{opt}})u_i<br>$$</p>
+<p>它确实会在该 batch 上降低方差（至少降低二阶矩）。</p>
+<hr>
+<h4 id="4-4-2-batch-场景下存在的问题"><a href="#4-4-2-batch-场景下存在的问题" class="headerlink" title="4.4.2 batch 场景下存在的问题"></a>4.4.2 batch 场景下存在的问题</h4><p><strong>(1) 它是“全局常数”，不随状态变化</strong></p>
+<p>LLM RLHF 的“状态”可以理解为 $(x,y_{&lt;t})$，不同 prompt、不同 token 位置差异极大。一个 batch 常数 baseline 混合了各种状态，离“条件最优 $b^*(s)$”很远。</p>
+<p><strong>(2) 高维代价：$|u_i|^2$ 非常贵</strong></p>
+<p>$u_i&#x3D;\nabla_\theta \log \pi_\theta(y_i)$ 是十亿维梯度向量。要算范数平方就要获取并处理完整梯度结构，代价高且影响吞吐。</p>
+<p><strong>(3) 与同 batch 样本耦合，存在偏差与稳定性隐患</strong></p>
+<p>严格无偏性要求 baseline 不依赖动作；而 $\hat b_{\text{opt}}$ 用了当前 batch 的 $(R_i,u_i)$，与样本存在统计耦合。大 batch 下偏差可能很小，但在实际训练（batch 不大、分布漂移快）会带来额外不稳定因素。</p>
+<p><strong>(4) token 级训练更需要“逐状态 baseline”（critic）</strong><br>RLHF 常用 token-level advantage（配合 GAE&#x2F;价值网络），因为 reward 需要进行信用分配。batch 常数 baseline 无法提供逐 token 的结构化信息。</p>
+<hr>
+<h4 id="4-4-3-工业级框架的现有类似做法（“折中答案”）"><a href="#4-4-3-工业级框架的现有类似做法（“折中答案”）" class="headerlink" title="4.4.3 工业级框架的现有类似做法（“折中答案”）"></a>4.4.3 工业级框架的现有类似做法（“折中答案”）</h4><p>工业界往往采取更稳定、性价比更高的方案：</p>
+<ul>
+<li><strong>Value network &#x2F; Critic</strong>：学习 $V_\phi(s)$ 做状态相关 baseline</li>
+<li><strong>Advantage normalization</strong>：对 batch 的 advantage 做标准化<br>$$<br>A \leftarrow \frac{A-\mu_A}{\sigma_A}<br>$$<br>这在数值上相当于动态缩放梯度，明显提升稳定性</li>
+<li><strong>GAE</strong>：偏差–方差折中，为 token 级 credit assignment 提供更低方差的 advantage 估计</li>
+<li><strong>KL penalty &#x2F; PPO clipping</strong>：从分布漂移角度控制 ratio 尾部，抑制二阶矩</li>
+</ul>
+<blockquote>
+<p>可以把 batch-optimal baseline 视为“理论上可行但不够强&#x2F;不够便宜&#x2F;不够稳”的方案；工业界更偏好“状态相关 critic + 归一化 + KL 约束”的组合拳。</p>
+</blockquote>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://zyxian31.github.io/2026/03/01/from-gradient-to-rlhf_2/" data-id="cmm7gjvjl000e8wud6fsu36ov" data-title="从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part II）" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RLHF/" rel="tag">RLHF</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/" rel="tag">强化学习</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-from-gradient-to-rlhf_1" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2026/03/01/from-gradient-to-rlhf_1/" class="article-date">
+  <time class="dt-published" datetime="2026-03-01T05:20:00.000Z" itemprop="datePublished">2026-03-01</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2026/03/01/from-gradient-to-rlhf_1/">从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part I）</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="从梯度到-RLHF：策略梯度的数学本质、方差来源与工程控制（Part-I）"><a href="#从梯度到-RLHF：策略梯度的数学本质、方差来源与工程控制（Part-I）" class="headerlink" title="从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part I）"></a>从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part I）</h1><h2 id="0-预备说明：确定性梯度-vs-随机梯度估计器"><a href="#0-预备说明：确定性梯度-vs-随机梯度估计器" class="headerlink" title="0. 预备说明：确定性梯度 vs 随机梯度估计器"></a>0. 预备说明：确定性梯度 vs 随机梯度估计器</h2><blockquote>
+<p>目的：解决“梯度为什么会有方差？”这一误解</p>
+</blockquote>
+<p>很多读者（包括我最初讨论时的直觉）会认为：梯度是反向传播算出来的，既然计算图确定、数值确定，<strong>梯度怎么会有方差</strong>？</p>
+<p>这类疑问的关键在于：我们讨论的是两件不同的东西：</p>
+<ul>
+<li><strong>确定性梯度</strong>：对一个确定的目标函数（以及确定的数据）求导，结果是确定的数。</li>
+<li><strong>随机梯度估计器</strong>：目标函数是一个期望（Expectation），我们用随机采样来估计这个期望的梯度。此时“梯度估计值”本身是随机变量，因此有方差。</li>
+</ul>
+<p>下面把这两者严格区分开。</p>
+<hr>
+<h3 id="0-1-固定数据下的梯度是确定的"><a href="#0-1-固定数据下的梯度是确定的" class="headerlink" title="0.1 固定数据下的梯度是确定的"></a>0.1 固定数据下的梯度是确定的</h3><p>以监督学习为例。给定一个固定的数据集 ($D&#x3D;{(x_i,y_i)}_{i&#x3D;1}^N$)，定义经验风险：</p>
+<p>$$<br>L(\theta)&#x3D;\frac{1}{N}\sum_{i&#x3D;1}^{N}\ell\big(f_\theta(x_i),y_i\big)<br>$$</p>
+<p>这里：</p>
+<ul>
+<li>数据集 ($D$) 是固定的（常量）</li>
+<li>模型 ($f_\theta$) 是确定的可微函数</li>
+<li>损失 ($\ell(\cdot)$) 是确定的可微函数</li>
+</ul>
+<p>因此，梯度</p>
+<p>$$<br>\nabla_\theta L(\theta)<br>$$</p>
+<p>在给定 ($D$) 与 ($\theta$) 时是一个确定的向量：你在同一台机器上重复计算（忽略浮点误差）会得到同一个值。</p>
+<blockquote>
+<p>注意：工程上我们常说 “SGD 的梯度有噪声&#x2F;方差”，那是因为我们用 mini-batch 近似全量数据梯度；但<strong>对一个固定 mini-batch</strong>，梯度依然是确定的。<br>也就是说：监督学习里“随机性”来自我们人为抽样 mini-batch，而不是来自模型输出必须被采样。</p>
+</blockquote>
+<hr>
+<h3 id="0-2-策略梯度是随机变量"><a href="#0-2-策略梯度是随机变量" class="headerlink" title="0.2 策略梯度是随机变量"></a>0.2 策略梯度是随机变量</h3><p>强化学习与 LLM-RLHF 里，目标通常是<strong>最大化期望回报</strong>：</p>
+<p>$$<br>J(\theta)&#x3D;\mathbb{E}<em>{\tau\sim P</em>\theta(\tau)}[R(\tau)]<br>$$</p>
+<p>这里出现了本节核心对象：($\tau$)（trajectory，轨迹）。</p>
+<h4 id="0-2-1-哪些东西是随机变量？"><a href="#0-2-1-哪些东西是随机变量？" class="headerlink" title="0.2.1 哪些东西是随机变量？"></a>0.2.1 哪些东西是随机变量？</h4><p><strong>随机变量不是 ($\nabla_\theta J(\theta)$) 这个数学对象本身</strong>，而是我们在实践中用来估计它的“单次采样梯度”：</p>
+<ul>
+<li>轨迹：($\tau&#x3D;(s_0,a_0,s_1,a_1,\dots)$) 是随机变量</li>
+<li>回报：($R(\tau)$) 依赖于随机轨迹，因此也是随机变量</li>
+<li>单次采样的梯度估计器：</li>
+</ul>
+<p>$$<br>g(\tau)&#x3D;R(\tau)\nabla_\theta\log P_\theta(\tau)<br>$$</p>
+<p>是随机变量（因为它是随机轨迹 ($\tau$) 的函数）。</p>
+<p>真正想要的梯度是期望：</p>
+<p>$$<br>\nabla_\theta J(\theta)&#x3D;\mathbb{E}<em>{\tau\sim P</em>\theta}[g(\tau)]<br>$$</p>
+<p>而训练时我们拿到的是有限条采样轨迹的平均：</p>
+<p>$$<br>\widehat{\nabla_\theta J}&#x3D;\frac{1}{N}\sum_{i&#x3D;1}^N g(\tau_i)<br>\quad,\quad \tau_i\sim P_\theta<br>$$</p>
+<p>由于 ($\tau_i$) 是随机采样的，这个估计 ($\widehat{\nabla_\theta J}$) 自然就会在不同 batch 之间波动——这就是“方差”的来源。</p>
+<hr>
+<h4 id="0-2-2-为什么固定数据下梯度就不是随机变量，而策略梯度是？"><a href="#0-2-2-为什么固定数据下梯度就不是随机变量，而策略梯度是？" class="headerlink" title="0.2.2 为什么固定数据下梯度就不是随机变量，而策略梯度是？"></a>0.2.2 为什么固定数据下梯度就不是随机变量，而策略梯度是？</h4><p>对比的关键在于：“输入是否是随机生成的”。</p>
+<ul>
+<li><strong>监督学习（固定数据）</strong>：你计算 ($\nabla_\theta L(\theta)$) 时，参与计算的样本 (${(x_i,y_i)}$) 是固定常量；梯度是确定函数值。</li>
+<li><strong>策略梯度（采样轨迹）</strong>：你计算 ($g(\tau)$) 时，参与计算的是由当前策略与环境交互产生的随机轨迹 ($\tau$)。即使你固定 ($\theta$)，每次 rollout 仍会产生不同的 ($\tau$)，从而得到不同的 ($g(\tau)$)。</li>
+</ul>
+<p>更直白地说：</p>
+<ul>
+<li>监督学习：样本在磁盘里，训练时只是读取</li>
+<li>强化学习 &#x2F; RLHF：样本要“生成出来”（rollout &#x2F; sampling），生成过程本身带随机性</li>
+</ul>
+<p>所以两者的“随机性地位”不同：</p>
+<ul>
+<li>监督学习里，随机性通常是你为了省计算故意抽 mini-batch（可关掉）</li>
+<li>策略梯度里，随机性来自策略的随机采样与环境随机性（通常关不掉，除非你用完全确定性策略且环境确定，且仍然存在探索&#x2F;可导性问题）</li>
+</ul>
+<hr>
+<h4 id="0-2-3-随机性具体体现在哪里？从什么分布采样？"><a href="#0-2-3-随机性具体体现在哪里？从什么分布采样？" class="headerlink" title="0.2.3 随机性具体体现在哪里？从什么分布采样？"></a>0.2.3 随机性具体体现在哪里？从什么分布采样？</h4><p>要回答“从什么分布采样”，我们把轨迹分布 ($P_\theta(\tau)$) 展开：</p>
+<h1 id="P-theta-tau"><a href="#P-theta-tau" class="headerlink" title="$$P_\theta(\tau)"></a>$$<br>P_\theta(\tau)</h1><p>\rho(s_0)\prod_{t&#x3D;0}^{T-1}\pi_\theta(a_t|s_t),P(s_{t+1}|s_t,a_t)<br>$$</p>
+<p>其中：</p>
+<ul>
+<li>($\rho(s_0)$)：初始状态分布</li>
+<li>($\pi_\theta(a_t|s_t)$)：策略分布（由模型给出）</li>
+<li>($P(s_{t+1}|s_t,a_t)$)：环境转移分布（黑箱或仿真器）</li>
+</ul>
+<p>这告诉我们：轨迹的随机性至少来自两处：</p>
+<ol>
+<li><strong>动作采样</strong>：($a_t\sim \pi_\theta(\cdot|s_t)$)</li>
+<li><strong>环境随机性</strong>：($s_{t+1}\sim P(\cdot|s_t,a_t)$)</li>
+</ol>
+<p>在 LLM-RLHF 中，环境可以理解为“生成过程 + reward 评价”，最核心的随机性来自：</p>
+<p>$$<br>y_t \sim \pi_\theta(\cdot|y_{&lt;t},x)<br>$$</p>
+<p>即每个 token 的采样。</p>
+<blockquote>
+<p>即使 reward model 是确定函数 ($r(y)$)，由于 ($y$) 是从 ($\pi_\theta$) 随机采样得到，($R&#x3D;r(y)$) 作为随机变量仍然会有方差：<br>$$<br>\mathrm{Var}(R)&#x3D;\mathrm{Var}<em>{y\sim\pi</em>\theta}[r(y)]<br>$$</p>
+</blockquote>
+<hr>
+<h4 id="0-2-4-一个极简数值例子：单-token-的梯度为什么会波动？"><a href="#0-2-4-一个极简数值例子：单-token-的梯度为什么会波动？" class="headerlink" title="0.2.4 一个极简数值例子：单 token 的梯度为什么会波动？"></a>0.2.4 一个极简数值例子：单 token 的梯度为什么会波动？</h4><p>很多人（包括我在讨论中）会误以为“梯度波动来自数值精度”。实际上，不需要任何数值误差，<strong>采样本身就足以制造方差</strong>。</p>
+<p>假设某一步 token 只有两个候选 A &#x2F; B：</p>
+<p>$$<br>\pi(A)&#x3D;0.9,\quad \pi(B)&#x3D;0.1<br>$$</p>
+<p>把参数简化为控制 ($\pi(B)$) 的 logit ($z_B$)。则（softmax&#x2F;sigmoid 的标准结果）：</p>
+<ul>
+<li>如果采到 B：</li>
+</ul>
+<p>$$<br>u&#x3D;\nabla_{z_B}\log\pi(B)&#x3D;1-\pi(B)&#x3D;0.9<br>$$</p>
+<ul>
+<li>如果采到 A：</li>
+</ul>
+<p>$$<br>u&#x3D;\nabla_{z_B}\log\pi(A)&#x3D;-\pi(B)&#x3D;-0.1<br>$$</p>
+<p>因此 ($u$) 是随机变量：</p>
+<p>$$<br>u&#x3D;<br>\begin{cases}<br>0.9 &amp; \text{概率 }0.1 \<br>-0.1 &amp; \text{概率 }0.9<br>\end{cases}<br>$$</p>
+<p>它的期望是 0（这是一个重要恒等式）：</p>
+<p>$$<br>\mathbb{E}[u]&#x3D;0.1\cdot 0.9 + 0.9\cdot (-0.1)&#x3D;0<br>$$</p>
+<p>但二阶矩非零：</p>
+<p>$$<br>\mathbb{E}[u^2]&#x3D;0.1\cdot 0.9^2+0.9\cdot 0.1^2<br>&#x3D;0.1\cdot 0.81+0.9\cdot 0.01<br>&#x3D;0.09<br>$$</p>
+<p>所以方差：</p>
+<p>$$<br>\mathrm{Var}(u)&#x3D;0.09<br>$$</p>
+<p>这说明：<strong>即便完全没有数值误差，单 token 的 log-prob 梯度也会因采样而波动。</strong></p>
+<p>一旦你把多个 token 的梯度相加、再乘上回报 ($R$)，方差会进一步累积和放大——这就是后文“策略梯度方差大”的根源之一。</p>
+<hr>
+<h4 id="0-2-5-为什么不能“解析地”计算期望梯度，而必须采样估计？"><a href="#0-2-5-为什么不能“解析地”计算期望梯度，而必须采样估计？" class="headerlink" title="0.2.5 为什么不能“解析地”计算期望梯度，而必须采样估计？"></a>0.2.5 为什么不能“解析地”计算期望梯度，而必须采样估计？</h4><p>你可能会问：既然</p>
+<p>$$<br>\nabla_\theta J(\theta)&#x3D;\mathbb{E}<em>{\tau\sim P</em>\theta}[g(\tau)]<br>$$</p>
+<p>那我能不能把这个期望直接算出来？</p>
+<p>理论上，如果你能枚举所有轨迹 ($\tau$)，当然可以：</p>
+<p>$$<br>\nabla_\theta J(\theta)&#x3D;\sum_\tau P_\theta(\tau)g(\tau)<br>$$</p>
+<p>但在实际问题里，这条路基本不可行，原因是<strong>轨迹空间爆炸</strong>：</p>
+<ul>
+<li>离散动作空间大小为 ($|\mathcal{A}|$)</li>
+<li>序列&#x2F;轨迹长度为 ($T$)</li>
+</ul>
+<p>仅动作序列数就有：</p>
+<p>$$<br>|\mathcal{A}|^T<br>$$</p>
+<p>在 LLM 中更夸张：</p>
+<ul>
+<li>token 词表 ($|V|$) 可能是 50k</li>
+<li>序列长度 ($T$) 动辄几百上千</li>
+</ul>
+<p>序列数 ($|V|^T$) 天文级，无法枚举，也无法精确求和。</p>
+<p>同时，轨迹分布还包含环境转移 ($P(s’|s,a)$)，真实世界或复杂仿真里它是黑箱，你甚至没有解析形式可用。</p>
+<p>因此实际只能用 Monte Carlo：</p>
+<p>$$<br>\nabla_\theta J(\theta)<br>\approx<br>\frac{1}{N}\sum_{i&#x3D;1}^{N} g(\tau_i)<br>\quad,\quad \tau_i\sim P_\theta<br>$$</p>
+<p>这一步把“解析求和”换成“随机采样平均”，代价就是：</p>
+<ul>
+<li>估计器有方差</li>
+<li>方差随 ($N$) 增大而下降（大致 ($\propto 1&#x2F;N$)），但样本成本很高</li>
+</ul>
+<hr>
+<h2 id="0-3-工程视角：SFT-与-RLHF-中梯度随机性的本质差别"><a href="#0-3-工程视角：SFT-与-RLHF-中梯度随机性的本质差别" class="headerlink" title="0.3 工程视角：SFT 与 RLHF 中梯度随机性的本质差别"></a>0.3 工程视角：SFT 与 RLHF 中梯度随机性的本质差别</h2><p>理解策略梯度为什么有方差，最直观的方法就是对比：</p>
+<ul>
+<li><strong>SFT（Supervised Fine-Tuning）</strong></li>
+<li><strong>RLHF（基于策略梯度的微调）</strong></li>
+</ul>
+<p>它们都训练同一个模型，但梯度的随机性来源完全不同。</p>
+<hr>
+<h3 id="0-3-1-SFT：Teacher-Forcing-下的“条件确定性梯度”"><a href="#0-3-1-SFT：Teacher-Forcing-下的“条件确定性梯度”" class="headerlink" title="0.3.1 SFT：Teacher Forcing 下的“条件确定性梯度”"></a>0.3.1 SFT：Teacher Forcing 下的“条件确定性梯度”</h3><p>在 SFT 中，我们有固定的数据对：</p>
+<p>$$<br>(x, y_1, y_2, \dots, y_T)<br>$$</p>
+<p>训练目标是最大化条件似然：</p>
+<h1 id="L-theta"><a href="#L-theta" class="headerlink" title="$$L(\theta)"></a>$$<br>L(\theta)</h1><p>\sum_{t&#x3D;1}^{T}<br>\log \pi_\theta(y_t \mid y_{&lt;t}, x)<br>$$</p>
+<p>梯度为：</p>
+<h1 id="nabla-theta-L-theta"><a href="#nabla-theta-L-theta" class="headerlink" title="$$\nabla_\theta L(\theta)"></a>$$<br>\nabla_\theta L(\theta)</h1><p>\sum_{t&#x3D;1}^{T}<br>\nabla_\theta \log \pi_\theta(y_t \mid y_{&lt;t}, x)<br>$$</p>
+<p>关键点：</p>
+<ul>
+<li>所有 token (y_t) 是<strong>数据集给定的固定值</strong></li>
+<li>不存在采样</li>
+<li>给定 mini-batch 后梯度是确定的</li>
+</ul>
+<blockquote>
+<p>即使模型输出分布是概率分布，我们并没有从中采样，而是用真实标签（teacher forcing）直接计算 log-prob。</p>
+</blockquote>
+<p>因此：</p>
+<ul>
+<li>SFT 的随机性仅来自“我们抽取了哪个 mini-batch”</li>
+<li>对于固定 mini-batch，梯度是确定的</li>
+</ul>
+<hr>
+<h3 id="0-3-2-RLHF：必须采样，随机性不可消除"><a href="#0-3-2-RLHF：必须采样，随机性不可消除" class="headerlink" title="0.3.2 RLHF：必须采样，随机性不可消除"></a>0.3.2 RLHF：必须采样，随机性不可消除</h3><p>在 RLHF 中，我们优化：</p>
+<h1 id="J-theta"><a href="#J-theta" class="headerlink" title="$$J(\theta)"></a>$$<br>J(\theta)</h1><p>\mathbb{E}<em>{y \sim \pi</em>\theta(\cdot|x)}<br>[r(y)]<br>$$</p>
+<p>训练步骤是：</p>
+<ol>
+<li>用当前模型 <strong>采样生成文本</strong>：</li>
+</ol>
+<p>$$<br>y \sim \pi_\theta(\cdot|x)<br>$$</p>
+<ol start="2">
+<li>用 reward model 计算分数：</li>
+</ol>
+<p>$$<br>R &#x3D; r(y)<br>$$</p>
+<ol start="3">
+<li>用策略梯度更新：</li>
+</ol>
+<h1 id="g"><a href="#g" class="headerlink" title="$$g"></a>$$<br>g</h1><p>R \sum_{t&#x3D;1}^{T}<br>\nabla_\theta \log \pi_\theta(y_t|y_{&lt;t},x)<br>$$</p>
+<p>注意这里的根本差异：</p>
+<ul>
+<li>在 SFT 中，(y_t) 来自数据集（常量）</li>
+<li>在 RLHF 中，(y_t) 来自模型分布（随机变量）</li>
+</ul>
+<p>因此：</p>
+<ul>
+<li>每一次 rollout 都可能生成不同文本</li>
+<li>reward 会随生成文本变化</li>
+<li>每个 token 的 log-prob 梯度也随采样 token 改变</li>
+</ul>
+<p>即使：</p>
+<ul>
+<li>reward model 是确定函数</li>
+<li>环境是确定性的</li>
+</ul>
+<p>只要生成是采样的：</p>
+<p>$$<br>y \sim \pi_\theta<br>$$</p>
+<p>梯度估计器就不可避免是随机变量。</p>
+<hr>
+<h3 id="0-3-3-一个极简对比示例"><a href="#0-3-3-一个极简对比示例" class="headerlink" title="0.3.3 一个极简对比示例"></a>0.3.3 一个极简对比示例</h3><p>假设 prompt 相同：</p>
+<h4 id="SFT-情况"><a href="#SFT-情况" class="headerlink" title="SFT 情况"></a>SFT 情况</h4><p>数据给定：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Question: 2+2=?</span><br><span class="line">Answer: 4</span><br></pre></td></tr></table></figure>
+
+<p>训练时永远计算：</p>
+<p>$$<br>\nabla_\theta \log \pi_\theta(4|\text{2+2&#x3D;?})<br>$$</p>
+<p>梯度是确定的。</p>
+<hr>
+<h4 id="RLHF-情况"><a href="#RLHF-情况" class="headerlink" title="RLHF 情况"></a>RLHF 情况</h4><p>模型可能生成：</p>
+<ul>
+<li>“4”（reward &#x3D; 1）</li>
+<li>“5”（reward &#x3D; 0）</li>
+<li>“The answer is 4.”（reward &#x3D; 0.9）</li>
+</ul>
+<p>不同采样 → 不同 reward → 不同梯度。</p>
+<p>哪怕参数 θ 不变，两次 rollout 得到的梯度也不同。</p>
+<hr>
+<h3 id="0-3-4-为什么-RLHF-不能改成“像-SFT-一样不采样”？"><a href="#0-3-4-为什么-RLHF-不能改成“像-SFT-一样不采样”？" class="headerlink" title="0.3.4 为什么 RLHF 不能改成“像 SFT 一样不采样”？"></a>0.3.4 为什么 RLHF 不能改成“像 SFT 一样不采样”？</h3><p>因为 RLHF 的目标不是拟合固定标签，而是最大化：</p>
+<p>$$<br>\mathbb{E}<em>{y\sim \pi</em>\theta}[r(y)]<br>$$</p>
+<p>如果不采样，就无法估计模型在当前分布下的期望 reward。</p>
+<p>你无法提前知道：</p>
+<ul>
+<li>哪些输出当前策略概率高</li>
+<li>哪些输出 reward 高</li>
+</ul>
+<p>因此必须从当前策略分布中采样，估计：</p>
+<p>$$<br>\nabla_\theta J(\theta)<br>$$</p>
+<p>这一步不可避免地引入 Monte Carlo 估计误差。</p>
+<hr>
+<h3 id="0-3-5-核心对比总结"><a href="#0-3-5-核心对比总结" class="headerlink" title="0.3.5 核心对比总结"></a>0.3.5 核心对比总结</h3><table>
+<thead>
+<tr>
+<th></th>
+<th>SFT</th>
+<th>RLHF</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>token 来源</td>
+<td>数据集</td>
+<td>模型采样</td>
+</tr>
+<tr>
+<td>reward 来源</td>
+<td>固定标签</td>
+<td>reward model</td>
+</tr>
+<tr>
+<td>梯度是否条件确定</td>
+<td>是（给定 batch）</td>
+<td>否</td>
+</tr>
+<tr>
+<td>方差来源</td>
+<td>mini-batch 抽样</td>
+<td>生成采样 + reward 波动</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="0-3-6-一句话总结"><a href="#0-3-6-一句话总结" class="headerlink" title="0.3.6 一句话总结"></a>0.3.6 一句话总结</h3><blockquote>
+<p>SFT 的梯度是“对固定数据的确定性函数求导”；<br>RLHF 的梯度是“对随机生成样本的期望进行 Monte Carlo 估计”。</p>
+</blockquote>
+<p>因此：</p>
+<ul>
+<li>策略梯度的方差不是数值误差</li>
+<li>不是实现问题</li>
+<li>而是优化目标本身的统计性质决定的</li>
+</ul>
+<p>这也是后文所有“baseline、advantage、PPO、KL 控制”的理论前提。</p>
+<h3 id="本节小结"><a href="#本节小结" class="headerlink" title="本节小结"></a>本节小结</h3><ul>
+<li>对固定数据的梯度是确定的：随机性只来自你是否抽 mini-batch。</li>
+<li>策略梯度训练时用的是“随机梯度估计器” ($g(\tau)$)，随机性来自轨迹&#x2F;文本的采样。</li>
+<li>在 LLM-RLHF 中，即使 reward model 是确定函数，reward 作为随机变量仍然会因生成样本不同而波动。</li>
+<li>期望梯度无法解析计算，原因是轨迹&#x2F;序列空间指数爆炸 + 环境黑箱，只能用采样估计，因此方差是内生的。</li>
+</ul>
+<h2 id="1-梯度与策略梯度：定义与区别"><a href="#1-梯度与策略梯度：定义与区别" class="headerlink" title="1. 梯度与策略梯度：定义与区别"></a>1. 梯度与策略梯度：定义与区别</h2><p>这一节的目标是把三个概念彻底分开：<strong>梯度</strong>（纯数学对象）、<strong>用梯度做优化</strong>（下降&#x2F;上升只是符号选择）、以及<strong>策略梯度</strong>（强化学习里对“分布参数”求导的特定形式）。后面的推导、方差分析、baseline 和 PPO&#x2F;KL 都建立在这三者的清晰区分之上。</p>
+<hr>
+<h3 id="1-1-梯度定义"><a href="#1-1-梯度定义" class="headerlink" title="1.1 梯度定义"></a>1.1 梯度定义</h3><h4 id="1-1-1-数学定义（严格形式）"><a href="#1-1-1-数学定义（严格形式）" class="headerlink" title="1.1.1 数学定义（严格形式）"></a>1.1.1 数学定义（严格形式）</h4><p>设有一个从参数空间到实数的可微函数：</p>
+<p>$$<br>f:\mathbb{R}^d \rightarrow \mathbb{R},\quad f&#x3D;f(\theta)<br>$$</p>
+<p>它在点 ($\theta$) 的<strong>梯度</strong>定义为偏导数组成的向量：</p>
+<h1 id="nabla-theta-f-theta"><a href="#nabla-theta-f-theta" class="headerlink" title="$$\nabla_\theta f(\theta)"></a>$$<br>\nabla_\theta f(\theta)</h1><p>\left(<br>\frac{\partial f}{\partial \theta_1},<br>\frac{\partial f}{\partial \theta_2},<br>\dots,<br>\frac{\partial f}{\partial \theta_d}<br>\right)^\top<br>$$</p>
+<p>它满足一个关键的“局部线性近似”性质：对任意小扰动 ($\Delta \theta$)，有</p>
+<p>$$<br>f(\theta+\Delta\theta)<br>\approx<br>f(\theta) + \nabla_\theta f(\theta)^\top \Delta\theta<br>$$</p>
+<p>这句话的意义是：在足够小的邻域里，($f$) 的变化近似由内积 ($\nabla f \cdot \Delta\theta$) 决定。</p>
+<hr>
+<h4 id="1-1-2-直观含义（可操作的解释）"><a href="#1-1-2-直观含义（可操作的解释）" class="headerlink" title="1.1.2 直观含义（可操作的解释）"></a>1.1.2 直观含义（可操作的解释）</h4><ul>
+<li>梯度给出“<strong>函数增长最快的方向</strong>”：在所有单位方向向量 ($v$) 中，使 ($f(\theta+\epsilon v)$) 增大最快的方向就是梯度方向。</li>
+</ul>
+<p>更形式地说，方向导数为：</p>
+<p>$$<br>D_v f(\theta)&#x3D;\lim_{\epsilon\to 0}\frac{f(\theta+\epsilon v)-f(\theta)}{\epsilon}<br>&#x3D; \nabla_\theta f(\theta)^\top v<br>$$</p>
+<p>当 ($|v|&#x3D;1$) 时，最大值由柯西–施瓦茨不等式得到：</p>
+<p>$$<br>\nabla f(\theta)^\top v \le |\nabla f(\theta)||v| &#x3D; |\nabla f(\theta)|<br>$$</p>
+<p>等号当且仅当 ($v$) 与 ($\nabla f$) 同向成立。因此：</p>
+<ul>
+<li><strong>沿着 ($\nabla f$) 走，($f$) 增加最快；</strong></li>
+<li><strong>沿着 ($-\nabla f$) 走，($f$) 减少最快。</strong></li>
+</ul>
+<p>这也解释了为什么“梯度”会自然地成为优化的方向信号：它提供了局部最陡方向。</p>
+<hr>
+<h3 id="1-2-梯度下降-vs-梯度上升"><a href="#1-2-梯度下降-vs-梯度上升" class="headerlink" title="1.2 梯度下降 vs 梯度上升"></a>1.2 梯度下降 vs 梯度上升</h3><h4 id="1-2-1-只是目标符号不同，不是方法本质不同"><a href="#1-2-1-只是目标符号不同，不是方法本质不同" class="headerlink" title="1.2.1 只是目标符号不同，不是方法本质不同"></a>1.2.1 只是目标符号不同，不是方法本质不同</h4><p>优化时你要么：</p>
+<ul>
+<li><strong>最小化</strong>一个目标（例如损失）</li>
+<li><strong>最大化</strong>一个目标（例如回报）</li>
+</ul>
+<p>两者在数学上互为相反数。若最大化 ($J(\theta)$)，等价于最小化 ($-J(\theta)$)：</p>
+<p>$$<br>\max_\theta J(\theta)<br>\quad\Longleftrightarrow\quad<br>\min_\theta -J(\theta)<br>$$</p>
+<p>因此更新规则只是符号选择：</p>
+<ul>
+<li>最小化（梯度下降）：</li>
+</ul>
+<p>$$<br>\theta \leftarrow \theta - \alpha \nabla_\theta L(\theta)<br>$$</p>
+<ul>
+<li>最大化（梯度上升）：</li>
+</ul>
+<p>$$<br>\theta \leftarrow \theta + \alpha \nabla_\theta J(\theta)<br>$$</p>
+<p>这里 ($\alpha&gt;0$) 是学习率。</p>
+<blockquote>
+<p>关键结论：<strong>采用上升还是下降，完全由你的优化目标是“最大化”还是“最小化”决定。</strong><br>算法本质仍是“沿着局部一阶近似的最陡方向移动”。</p>
+</blockquote>
+<hr>
+<h3 id="1-3-策略梯度定义"><a href="#1-3-策略梯度定义" class="headerlink" title="1.3 策略梯度定义"></a>1.3 策略梯度定义</h3><p>强化学习中，我们的“模型”不是直接输出一个数，而是输出一个<strong>策略（policy）</strong>：给定状态 (s)，输出对动作 (a) 的概率分布。</p>
+<p>$$<br>\pi_\theta(a|s)<br>$$</p>
+<p>其中 ($\theta$) 是策略参数（例如神经网络参数），($\pi_\theta(a|s)$) 是在状态 ($s$) 选择动作 ($a$) 的概率。</p>
+<p>强化学习的优化目标通常写成<strong>期望回报</strong>：</p>
+<p>$$<br>J(\theta)&#x3D;\mathbb{E}<em>{\tau\sim P</em>\theta(\tau)}[R(\tau)]<br>$$</p>
+<ul>
+<li>($\tau$) 是轨迹（trajectory），包含状态、动作序列：($(s_0,a_0,s_1,a_1,\dots)$)</li>
+<li>($P_\theta(\tau)$) 是在策略 ($\pi_\theta$) 下产生轨迹的概率分布</li>
+<li>($R(\tau)$) 是该轨迹的回报（return）</li>
+</ul>
+<p>于是，“策略梯度（policy gradient）”指的就是：</p>
+<p>$$<br>\nabla_\theta J(\theta)<br>$$</p>
+<p>也就是：<strong>对策略参数求导，让期望回报变大。</strong></p>
+<blockquote>
+<p>和监督学习最重要的不同点在于：<br>这里的目标函数是一个对“轨迹分布”取期望的量，($\theta$) 影响的是 ($P_\theta(\tau)$)（即采样分布），而不是直接给出一个可微的标量输出供你对齐标签。</p>
+</blockquote>
+<p>在 LLM 的 RLHF 里，策略就是语言模型的 token 分布：</p>
+<p>$$<br>\pi_\theta(y_t|y_{&lt;t},x)<br>$$</p>
+<p>轨迹是完整生成序列 ($y&#x3D;(y_1,\dots,y_T)$)，回报是 reward model 对整段输出的评分 ($r(y)$)。形式完全一致：</p>
+<p>$$<br>J(\theta)&#x3D;\mathbb{E}<em>{y\sim \pi</em>\theta(\cdot|x)}[r(y)]<br>$$</p>
+<hr>
+<h3 id="1-4-监督学习-vs-强化学习的差异"><a href="#1-4-监督学习-vs-强化学习的差异" class="headerlink" title="1.4 监督学习 vs 强化学习的差异"></a>1.4 监督学习 vs 强化学习的差异</h3><p>这一节只强调最核心、与后文推导直接相关的差异：<strong>优化对象、数据生成机制、以及梯度信号的来源</strong>。</p>
+<h4 id="1-4-1-优化对象不同：拟合标签-vs-优化期望回报"><a href="#1-4-1-优化对象不同：拟合标签-vs-优化期望回报" class="headerlink" title="1.4.1 优化对象不同：拟合标签 vs 优化期望回报"></a>1.4.1 优化对象不同：拟合标签 vs 优化期望回报</h4><ul>
+<li>监督学习：数据集提供“正确答案&#x2F;标签”，目标是最小化预测误差</li>
+</ul>
+<p>$$<br>\min_\theta \mathbb{E}<em>{(x,y)\sim D}\big[\ell(f</em>\theta(x),y)\big]<br>$$</p>
+<ul>
+<li>强化学习：没有逐步标签，目标是最大化交互产生的期望回报</li>
+</ul>
+<p>$$<br>\max_\theta \mathbb{E}<em>{\tau\sim P</em>\theta}[R(\tau)]<br>$$</p>
+<p>监督学习里的误差信号来自“标签差”，强化学习里来自“回报好坏”。</p>
+<hr>
+<h4 id="1-4-2-数据生成机制不同：离线固定数据-vs-在线采样轨迹"><a href="#1-4-2-数据生成机制不同：离线固定数据-vs-在线采样轨迹" class="headerlink" title="1.4.2 数据生成机制不同：离线固定数据 vs 在线采样轨迹"></a>1.4.2 数据生成机制不同：离线固定数据 vs 在线采样轨迹</h4><ul>
+<li>监督学习：样本 ((x,y)) 在数据集里是固定的，你读取它们并计算梯度</li>
+<li>强化学习：样本（轨迹）需要由当前策略去环境中<strong>生成&#x2F;采样</strong>出来</li>
+</ul>
+<p>这一点决定了：强化学习里你讨论的不是“对固定样本的梯度”，而是“对随机采样轨迹的梯度估计器”（这也是为什么后文必须谈方差、baseline、PPO 等稳定化技术）。</p>
+<hr>
+<h4 id="1-4-3-可微性链路不同：计算图可见-vs-黑箱环境-采样节点"><a href="#1-4-3-可微性链路不同：计算图可见-vs-黑箱环境-采样节点" class="headerlink" title="1.4.3 可微性链路不同：计算图可见 vs 黑箱环境&#x2F;采样节点"></a>1.4.3 可微性链路不同：计算图可见 vs 黑箱环境&#x2F;采样节点</h4><ul>
+<li><p>监督学习的计算图通常是：<br>$$<br>\theta \rightarrow f_\theta(x) \rightarrow \ell(\cdot,y)<br>$$<br>全部在模型内部，端到端可微。</p>
+</li>
+<li><p>强化学习的交互链路通常是：<br>$$<br>\theta \rightarrow \pi_\theta(a|s) \rightarrow \text{采样 }a \rightarrow \text{环境} \rightarrow R<br>$$<br>其中“采样动作”和“环境转移”通常不可微或不可得解析形式。</p>
+</li>
+</ul>
+<p>因此强化学习要用“对分布求导”的方式（后文的 log-likelihood trick &#x2F; score function）把梯度写成可采样估计的形式。</p>
+<hr>
+<h4 id="1-4-4-信号结构不同：稠密监督-vs-延迟回报（信用分配）"><a href="#1-4-4-信号结构不同：稠密监督-vs-延迟回报（信用分配）" class="headerlink" title="1.4.4 信号结构不同：稠密监督 vs 延迟回报（信用分配）"></a>1.4.4 信号结构不同：稠密监督 vs 延迟回报（信用分配）</h4><p>监督学习通常每个样本都有直接误差信号；强化学习常见设置是回报在轨迹末端或稀疏出现，导致信用分配（credit assignment）更难、方差更大。LLM 的 RLHF 就属于典型的“序列末端给分”的结构：reward 对整段生成打分，但梯度要分摊到每个 token 的采样决策上。</p>
+<hr>
+<p><strong>本节小结</strong></p>
+<ul>
+<li>梯度是局部一阶变化率向量；下降&#x2F;上升仅由目标的最小化&#x2F;最大化决定。</li>
+<li>策略梯度是强化学习中对 ($J(\theta)&#x3D;\mathbb{E}[R]$) 求导，其核心是：($\theta$) 改变的是采样分布而非直接标签误差。</li>
+<li>监督学习与强化学习的关键差异在于数据生成与可微链路：前者“固定数据 + 直接误差”，后者“采样轨迹 + 分布求导”，这自然引出后文的 log-likelihood trick 与方差控制工具。</li>
+</ul>
+<h2 id="2-从第一性原理推导策略梯度"><a href="#2-从第一性原理推导策略梯度" class="headerlink" title="2. 从第一性原理推导策略梯度"></a>2. 从第一性原理推导策略梯度</h2><p>本节要解决两件事：</p>
+<ol>
+<li><strong>数学上</strong>：从 ($J(\theta)&#x3D;\mathbb{E}[R]$) 出发推导出可采样估计的梯度形式</li>
+<li><strong>概念上</strong>：澄清“不是不能对 ($\mathbb{E}[R]$) 求导，而是不能解析枚举求导；需要通过采样估计”</li>
+</ol>
+<h3 id="2-1-数学推导（含中间-trick）"><a href="#2-1-数学推导（含中间-trick）" class="headerlink" title="2.1 数学推导（含中间 trick）"></a>2.1 数学推导（含中间 trick）</h3><h4 id="2-1-1-目标函数：期望回报"><a href="#2-1-1-目标函数：期望回报" class="headerlink" title="2.1.1 目标函数：期望回报"></a>2.1.1 目标函数：期望回报</h4><p>定义轨迹（trajectory）：</p>
+<p>$$<br>\tau&#x3D;(s_0,a_0,s_1,a_1,\dots,s_T)<br>$$</p>
+<p>策略为 ($\pi_\theta(a|s)$)，轨迹分布为：</p>
+<p>$$<br>P_\theta(\tau)&#x3D;\rho(s_0)\prod_{t&#x3D;0}^{T-1}\pi_\theta(a_t|s_t),P(s_{t+1}|s_t,a_t)<br>$$</p>
+<p>回报（return）记为 ($R(\tau)$)。优化目标：</p>
+<p>$$<br>J(\theta)&#x3D;\mathbb{E}<em>{\tau\sim P</em>\theta}[R(\tau)]<br>&#x3D;\sum_{\tau}P_\theta(\tau)R(\tau)<br>$$</p>
+<blockquote>
+<p>这里写成求和是离散轨迹情形；连续情形就是积分，推导一致。</p>
+</blockquote>
+<hr>
+<h4 id="2-1-2-对期望求导（第一性原理）"><a href="#2-1-2-对期望求导（第一性原理）" class="headerlink" title="2.1.2 对期望求导（第一性原理）"></a>2.1.2 对期望求导（第一性原理）</h4><p>直接对 ($\theta$) 求导：</p>
+<p>$$<br>\nabla_\theta J(\theta)&#x3D;\sum_\tau \nabla_\theta P_\theta(\tau),R(\tau)<br>$$</p>
+<p>困难在于 ($\nabla_\theta P_\theta(\tau)$) 不好用：它不在“期望形式”，不利于采样估计。关键 trick 是把 ($\nabla P$) 变成 ($P\nabla\log P$)。</p>
+<blockquote>
+<p>对这里做几个阐述：</p>
+<h2 id="1-“不在期望形式”到底是什么意思？"><a href="#1-“不在期望形式”到底是什么意思？" class="headerlink" title="1) “不在期望形式”到底是什么意思？"></a>1) “不在期望形式”到底是什么意思？</h2><p>你现在有：</p>
+<p>$$<br>\nabla_\theta J(\theta)&#x3D;\sum_\tau \nabla_\theta P_\theta(\tau),R(\tau)<br>$$</p>
+<p>这当然是对的。但问题是：在强化学习&#x2F;LLM 里，($\tau$) 的空间巨大（指数级），你无法枚举求和，所以你想做的是用采样来近似这个和：</p>
+<p>$$<br>\sum_\tau (\cdot) \approx \frac{1}{N}\sum_{i&#x3D;1}^N (\cdot)\Big|_{\tau_i}<br>$$</p>
+<p>而 <strong>Monte Carlo 采样近似</strong>之所以成立，要求你写成下面这种结构：</p>
+<p>$$<br>\sum_\tau P_\theta(\tau),f(\tau)<br>\quad\Rightarrow\quad<br>\mathbb{E}<em>{\tau\sim P</em>\theta}[f(\tau)]<br>$$</p>
+<p>因为你采样的是 ($\tau_i\sim P_\theta$)，也就是用 ($P_\theta$) 当“权重”。</p>
+<p>但你的式子是：</p>
+<p>$$<br>\sum_\tau \nabla_\theta P_\theta(\tau),R(\tau)<br>$$</p>
+<p>这里的“权重”不是 ($P_\theta(\tau)$)，而是 ($\nabla_\theta P_\theta(\tau)$)，它既：</p>
+<ul>
+<li>不是概率分布（不非负、和不为 1）</li>
+<li>也不是你能用“从某个分布采样”的方式自然得到的权重</li>
+</ul>
+<p>所以它“不在期望形式”的真正含义是：</p>
+<blockquote>
+<p>你没法直接把它解释成 “对某个可采样分布的期望”，因此无法用“采样均值”去构造一个自然的无偏估计器。</p>
+</blockquote>
+<hr>
+<h2 id="2-“不利于采样估计”具体卡在哪里？"><a href="#2-“不利于采样估计”具体卡在哪里？" class="headerlink" title="2) “不利于采样估计”具体卡在哪里？"></a>2) “不利于采样估计”具体卡在哪里？</h2><p>假设你硬要用 ($\tau_i\sim P_\theta(\tau)$) 来采样（这是你唯一能采样的分布：用策略 rollout）。</p>
+<p>那么你想要无偏估计：</p>
+<p>$$<br>\sum_\tau \nabla_\theta P_\theta(\tau),R(\tau)<br>$$</p>
+<p>通常的套路是乘除以 ($P_\theta(\tau)$)：</p>
+<h1 id="sum-tau-nabla-theta-P-theta-tau-R-tau"><a href="#sum-tau-nabla-theta-P-theta-tau-R-tau" class="headerlink" title="$$\sum_\tau \nabla_\theta P_\theta(\tau),R(\tau)"></a>$$<br>\sum_\tau \nabla_\theta P_\theta(\tau),R(\tau)</h1><h1 id="sum-tau-P-theta-tau-underbrace-frac-nabla-theta-P-theta-tau-P-theta-tau-R-tau-f-tau"><a href="#sum-tau-P-theta-tau-underbrace-frac-nabla-theta-P-theta-tau-P-theta-tau-R-tau-f-tau" class="headerlink" title="\sum_\tau P_\theta(\tau),\underbrace{\frac{\nabla_\theta P_\theta(\tau)}{P_\theta(\tau)}R(\tau)}_{f(\tau)}"></a>\sum_\tau P_\theta(\tau),\underbrace{\frac{\nabla_\theta P_\theta(\tau)}{P_\theta(\tau)}R(\tau)}_{f(\tau)}</h1><p>\mathbb{E}<em>{\tau\sim P</em>\theta}\left[\frac{\nabla_\theta P_\theta(\tau)}{P_\theta(\tau)}R(\tau)\right]<br>$$</p>
+<p>你会发现：<strong>这一步本质上就是 log-likelihood trick</strong>，因为：</p>
+<p>$$<br>\frac{\nabla_\theta P_\theta(\tau)}{P_\theta(\tau)}&#x3D;\nabla_\theta \log P_\theta(\tau)<br>$$</p>
+<p>所以“不利于采样估计”的含义是：</p>
+<ul>
+<li>如果你不做这步变形，你不知道该用什么分布采样，也不知道单样本该怎么计算贡献</li>
+<li>做了这步变形后，你就能用 ($\tau\sim P_\theta$) 采样，并且每条样本只需要算 ($R(\tau)$) 和 ($\nabla \log P_\theta(\tau)$) 就能得到无偏估计</li>
+</ul>
+<hr>
+<h2 id="3-“关键-trick-的逻辑”其实就是把“导数权重”换成“概率权重”"><a href="#3-“关键-trick-的逻辑”其实就是把“导数权重”换成“概率权重”" class="headerlink" title="3) “关键 trick 的逻辑”其实就是把“导数权重”换成“概率权重”"></a>3) “关键 trick 的逻辑”其实就是把“导数权重”换成“概率权重”</h2><p>你可以把 log-likelihood trick 解释成一句非常具体的话：</p>
+<blockquote>
+<p>我们只能从 ($P_\theta(\tau)$) 这个概率分布采样，<br>所以必须把求和写成 ($\sum_\tau P_\theta(\tau)\times (\text{某个函数})$)，<br>才能用 Monte Carlo 平均来估计它。</p>
+</blockquote>
+<p>而</p>
+<p>$$<br>\nabla_\theta P_\theta(\tau)&#x3D;P_\theta(\tau)\nabla_\theta\log P_\theta(\tau)<br>$$</p>
+<p>正好完成这件事：把“不可采样的权重 ($\nabla P$)”变成“可采样的权重 ($P$)”乘上一个可计算的校正项 ($\nabla\log P$)。</p>
+</blockquote>
+<hr>
+<h4 id="2-1-3-Log-likelihood-trick-Score-function-identity"><a href="#2-1-3-Log-likelihood-trick-Score-function-identity" class="headerlink" title="2.1.3 Log-likelihood trick &#x2F; Score function identity"></a>2.1.3 Log-likelihood trick &#x2F; Score function identity</h4><p>对任意可微且 ($P_\theta(\tau)&gt;0$) 的概率，有：</p>
+<p>$$<br>\nabla_\theta \log P_\theta(\tau)<br>&#x3D;\frac{1}{P_\theta(\tau)}\nabla_\theta P_\theta(\tau)<br>\quad\Rightarrow\quad<br>\nabla_\theta P_\theta(\tau)&#x3D;P_\theta(\tau)\nabla_\theta \log P_\theta(\tau)<br>$$</p>
+<p>将其代回：</p>
+<p>$$<br>\nabla_\theta J(\theta)<br>&#x3D;\sum_\tau P_\theta(\tau),R(\tau),\nabla_\theta \log P_\theta(\tau)<br>&#x3D;\mathbb{E}<em>{\tau\sim P</em>\theta}\big[R(\tau)\nabla_\theta \log P_\theta(\tau)\big]<br>$$</p>
+<p>这一步非常关键：我们得到一个“期望形式”的梯度，因此可以 Monte Carlo 采样估计。</p>
+<hr>
+<h4 id="2-1-4-将轨迹对数概率拆开（环境项消失）"><a href="#2-1-4-将轨迹对数概率拆开（环境项消失）" class="headerlink" title="2.1.4 将轨迹对数概率拆开（环境项消失）"></a>2.1.4 将轨迹对数概率拆开（环境项消失）</h4><p>把 ($\log P_\theta(\tau)$) 展开：</p>
+<p>$$<br>\log P_\theta(\tau)<br>&#x3D;\log\rho(s_0)+\sum_{t&#x3D;0}^{T-1}\log\pi_\theta(a_t|s_t)+\sum_{t&#x3D;0}^{T-1}\log P(s_{t+1}|s_t,a_t)<br>$$</p>
+<p>注意：环境转移 ($P(s_{t+1}|s_t,a_t)$) 与初始分布 ($\rho(s_0)$) <strong>不依赖 ($\theta$)</strong>（($\theta$) 只参数化策略），因此</p>
+<p>$$<br>\nabla_\theta \log P_\theta(\tau)&#x3D;\sum_{t&#x3D;0}^{T-1}\nabla_\theta \log\pi_\theta(a_t|s_t)<br>$$</p>
+<p>代回得到经典策略梯度定理（蒙特卡洛形式）：</p>
+<p>$$<br>\boxed{<br>\nabla_\theta J(\theta)&#x3D;<br>\mathbb{E}<em>{\tau\sim P</em>\theta}<br>\left[<br>R(\tau)\sum_{t&#x3D;0}^{T-1}\nabla_\theta \log\pi_\theta(a_t|s_t)<br>\right]<br>}<br>$$</p>
+<blockquote>
+<p>这也解释了一个常见误解：<br>强化学习里我们并不是“对环境求导”，而是把梯度写成只包含 ($\nabla\log\pi$) 的形式，环境只通过采样产生 ($R(\tau)$) 影响更新。</p>
+</blockquote>
+<hr>
+<h4 id="2-1-5-采样估计（有限-batch）"><a href="#2-1-5-采样估计（有限-batch）" class="headerlink" title="2.1.5 采样估计（有限 batch）"></a>2.1.5 采样估计（有限 batch）</h4><p>用 ($N$) 条轨迹采样 ($\tau_i\sim P_\theta$)：</p>
+<p>$$<br>\widehat{\nabla_\theta J}<br>&#x3D;\frac{1}{N}\sum_{i&#x3D;1}^N<br>R(\tau_i)\sum_{t}\nabla_\theta \log\pi_\theta(a_{i,t}|s_{i,t})<br>$$</p>
+<p>这就是策略梯度在工程里训练时真正用到的“梯度估计器”。它是随机变量，因此有方差（第 3 节会系统展开）。</p>
+<hr>
+<h3 id="2-2-数值案例说明：离散-2-动作系统，枚举所有轨迹验证一致性"><a href="#2-2-数值案例说明：离散-2-动作系统，枚举所有轨迹验证一致性" class="headerlink" title="2.2 数值案例说明：离散 2 动作系统，枚举所有轨迹验证一致性"></a>2.2 数值案例说明：离散 2 动作系统，枚举所有轨迹验证一致性</h3><p>为了让“求导形式 &#x3D; 期望形式”变成可检查的事实，我们构造一个能完全枚举的 toy。</p>
+<h4 id="场景设定（一步轨迹）"><a href="#场景设定（一步轨迹）" class="headerlink" title="场景设定（一步轨迹）"></a>场景设定（一步轨迹）</h4><ul>
+<li>单状态 ($s$)，两动作 ($A,B$)</li>
+<li>策略参数 ($\theta$) 直接表示 ($p&#x3D;\pi_\theta(B)$)，因此 ($\pi_\theta(A)&#x3D;1-p$)</li>
+<li>回报：若选 ($B$) 得 10 分，若选 ($A$) 得 0 分</li>
+</ul>
+<p>则目标函数：</p>
+<p>$$<br>J(p)&#x3D;\mathbb{E}[R]&#x3D;p\cdot 10+(1-p)\cdot 0 &#x3D; 10p<br>$$</p>
+<p><strong>解析求导</strong>：</p>
+<p>$$<br>\frac{dJ}{dp}&#x3D;10<br>$$</p>
+<hr>
+<h4 id="用“期望形式策略梯度”再算一遍"><a href="#用“期望形式策略梯度”再算一遍" class="headerlink" title="用“期望形式策略梯度”再算一遍"></a>用“期望形式策略梯度”再算一遍</h4><p>轨迹只有两种：($\tau&#x3D;A$) 或 ($\tau&#x3D;B$)</p>
+<ul>
+<li>($P(\tau&#x3D;B)&#x3D;p$)，($R(B)&#x3D;10$)</li>
+<li>($P(\tau&#x3D;A)&#x3D;1-p$)，($R(A)&#x3D;0$)</li>
+</ul>
+<p>并且：</p>
+<p>$$<br>\frac{d}{dp}\log P(\tau&#x3D;B)&#x3D;\frac{d}{dp}\log p&#x3D;\frac{1}{p}<br>$$<br>$$<br>\frac{d}{dp}\log P(\tau&#x3D;A)&#x3D;\frac{d}{dp}\log(1-p)&#x3D;-\frac{1}{1-p}<br>$$</p>
+<p>期望形式：</p>
+<p>$$<br>\frac{dJ}{dp}<br>&#x3D;\mathbb{E}\big[R(\tau)\frac{d}{dp}\log P(\tau)\big]<br>&#x3D;p\cdot 10\cdot \frac{1}{p} + (1-p)\cdot 0\cdot\left(-\frac{1}{1-p}\right)<br>&#x3D;10<br>$$</p>
+<p>与解析求导完全一致。</p>
+<blockquote>
+<p>这例子回答了我们对话里的关键争议：<br><strong>并不是“不能对 ($\mathbb{E}[R]$) 求导”，而是大问题里轨迹空间巨大、无法枚举求和，只能用采样估计期望。</strong></p>
+</blockquote>
+<hr>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://zyxian31.github.io/2026/03/01/from-gradient-to-rlhf_1/" data-id="cmm7gjvjl000d8wuddnmlf18g" data-title="从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part I）" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RLHF/" rel="tag">RLHF</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/" rel="tag">强化学习</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-claude-code-usage" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2026/01/06/claude-code-usage/" class="article-date">
@@ -863,7 +1968,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://zyxian31.github.io/2026/01/06/claude-code-usage/" data-id="cmk2hgxdq000ampud47b2deve" data-title="claude-code usage" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://zyxian31.github.io/2026/01/06/claude-code-usage/" data-id="cmm7gjvjk000b8wud1wlhf5t1" data-title="claude-code usage" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
@@ -1062,7 +2167,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://zyxian31.github.io/2025/07/05/CS336-Spring2025-Lec2/" data-id="cmk2hgxdi0000mpud03anazuy" data-title="CS336 Language Modeling: Tensors, Operations &amp; Training" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://zyxian31.github.io/2025/07/05/CS336-Spring2025-Lec2/" data-id="cmm7gjvjc00008wudgnoz9tm1" data-title="CS336 Language Modeling: Tensors, Operations &amp; Training" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
@@ -1309,7 +2414,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://zyxian31.github.io/2025/07/05/CS336-Spring2025-Lec3/" data-id="cmk2hgxdr000bmpudgv82c8tm" data-title="CS336 Lecture 3: LM架构与训练 - 学习笔记" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://zyxian31.github.io/2025/07/05/CS336-Spring2025-Lec3/" data-id="cmm7gjvjk000a8wudd1z37mfw" data-title="CS336 Lecture 3: LM架构与训练 - 学习笔记" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
@@ -1362,7 +2467,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://zyxian31.github.io/1970/01/01/hello-world/" data-id="cmk2hgxdm0001mpudcoz5do75" data-title="Hello World" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://zyxian31.github.io/1970/01/01/hello-world/" data-id="cmm7gjvjm000g8wudfje5e56d" data-title="Hello World" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
@@ -1394,7 +2499,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CS336/" rel="tag">CS336</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LLM/" rel="tag">LLM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Transformer/" rel="tag">Transformer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a></li></ul>
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CS336/" rel="tag">CS336</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LLM/" rel="tag">LLM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RLHF/" rel="tag">RLHF</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Transformer/" rel="tag">Transformer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/" rel="tag">强化学习</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a></li></ul>
     </div>
   </div>
 
@@ -1404,7 +2509,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/CS336/" style="font-size: 20px;">CS336</a> <a href="/tags/LLM/" style="font-size: 20px;">LLM</a> <a href="/tags/Transformer/" style="font-size: 10px;">Transformer</a> <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" style="font-size: 20px;">深度学习</a>
+      <a href="/tags/CS336/" style="font-size: 15px;">CS336</a> <a href="/tags/LLM/" style="font-size: 15px;">LLM</a> <a href="/tags/RLHF/" style="font-size: 15px;">RLHF</a> <a href="/tags/Transformer/" style="font-size: 10px;">Transformer</a> <a href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/" style="font-size: 15px;">强化学习</a> <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" style="font-size: 15px;">机器学习</a> <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" style="font-size: 20px;">深度学习</a>
     </div>
   </div>
 
@@ -1413,7 +2518,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/01/">一月 2026</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/07/">七月 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/1970/01/">一月 1970</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/03/">三月 2026</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/01/">一月 2026</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/07/">七月 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/1970/01/">一月 1970</a></li></ul>
     </div>
   </div>
 
@@ -1426,6 +2531,14 @@
       <ul>
         
           <li>
+            <a href="/2026/03/01/from-gradient-to-rlhf_2/">从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part II）</a>
+          </li>
+        
+          <li>
+            <a href="/2026/03/01/from-gradient-to-rlhf_1/">从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part I）</a>
+          </li>
+        
+          <li>
             <a href="/2026/01/06/claude-code-usage/">claude-code usage</a>
           </li>
         
@@ -1435,10 +2548,6 @@
         
           <li>
             <a href="/2025/07/05/CS336-Spring2025-Lec3/">CS336 Lecture 3: LM架构与训练 - 学习笔记</a>
-          </li>
-        
-          <li>
-            <a href="/1970/01/01/hello-world/">Hello World</a>
           </li>
         
       </ul>
