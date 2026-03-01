@@ -240,7 +240,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2026/03/01/from-gradient-to-rlhf_2/" target="_self">
         <div>
-          3. 策略梯度对于动作概率的影响 本节解决三个问题：  数学上：策略梯度更新如何导致“被采样动作概率上升/下降” 数值上：用具体数字展示概率变化 统计上：解释“策略梯度方差为什么大”，并落到 LLM/RLHF + PPO/KL   3.1 数学推导：动作概率变化与策略梯度的关系 为了严谨起见，先写出带期望的策略梯度形式。策略梯度定理给出： $$ \nabla_\theta J(\theta) \m
+          3. 策略梯度对于动作概率的影响 本节解决三个问题：  数学上：策略梯度更新如何导致“被采样动作概率上升/下降” 数值上：用具体数字展示概率变化 统计上：解释“策略梯度方差为什么大”，并落到 LLM/RLHF + PPO/KL   3.1 数学推导：动作概率变化与策略梯度的关系 为了严谨起见，先写出带期望的策略梯度形式。策略梯度定理给出： ∇θJ(θ)=Es∼dπθ, a∼πθ(⋅∣s)[Aπθ(
         </div>
       </a>
 
@@ -399,6 +399,71 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2025/07/05/CS336-Spring2025-Lec2/" target="_self">
+          CS336 Language Modeling: Tensors, Operations &amp; Training
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/07/05/CS336-Spring2025-Lec2/" target="_self">
+        <div>
+          课程概述 本讲座深入探讨了语言模型训练的核心组件，从底层的张量操作到完整的训练循环。重点关注资源利用（内存和计算）的精确计算。 主要内容结构  张量基础 → 模型构建 → 优化器 → 训练循环 资源核算：内存（GB）+ 计算（FLOPs）   💡 动机：快速计算题 问题1：训练时间估算 70B参数模型，15T tokens，1024 H100s需要多长时间？ 1234total_flops =
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-07-05 14:54" pubdate>
+              2025-07-05
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="category-chain-item">学习笔记</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/CS336/">#CS336</a>
+            
+              <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">#深度学习</a>
+            
+              <a href="/tags/LLM/">#LLM</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2025/07/05/CS336-Spring2025-Lec3/" target="_self">
           CS336 Lecture 3: LM架构与训练 - 学习笔记
         </a>
@@ -453,71 +518,6 @@
               <a href="/tags/LLM/">#LLM</a>
             
               <a href="/tags/Transformer/">#Transformer</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2025/07/05/CS336-Spring2025-Lec2/" target="_self">
-          CS336 Language Modeling: Tensors, Operations &amp; Training
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/07/05/CS336-Spring2025-Lec2/" target="_self">
-        <div>
-          课程概述 本讲座深入探讨了语言模型训练的核心组件，从底层的张量操作到完整的训练循环。重点关注资源利用（内存和计算）的精确计算。 主要内容结构  张量基础 → 模型构建 → 优化器 → 训练循环 资源核算：内存（GB）+ 计算（FLOPs）   💡 动机：快速计算题 问题1：训练时间估算 70B参数模型，15T tokens，1024 H100s需要多长时间？ 1234total_flops =
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-07-05 14:54" pubdate>
-              2025-07-05
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="category-chain-item">学习笔记</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/CS336/">#CS336</a>
-            
-              <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">#深度学习</a>
-            
-              <a href="/tags/LLM/">#LLM</a>
             
           </div>
         
