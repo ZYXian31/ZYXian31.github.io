@@ -6,15 +6,15 @@
   
   <title>从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part II） | ZYXian31&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part II）3. 策略梯度对于动作概率的影响本节解决三个问题：  数学上：策略梯度更新如何导致“被采样动作概率上升&#x2F;下降” 数值上：用具体数字展示概率变化 统计上：解释“策略梯度方差为什么大”，并落到 LLM&#x2F;RLHF + PPO&#x2F;KL   3.1 数学推导：动作概率变化与策略梯度的关系为了严谨起见，先写">
+  <meta name="description" content="3. 策略梯度对于动作概率的影响本节解决三个问题：  数学上：策略梯度更新如何导致“被采样动作概率上升&#x2F;下降” 数值上：用具体数字展示概率变化 统计上：解释“策略梯度方差为什么大”，并落到 LLM&#x2F;RLHF + PPO&#x2F;KL   3.1 数学推导：动作概率变化与策略梯度的关系为了严谨起见，先写出带期望的策略梯度形式。策略梯度定理给出： $$\nabla_\theta">
 <meta property="og:type" content="article">
 <meta property="og:title" content="从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part II）">
 <meta property="og:url" content="https://zyxian31.github.io/2026/03/01/from-gradient-to-rlhf_2/index.html">
 <meta property="og:site_name" content="ZYXian31&#39;s Blog">
-<meta property="og:description" content="从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part II）3. 策略梯度对于动作概率的影响本节解决三个问题：  数学上：策略梯度更新如何导致“被采样动作概率上升&#x2F;下降” 数值上：用具体数字展示概率变化 统计上：解释“策略梯度方差为什么大”，并落到 LLM&#x2F;RLHF + PPO&#x2F;KL   3.1 数学推导：动作概率变化与策略梯度的关系为了严谨起见，先写">
+<meta property="og:description" content="3. 策略梯度对于动作概率的影响本节解决三个问题：  数学上：策略梯度更新如何导致“被采样动作概率上升&#x2F;下降” 数值上：用具体数字展示概率变化 统计上：解释“策略梯度方差为什么大”，并落到 LLM&#x2F;RLHF + PPO&#x2F;KL   3.1 数学推导：动作概率变化与策略梯度的关系为了严谨起见，先写出带期望的策略梯度形式。策略梯度定理给出： $$\nabla_\theta">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-03-01T06:47:00.000Z">
-<meta property="article:modified_time" content="2026-03-01T07:55:23.846Z">
+<meta property="article:modified_time" content="2026-03-01T08:01:37.284Z">
 <meta property="article:author" content="ZYXian31">
 <meta property="article:tag" content="深度学习">
 <meta property="article:tag" content="机器学习">
@@ -107,7 +107,7 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <h1 id="从梯度到-RLHF：策略梯度的数学本质、方差来源与工程控制（Part-II）"><a href="#从梯度到-RLHF：策略梯度的数学本质、方差来源与工程控制（Part-II）" class="headerlink" title="从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part II）"></a>从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part II）</h1><h2 id="3-策略梯度对于动作概率的影响"><a href="#3-策略梯度对于动作概率的影响" class="headerlink" title="3. 策略梯度对于动作概率的影响"></a>3. 策略梯度对于动作概率的影响</h2><p>本节解决三个问题：</p>
+        <h2 id="3-策略梯度对于动作概率的影响"><a href="#3-策略梯度对于动作概率的影响" class="headerlink" title="3. 策略梯度对于动作概率的影响"></a>3. 策略梯度对于动作概率的影响</h2><p>本节解决三个问题：</p>
 <ol>
 <li><strong>数学上</strong>：策略梯度更新如何导致“被采样动作概率上升&#x2F;下降”</li>
 <li><strong>数值上</strong>：用具体数字展示概率变化</li>
@@ -656,7 +656,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://zyxian31.github.io/2026/03/01/from-gradient-to-rlhf_2/" data-id="cmm7gjvjl000e8wud6fsu36ov" data-title="从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part II）" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://zyxian31.github.io/2026/03/01/from-gradient-to-rlhf_2/" data-id="cmm7gp0qp000l5xudawm7ekbe" data-title="从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part II）" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
@@ -742,11 +742,11 @@
           </li>
         
           <li>
-            <a href="/2025/07/05/CS336-Spring2025-Lec2/">CS336 Language Modeling: Tensors, Operations &amp; Training</a>
+            <a href="/2025/07/05/CS336-Spring2025-Lec3/">CS336 Lecture 3: LM架构与训练 - 学习笔记</a>
           </li>
         
           <li>
-            <a href="/2025/07/05/CS336-Spring2025-Lec3/">CS336 Lecture 3: LM架构与训练 - 学习笔记</a>
+            <a href="/2025/07/05/CS336-Spring2025-Lec2/">CS336 Language Modeling: Tensors, Operations &amp; Training</a>
           </li>
         
       </ul>

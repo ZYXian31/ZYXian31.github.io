@@ -6,15 +6,15 @@
   
   <title>从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part I） | ZYXian31&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part I）0. 预备说明：确定性梯度 vs 随机梯度估计器 目的：解决“梯度为什么会有方差？”这一误解  很多读者（包括我最初讨论时的直觉）会认为：梯度是反向传播算出来的，既然计算图确定、数值确定，梯度怎么会有方差？ 这类疑问的关键在于：我们讨论的是两件不同的东西：  确定性梯度：对一个确定的目标函数（以及确定的数据）求导，结果是确定">
+  <meta name="description" content="0. 预备说明：确定性梯度 vs 随机梯度估计器 目的：解决“梯度为什么会有方差？”这一误解  很多读者（包括我最初讨论时的直觉）会认为：梯度是反向传播算出来的，既然计算图确定、数值确定，梯度怎么会有方差？ 这类疑问的关键在于：我们讨论的是两件不同的东西：  确定性梯度：对一个确定的目标函数（以及确定的数据）求导，结果是确定的数。 随机梯度估计器：目标函数是一个期望（Expectation），我们">
 <meta property="og:type" content="article">
 <meta property="og:title" content="从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part I）">
 <meta property="og:url" content="https://zyxian31.github.io/2026/03/01/from-gradient-to-rlhf_1/index.html">
 <meta property="og:site_name" content="ZYXian31&#39;s Blog">
-<meta property="og:description" content="从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part I）0. 预备说明：确定性梯度 vs 随机梯度估计器 目的：解决“梯度为什么会有方差？”这一误解  很多读者（包括我最初讨论时的直觉）会认为：梯度是反向传播算出来的，既然计算图确定、数值确定，梯度怎么会有方差？ 这类疑问的关键在于：我们讨论的是两件不同的东西：  确定性梯度：对一个确定的目标函数（以及确定的数据）求导，结果是确定">
+<meta property="og:description" content="0. 预备说明：确定性梯度 vs 随机梯度估计器 目的：解决“梯度为什么会有方差？”这一误解  很多读者（包括我最初讨论时的直觉）会认为：梯度是反向传播算出来的，既然计算图确定、数值确定，梯度怎么会有方差？ 这类疑问的关键在于：我们讨论的是两件不同的东西：  确定性梯度：对一个确定的目标函数（以及确定的数据）求导，结果是确定的数。 随机梯度估计器：目标函数是一个期望（Expectation），我们">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-03-01T05:20:00.000Z">
-<meta property="article:modified_time" content="2026-03-01T06:46:30.705Z">
+<meta property="article:modified_time" content="2026-03-01T08:01:35.534Z">
 <meta property="article:author" content="ZYXian31">
 <meta property="article:tag" content="深度学习">
 <meta property="article:tag" content="机器学习">
@@ -107,7 +107,7 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <h1 id="从梯度到-RLHF：策略梯度的数学本质、方差来源与工程控制（Part-I）"><a href="#从梯度到-RLHF：策略梯度的数学本质、方差来源与工程控制（Part-I）" class="headerlink" title="从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part I）"></a>从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part I）</h1><h2 id="0-预备说明：确定性梯度-vs-随机梯度估计器"><a href="#0-预备说明：确定性梯度-vs-随机梯度估计器" class="headerlink" title="0. 预备说明：确定性梯度 vs 随机梯度估计器"></a>0. 预备说明：确定性梯度 vs 随机梯度估计器</h2><blockquote>
+        <h2 id="0-预备说明：确定性梯度-vs-随机梯度估计器"><a href="#0-预备说明：确定性梯度-vs-随机梯度估计器" class="headerlink" title="0. 预备说明：确定性梯度 vs 随机梯度估计器"></a>0. 预备说明：确定性梯度 vs 随机梯度估计器</h2><blockquote>
 <p>目的：解决“梯度为什么会有方差？”这一误解</p>
 </blockquote>
 <p>很多读者（包括我最初讨论时的直觉）会认为：梯度是反向传播算出来的，既然计算图确定、数值确定，<strong>梯度怎么会有方差</strong>？</p>
@@ -583,7 +583,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://zyxian31.github.io/2026/03/01/from-gradient-to-rlhf_1/" data-id="cmm7gjvjl000d8wuddnmlf18g" data-title="从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part I）" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://zyxian31.github.io/2026/03/01/from-gradient-to-rlhf_1/" data-id="cmm7gp0qn000e5xud2bep4pbb" data-title="从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part I）" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
@@ -678,11 +678,11 @@
           </li>
         
           <li>
-            <a href="/2025/07/05/CS336-Spring2025-Lec2/">CS336 Language Modeling: Tensors, Operations &amp; Training</a>
+            <a href="/2025/07/05/CS336-Spring2025-Lec3/">CS336 Lecture 3: LM架构与训练 - 学习笔记</a>
           </li>
         
           <li>
-            <a href="/2025/07/05/CS336-Spring2025-Lec3/">CS336 Lecture 3: LM架构与训练 - 学习笔记</a>
+            <a href="/2025/07/05/CS336-Spring2025-Lec2/">CS336 Language Modeling: Tensors, Operations &amp; Training</a>
           </li>
         
       </ul>
