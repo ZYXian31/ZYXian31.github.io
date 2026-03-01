@@ -27,7 +27,7 @@
 <meta property="og:description" content="0. 预备说明：确定性梯度 vs 随机梯度估计器 目的：解决“梯度为什么会有方差？”这一误解  很多读者（包括我最初讨论时的直觉）会认为：梯度是反向传播算出来的，既然计算图确定、数值确定，梯度怎么会有方差？ 这类疑问的关键在于：我们讨论的是两件不同的东西：  确定性梯度：对一个确定的目标函数（以及确定的数据）求导，结果是确定的数。 随机梯度估计器：目标函数是一个期望（Expectation），我们">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-03-01T05:20:00.000Z">
-<meta property="article:modified_time" content="2026-03-01T08:20:22.697Z">
+<meta property="article:modified_time" content="2026-03-01T08:31:01.032Z">
 <meta property="article:author" content="ZYXian31">
 <meta property="article:tag" content="深度学习">
 <meta property="article:tag" content="机器学习">
@@ -290,43 +290,43 @@
 </ul>
 <p>下面把这两者严格区分开。</p>
 <hr>
-<h3 id="0-1-固定数据下的梯度是确定的"><a href="#0-1-固定数据下的梯度是确定的" class="headerlink" title="0.1 固定数据下的梯度是确定的"></a>0.1 固定数据下的梯度是确定的</h3><p>以监督学习为例。给定一个固定的数据集 $D={(x<em>i,y_i)}</em>{i=1}^N$，定义经验风险：</p>
+<h3 id="0-1-固定数据下的梯度是确定的"><a href="#0-1-固定数据下的梯度是确定的" class="headerlink" title="0.1 固定数据下的梯度是确定的"></a>0.1 固定数据下的梯度是确定的</h3><p>以监督学习为例。给定一个固定的数据集 ($D={(x<em>i,y_i)}</em>{i=1}^N$)，定义经验风险：</p>
 <script type="math/tex; mode=display">
 L(\theta)=\frac{1}{N}\sum_{i=1}^{N}\ell\big(f_\theta(x_i),y_i\big)</script><p>这里：</p>
 <ul>
-<li>数据集 $D$ 是固定的（常量）</li>
-<li>模型 $f_\theta$ 是确定的可微函数</li>
-<li>损失 $\ell(\cdot)$ 是确定的可微函数</li>
+<li>数据集 ($D$) 是固定的（常量）</li>
+<li>模型 ($f_\theta$) 是确定的可微函数</li>
+<li>损失 ($\ell(\cdot)$) 是确定的可微函数</li>
 </ul>
 <p>因此，梯度</p>
 <script type="math/tex; mode=display">
-\nabla_\theta L(\theta)</script><p>在给定 $D$ 与 $\theta$ 时是一个确定的向量：你在同一台机器上重复计算（忽略浮点误差）会得到同一个值。</p>
+\nabla_\theta L(\theta)</script><p>在给定 ($D$) 与 ($\theta$) 时是一个确定的向量：你在同一台机器上重复计算（忽略浮点误差）会得到同一个值。</p>
 <blockquote>
 <p>注意：工程上我们常说 “SGD 的梯度有噪声/方差”，那是因为我们用 mini-batch 近似全量数据梯度；但<strong>对一个固定 mini-batch</strong>，梯度依然是确定的。<br>也就是说：监督学习里“随机性”来自我们人为抽样 mini-batch，而不是来自模型输出必须被采样。</p>
 </blockquote>
 <hr>
 <h3 id="0-2-策略梯度是随机变量"><a href="#0-2-策略梯度是随机变量" class="headerlink" title="0.2 策略梯度是随机变量"></a>0.2 策略梯度是随机变量</h3><p>强化学习与 LLM-RLHF 里，目标通常是<strong>最大化期望回报</strong>：</p>
 <script type="math/tex; mode=display">
-J(\theta)=\mathbb{E}_{\tau\sim P_\theta(\tau)}[R(\tau)]</script><p>这里出现了本节核心对象：$\tau$（trajectory，轨迹）。</p>
-<h4 id="0-2-1-哪些东西是随机变量？"><a href="#0-2-1-哪些东西是随机变量？" class="headerlink" title="0.2.1 哪些东西是随机变量？"></a>0.2.1 哪些东西是随机变量？</h4><p><strong>随机变量不是 $\nabla_\theta J(\theta)$ 这个数学对象本身</strong>，而是我们在实践中用来估计它的“单次采样梯度”：</p>
+J(\theta)=\mathbb{E}_{\tau\sim P_\theta(\tau)}[R(\tau)]</script><p>这里出现了本节核心对象：($\tau$)（trajectory，轨迹）。</p>
+<h4 id="0-2-1-哪些东西是随机变量？"><a href="#0-2-1-哪些东西是随机变量？" class="headerlink" title="0.2.1 哪些东西是随机变量？"></a>0.2.1 哪些东西是随机变量？</h4><p><strong>随机变量不是 ($\nabla_\theta J(\theta)$) 这个数学对象本身</strong>，而是我们在实践中用来估计它的“单次采样梯度”：</p>
 <ul>
-<li>轨迹：$\tau=(s_0,a_0,s_1,a_1,\dots)$ 是随机变量</li>
-<li>回报：$R(\tau)$ 依赖于随机轨迹，因此也是随机变量</li>
+<li>轨迹：($\tau=(s_0,a_0,s_1,a_1,\dots)$) 是随机变量</li>
+<li>回报：($R(\tau)$) 依赖于随机轨迹，因此也是随机变量</li>
 <li>单次采样的梯度估计器：</li>
 </ul>
 <script type="math/tex; mode=display">
-g(\tau)=R(\tau)\nabla_\theta\log P_\theta(\tau)</script><p>是随机变量（因为它是随机轨迹 $\tau$ 的函数）。</p>
+g(\tau)=R(\tau)\nabla_\theta\log P_\theta(\tau)</script><p>是随机变量（因为它是随机轨迹 ($\tau$) 的函数）。</p>
 <p>真正想要的梯度是期望：</p>
 <script type="math/tex; mode=display">
 \nabla_\theta J(\theta)=\mathbb{E}_{\tau\sim P_\theta}[g(\tau)]</script><p>而训练时我们拿到的是有限条采样轨迹的平均：</p>
 <script type="math/tex; mode=display">
 \widehat{\nabla_\theta J}=\frac{1}{N}\sum_{i=1}^N g(\tau_i)
-\quad,\quad \tau_i\sim P_\theta</script><p>由于 $\tau<em>i$ 是随机采样的，这个估计 $\widehat{\nabla</em>\theta J}$ 自然就会在不同 batch 之间波动——这就是“方差”的来源。</p>
+\quad,\quad \tau_i\sim P_\theta</script><p>由于 ($\tau<em>i$) 是随机采样的，这个估计 ($\widehat{\nabla</em>\theta J}$) 自然就会在不同 batch 之间波动——这就是“方差”的来源。</p>
 <hr>
 <h4 id="0-2-2-为什么固定数据下梯度就不是随机变量，而策略梯度是？"><a href="#0-2-2-为什么固定数据下梯度就不是随机变量，而策略梯度是？" class="headerlink" title="0.2.2 为什么固定数据下梯度就不是随机变量，而策略梯度是？"></a>0.2.2 为什么固定数据下梯度就不是随机变量，而策略梯度是？</h4><p>对比的关键在于：“输入是否是随机生成的”。</p>
 <ul>
-<li><strong>监督学习（固定数据）</strong>：你计算 $\nabla_\theta L(\theta)$ 时，参与计算的样本 ${(x_i,y_i)}$ 是固定常量；梯度是确定函数值。</li>
-<li><strong>策略梯度（采样轨迹）</strong>：你计算 $g(\tau)$ 时，参与计算的是由当前策略与环境交互产生的随机轨迹 $\tau$。即使你固定 $\theta$，每次 rollout 仍会产生不同的 $\tau$，从而得到不同的 $g(\tau)$。</li>
+<li><strong>监督学习（固定数据）</strong>：你计算 ($\nabla_\theta L(\theta)$) 时，参与计算的样本 (${(x_i,y_i)}$) 是固定常量；梯度是确定函数值。</li>
+<li><strong>策略梯度（采样轨迹）</strong>：你计算 ($g(\tau)$) 时，参与计算的是由当前策略与环境交互产生的随机轨迹 ($\tau$)。即使你固定 ($\theta$)，每次 rollout 仍会产生不同的 ($\tau$)，从而得到不同的 ($g(\tau)$)。</li>
 </ul>
 <p>更直白地说：</p>
 <ul>
@@ -339,33 +339,33 @@ g(\tau)=R(\tau)\nabla_\theta\log P_\theta(\tau)</script><p>是随机变量（因
 <li>策略梯度里，随机性来自策略的随机采样与环境随机性（通常关不掉，除非你用完全确定性策略且环境确定，且仍然存在探索/可导性问题）</li>
 </ul>
 <hr>
-<h4 id="0-2-3-随机性具体体现在哪里？从什么分布采样？"><a href="#0-2-3-随机性具体体现在哪里？从什么分布采样？" class="headerlink" title="0.2.3 随机性具体体现在哪里？从什么分布采样？"></a>0.2.3 随机性具体体现在哪里？从什么分布采样？</h4><p>要回答“从什么分布采样”，我们把轨迹分布 $P_\theta(\tau)$ 展开：</p>
+<h4 id="0-2-3-随机性具体体现在哪里？从什么分布采样？"><a href="#0-2-3-随机性具体体现在哪里？从什么分布采样？" class="headerlink" title="0.2.3 随机性具体体现在哪里？从什么分布采样？"></a>0.2.3 随机性具体体现在哪里？从什么分布采样？</h4><p>要回答“从什么分布采样”，我们把轨迹分布 ($P_\theta(\tau)$) 展开：</p>
 <script type="math/tex; mode=display">
 P_\theta(\tau)
 =
 \rho(s_0)\prod_{t=0}^{T-1}\pi_\theta(a_t|s_t)\,P(s_{t+1}|s_t,a_t)</script><p>其中：</p>
 <ul>
-<li>$\rho(s_0)$：初始状态分布</li>
-<li>$\pi_\theta(a_t|s_t)$：策略分布（由模型给出）</li>
-<li>$P(s_{t+1}|s_t,a_t)$：环境转移分布（黑箱或仿真器）</li>
+<li>($\rho(s_0)$)：初始状态分布</li>
+<li>($\pi_\theta(a_t|s_t)$)：策略分布（由模型给出）</li>
+<li>($P(s_{t+1}|s_t,a_t)$)：环境转移分布（黑箱或仿真器）</li>
 </ul>
 <p>这告诉我们：轨迹的随机性至少来自两处：</p>
 <ol>
 <li><strong>动作采样</strong>：$a<em>t\sim \pi</em>\theta(\cdot|s_t)$</li>
-<li><strong>环境随机性</strong>：$s_{t+1}\sim P(\cdot|s_t,a_t)$</li>
+<li><strong>环境随机性</strong>：($s_{t+1}\sim P(\cdot|s_t,a_t)$)</li>
 </ol>
 <p>在 LLM-RLHF 中，环境可以理解为“生成过程 + reward 评价”，最核心的随机性来自：</p>
 <script type="math/tex; mode=display">
 y_t \sim \pi_\theta(\cdot|y_{<t},x)</script><p>即每个 token 的采样。</p>
 <blockquote>
-<p>即使 reward model 是确定函数 $r(y)$，由于 $y$ 是从 $\pi_\theta$ 随机采样得到，$R=r(y)$ 作为随机变量仍然会有方差：</p>
+<p>即使 reward model 是确定函数 ($r(y)$)，由于 ($y$) 是从 ($\pi_\theta$) 随机采样得到，($R=r(y)$) 作为随机变量仍然会有方差：</p>
 <script type="math/tex; mode=display">
 \mathrm{Var}(R)=\mathrm{Var}_{y\sim\pi_\theta}[r(y)]</script></blockquote>
 <hr>
 <h4 id="0-2-4-一个极简数值例子：单-token-的梯度为什么会波动？"><a href="#0-2-4-一个极简数值例子：单-token-的梯度为什么会波动？" class="headerlink" title="0.2.4 一个极简数值例子：单 token 的梯度为什么会波动？"></a>0.2.4 一个极简数值例子：单 token 的梯度为什么会波动？</h4><p>很多人（包括我在讨论中）会误以为“梯度波动来自数值精度”。实际上，不需要任何数值误差，<strong>采样本身就足以制造方差</strong>。</p>
 <p>假设某一步 token 只有两个候选 A / B：</p>
 <script type="math/tex; mode=display">
-\pi(A)=0.9,\quad \pi(B)=0.1</script><p>把参数简化为控制 $\pi(B)$ 的 logit $z_B$。则（softmax/sigmoid 的标准结果）：</p>
+\pi(A)=0.9,\quad \pi(B)=0.1</script><p>把参数简化为控制 ($\pi(B)$) 的 logit ($z_B$)。则（softmax/sigmoid 的标准结果）：</p>
 <ul>
 <li>如果采到 B：</li>
 </ul>
@@ -374,7 +374,7 @@ u=\nabla_{z_B}\log\pi(B)=1-\pi(B)=0.9</script><ul>
 <li>如果采到 A：</li>
 </ul>
 <script type="math/tex; mode=display">
-u=\nabla_{z_B}\log\pi(A)=-\pi(B)=-0.1</script><p>因此 $u$ 是随机变量：</p>
+u=\nabla_{z_B}\log\pi(A)=-\pi(B)=-0.1</script><p>因此 ($u$) 是随机变量：</p>
 <script type="math/tex; mode=display">
 u=
 \begin{cases}
@@ -389,27 +389,27 @@ u=
 =0.09</script><p>所以方差：</p>
 <script type="math/tex; mode=display">
 \mathrm{Var}(u)=0.09</script><p>这说明：<strong>即便完全没有数值误差，单 token 的 log-prob 梯度也会因采样而波动。</strong></p>
-<p>一旦你把多个 token 的梯度相加、再乘上回报 $R$，方差会进一步累积和放大——这就是后文“策略梯度方差大”的根源之一。</p>
+<p>一旦你把多个 token 的梯度相加、再乘上回报 ($R$)，方差会进一步累积和放大——这就是后文“策略梯度方差大”的根源之一。</p>
 <hr>
 <h4 id="0-2-5-为什么不能“解析地”计算期望梯度，而必须采样估计？"><a href="#0-2-5-为什么不能“解析地”计算期望梯度，而必须采样估计？" class="headerlink" title="0.2.5 为什么不能“解析地”计算期望梯度，而必须采样估计？"></a>0.2.5 为什么不能“解析地”计算期望梯度，而必须采样估计？</h4><p>你可能会问：既然</p>
 <script type="math/tex; mode=display">
 \nabla_\theta J(\theta)=\mathbb{E}_{\tau\sim P_\theta}[g(\tau)]</script><p>那我能不能把这个期望直接算出来？</p>
-<p>理论上，如果你能枚举所有轨迹 $\tau$，当然可以：</p>
+<p>理论上，如果你能枚举所有轨迹 ($\tau$)，当然可以：</p>
 <script type="math/tex; mode=display">
 \nabla_\theta J(\theta)=\sum_\tau P_\theta(\tau)g(\tau)</script><p>但在实际问题里，这条路基本不可行，原因是<strong>轨迹空间爆炸</strong>：</p>
 <ul>
-<li>离散动作空间大小为 $|\mathcal{A}|$</li>
-<li>序列/轨迹长度为 $T$</li>
+<li>离散动作空间大小为 ($|\mathcal{A}|$)</li>
+<li>序列/轨迹长度为 ($T$)</li>
 </ul>
 <p>仅动作序列数就有：</p>
 <script type="math/tex; mode=display">
 |\mathcal{A}|^T</script><p>在 LLM 中更夸张：</p>
 <ul>
-<li>token 词表 $|V|$ 可能是 50k</li>
-<li>序列长度 $T$ 动辄几百上千</li>
+<li>token 词表 ($|V|$) 可能是 50k</li>
+<li>序列长度 ($T$) 动辄几百上千</li>
 </ul>
-<p>序列数 $|V|^T$ 天文级，无法枚举，也无法精确求和。</p>
-<p>同时，轨迹分布还包含环境转移 $P(s’|s,a)$，真实世界或复杂仿真里它是黑箱，你甚至没有解析形式可用。</p>
+<p>序列数 ($|V|^T$) 天文级，无法枚举，也无法精确求和。</p>
+<p>同时，轨迹分布还包含环境转移 ($P(s’|s,a)$)，真实世界或复杂仿真里它是黑箱，你甚至没有解析形式可用。</p>
 <p>因此实际只能用 Monte Carlo：</p>
 <script type="math/tex; mode=display">
 \nabla_\theta J(\theta)
@@ -418,7 +418,7 @@ u=
 \quad,\quad \tau_i\sim P_\theta</script><p>这一步把“解析求和”换成“随机采样平均”，代价就是：</p>
 <ul>
 <li>估计器有方差</li>
-<li>方差随 $N$ 增大而下降（大致 $\propto 1/N$），但样本成本很高</li>
+<li>方差随 ($N$) 增大而下降（大致 ($\propto 1/N$)），但样本成本很高</li>
 </ul>
 <hr>
 <h2 id="0-3-工程视角：SFT-与-RLHF-中梯度随机性的本质差别"><a href="#0-3-工程视角：SFT-与-RLHF-中梯度随机性的本质差别" class="headerlink" title="0.3 工程视角：SFT 与 RLHF 中梯度随机性的本质差别"></a>0.3 工程视角：SFT 与 RLHF 中梯度随机性的本质差别</h2><p>理解策略梯度为什么有方差，最直观的方法就是对比：</p>
@@ -570,7 +570,7 @@ y \sim \pi_\theta</script><p>梯度估计器就不可避免是随机变量。</p
 <p>这也是后文所有“baseline、advantage、PPO、KL 控制”的理论前提。</p>
 <h3 id="本节小结"><a href="#本节小结" class="headerlink" title="本节小结"></a>本节小结</h3><ul>
 <li>对固定数据的梯度是确定的：随机性只来自你是否抽 mini-batch。</li>
-<li>策略梯度训练时用的是“随机梯度估计器” $g(\tau)$，随机性来自轨迹/文本的采样。</li>
+<li>策略梯度训练时用的是“随机梯度估计器” ($g(\tau)$)，随机性来自轨迹/文本的采样。</li>
 <li>在 LLM-RLHF 中，即使 reward model 是确定函数，reward 作为随机变量仍然会因生成样本不同而波动。</li>
 <li>期望梯度无法解析计算，原因是轨迹/序列空间指数爆炸 + 环境黑箱，只能用采样估计，因此方差是内生的。</li>
 </ul>
@@ -578,7 +578,7 @@ y \sim \pi_\theta</script><p>梯度估计器就不可避免是随机变量。</p
 <hr>
 <h3 id="1-1-梯度定义"><a href="#1-1-梯度定义" class="headerlink" title="1.1 梯度定义"></a>1.1 梯度定义</h3><h4 id="1-1-1-数学定义（严格形式）"><a href="#1-1-1-数学定义（严格形式）" class="headerlink" title="1.1.1 数学定义（严格形式）"></a>1.1.1 数学定义（严格形式）</h4><p>设有一个从参数空间到实数的可微函数：</p>
 <script type="math/tex; mode=display">
-f:\mathbb{R}^d \rightarrow \mathbb{R},\quad f=f(\theta)</script><p>它在点 $\theta$ 的<strong>梯度</strong>定义为偏导数组成的向量：</p>
+f:\mathbb{R}^d \rightarrow \mathbb{R},\quad f=f(\theta)</script><p>它在点 ($\theta$) 的<strong>梯度</strong>定义为偏导数组成的向量：</p>
 <script type="math/tex; mode=display">
 \nabla_\theta f(\theta)
 =
@@ -587,24 +587,24 @@ f:\mathbb{R}^d \rightarrow \mathbb{R},\quad f=f(\theta)</script><p>它在点 $\t
 \frac{\partial f}{\partial \theta_2},
 \dots,
 \frac{\partial f}{\partial \theta_d}
-\right)^\top</script><p>它满足一个关键的“局部线性近似”性质：对任意小扰动 $\Delta \theta$，有</p>
+\right)^\top</script><p>它满足一个关键的“局部线性近似”性质：对任意小扰动 ($\Delta \theta$)，有</p>
 <script type="math/tex; mode=display">
 f(\theta+\Delta\theta)
 \approx
-f(\theta) + \nabla_\theta f(\theta)^\top \Delta\theta</script><p>这句话的意义是：在足够小的邻域里，$f$ 的变化近似由内积 $\nabla f \cdot \Delta\theta$ 决定。</p>
+f(\theta) + \nabla_\theta f(\theta)^\top \Delta\theta</script><p>这句话的意义是：在足够小的邻域里，($f$) 的变化近似由内积 ($\nabla f \cdot \Delta\theta$) 决定。</p>
 <hr>
 <h4 id="1-1-2-直观含义（可操作的解释）"><a href="#1-1-2-直观含义（可操作的解释）" class="headerlink" title="1.1.2 直观含义（可操作的解释）"></a>1.1.2 直观含义（可操作的解释）</h4><ul>
-<li>梯度给出“<strong>函数增长最快的方向</strong>”：在所有单位方向向量 $v$ 中，使 $f(\theta+\epsilon v)$ 增大最快的方向就是梯度方向。</li>
+<li>梯度给出“<strong>函数增长最快的方向</strong>”：在所有单位方向向量 ($v$) 中，使 ($f(\theta+\epsilon v)$) 增大最快的方向就是梯度方向。</li>
 </ul>
 <p>更形式地说，方向导数为：</p>
 <script type="math/tex; mode=display">
 D_v f(\theta)=\lim_{\epsilon\to 0}\frac{f(\theta+\epsilon v)-f(\theta)}{\epsilon}
-= \nabla_\theta f(\theta)^\top v</script><p>当 $|v|=1$ 时，最大值由柯西–施瓦茨不等式得到：</p>
+= \nabla_\theta f(\theta)^\top v</script><p>当 ($|v|=1$) 时，最大值由柯西–施瓦茨不等式得到：</p>
 <script type="math/tex; mode=display">
-\nabla f(\theta)^\top v \le |\nabla f(\theta)||v| = |\nabla f(\theta)|</script><p>等号当且仅当 $v$ 与 $\nabla f$ 同向成立。因此：</p>
+\nabla f(\theta)^\top v \le |\nabla f(\theta)||v| = |\nabla f(\theta)|</script><p>等号当且仅当 ($v$) 与 ($\nabla f$) 同向成立。因此：</p>
 <ul>
-<li><strong>沿着 $\nabla f$ 走，$f$ 增加最快；</strong></li>
-<li><strong>沿着 $-\nabla f$ 走，$f$ 减少最快。</strong></li>
+<li><strong>沿着 ($\nabla f$) 走，($f$) 增加最快；</strong></li>
+<li><strong>沿着 ($-\nabla f$) 走，($f$) 减少最快。</strong></li>
 </ul>
 <p>这也解释了为什么“梯度”会自然地成为优化的方向信号：它提供了局部最陡方向。</p>
 <hr>
@@ -613,7 +613,7 @@ D_v f(\theta)=\lim_{\epsilon\to 0}\frac{f(\theta+\epsilon v)-f(\theta)}{\epsilon
 <li><strong>最小化</strong>一个目标（例如损失）</li>
 <li><strong>最大化</strong>一个目标（例如回报）</li>
 </ul>
-<p>两者在数学上互为相反数。若最大化 $J(\theta)$，等价于最小化 $-J(\theta)$：</p>
+<p>两者在数学上互为相反数。若最大化 ($J(\theta)$)，等价于最小化 ($-J(\theta)$)：</p>
 <script type="math/tex; mode=display">
 \max_\theta J(\theta)
 \quad\Longleftrightarrow\quad
@@ -626,30 +626,30 @@ D_v f(\theta)=\lim_{\epsilon\to 0}\frac{f(\theta+\epsilon v)-f(\theta)}{\epsilon
 <li>最大化（梯度上升）：</li>
 </ul>
 <script type="math/tex; mode=display">
-\theta \leftarrow \theta + \alpha \nabla_\theta J(\theta)</script><p>这里 $\alpha&gt;0$ 是学习率。</p>
+\theta \leftarrow \theta + \alpha \nabla_\theta J(\theta)</script><p>这里 ($\alpha&gt;0$) 是学习率。</p>
 <blockquote>
 <p>关键结论：<strong>采用上升还是下降，完全由你的优化目标是“最大化”还是“最小化”决定。</strong><br>算法本质仍是“沿着局部一阶近似的最陡方向移动”。</p>
 </blockquote>
 <hr>
 <h3 id="1-3-策略梯度定义"><a href="#1-3-策略梯度定义" class="headerlink" title="1.3 策略梯度定义"></a>1.3 策略梯度定义</h3><p>强化学习中，我们的“模型”不是直接输出一个数，而是输出一个<strong>策略（policy）</strong>：给定状态 (s)，输出对动作 (a) 的概率分布。</p>
 <script type="math/tex; mode=display">
-\pi_\theta(a|s)</script><p>其中 $\theta$ 是策略参数（例如神经网络参数），$\pi_\theta(a|s)$ 是在状态 $s$ 选择动作 $a$ 的概率。</p>
+\pi_\theta(a|s)</script><p>其中 ($\theta$) 是策略参数（例如神经网络参数），($\pi_\theta(a|s)$) 是在状态 ($s$) 选择动作 ($a$) 的概率。</p>
 <p>强化学习的优化目标通常写成<strong>期望回报</strong>：</p>
 <script type="math/tex; mode=display">
 J(\theta)=\mathbb{E}_{\tau\sim P_\theta(\tau)}[R(\tau)]</script><ul>
-<li>$\tau$ 是轨迹（trajectory），包含状态、动作序列：$(s_0,a_0,s_1,a_1,\dots)$</li>
-<li>$P<em>\theta(\tau)$ 是在策略 $\pi</em>\theta$ 下产生轨迹的概率分布</li>
-<li>$R(\tau)$ 是该轨迹的回报（return）</li>
+<li>($\tau$) 是轨迹（trajectory），包含状态、动作序列：($(s_0,a_0,s_1,a_1,\dots)$)</li>
+<li>($P<em>\theta(\tau)$) 是在策略 ($\pi</em>\theta$) 下产生轨迹的概率分布</li>
+<li>($R(\tau)$) 是该轨迹的回报（return）</li>
 </ul>
 <p>于是，“策略梯度（policy gradient）”指的就是：</p>
 <script type="math/tex; mode=display">
 \nabla_\theta J(\theta)</script><p>也就是：<strong>对策略参数求导，让期望回报变大。</strong></p>
 <blockquote>
-<p>和监督学习最重要的不同点在于：<br>这里的目标函数是一个对“轨迹分布”取期望的量，$\theta$ 影响的是 $P_\theta(\tau)$（即采样分布），而不是直接给出一个可微的标量输出供你对齐标签。</p>
+<p>和监督学习最重要的不同点在于：<br>这里的目标函数是一个对“轨迹分布”取期望的量，($\theta$) 影响的是 ($P_\theta(\tau)$)（即采样分布），而不是直接给出一个可微的标量输出供你对齐标签。</p>
 </blockquote>
 <p>在 LLM 的 RLHF 里，策略就是语言模型的 token 分布：</p>
 <script type="math/tex; mode=display">
-\pi_\theta(y_t|y_{<t},x)</script><p>轨迹是完整生成序列 $y=(y_1,\dots,y_T)$，回报是 reward model 对整段输出的评分 $r(y)$。形式完全一致：</p>
+\pi_\theta(y_t|y_{<t},x)</script><p>轨迹是完整生成序列 ($y=(y_1,\dots,y_T)$)，回报是 reward model 对整段输出的评分 ($r(y)$)。形式完全一致：</p>
 <script type="math/tex; mode=display">
 J(\theta)=\mathbb{E}_{y\sim \pi_\theta(\cdot|x)}[r(y)]</script><hr>
 <h3 id="1-4-监督学习-vs-强化学习的差异"><a href="#1-4-监督学习-vs-强化学习的差异" class="headerlink" title="1.4 监督学习 vs 强化学习的差异"></a>1.4 监督学习 vs 强化学习的差异</h3><p>这一节只强调最核心、与后文推导直接相关的差异：<strong>优化对象、数据生成机制、以及梯度信号的来源</strong>。</p>
@@ -686,42 +686,42 @@ J(\theta)=\mathbb{E}_{y\sim \pi_\theta(\cdot|x)}[r(y)]</script><hr>
 <p><strong>本节小结</strong></p>
 <ul>
 <li>梯度是局部一阶变化率向量；下降/上升仅由目标的最小化/最大化决定。</li>
-<li>策略梯度是强化学习中对 $J(\theta)=\mathbb{E}[R]$ 求导，其核心是：$\theta$ 改变的是采样分布而非直接标签误差。</li>
+<li>策略梯度是强化学习中对 ($J(\theta)=\mathbb{E}[R]$) 求导，其核心是：($\theta$) 改变的是采样分布而非直接标签误差。</li>
 <li>监督学习与强化学习的关键差异在于数据生成与可微链路：前者“固定数据 + 直接误差”，后者“采样轨迹 + 分布求导”，这自然引出后文的 log-likelihood trick 与方差控制工具。</li>
 </ul>
 <h2 id="2-从第一性原理推导策略梯度"><a href="#2-从第一性原理推导策略梯度" class="headerlink" title="2. 从第一性原理推导策略梯度"></a>2. 从第一性原理推导策略梯度</h2><p>本节要解决两件事：</p>
 <ol>
-<li><strong>数学上</strong>：从 $J(\theta)=\mathbb{E}[R]$ 出发推导出可采样估计的梯度形式</li>
-<li><strong>概念上</strong>：澄清“不是不能对 $\mathbb{E}[R]$ 求导，而是不能解析枚举求导；需要通过采样估计”</li>
+<li><strong>数学上</strong>：从 ($J(\theta)=\mathbb{E}[R]$) 出发推导出可采样估计的梯度形式</li>
+<li><strong>概念上</strong>：澄清“不是不能对 ($\mathbb{E}[R]$) 求导，而是不能解析枚举求导；需要通过采样估计”</li>
 </ol>
 <h3 id="2-1-数学推导（含中间-trick）"><a href="#2-1-数学推导（含中间-trick）" class="headerlink" title="2.1 数学推导（含中间 trick）"></a>2.1 数学推导（含中间 trick）</h3><h4 id="2-1-1-目标函数：期望回报"><a href="#2-1-1-目标函数：期望回报" class="headerlink" title="2.1.1 目标函数：期望回报"></a>2.1.1 目标函数：期望回报</h4><p>定义轨迹（trajectory）：</p>
 <script type="math/tex; mode=display">
-\tau=(s_0,a_0,s_1,a_1,\dots,s_T)</script><p>策略为 $\pi_\theta(a|s)$，轨迹分布为：</p>
+\tau=(s_0,a_0,s_1,a_1,\dots,s_T)</script><p>策略为 ($\pi_\theta(a|s)$)，轨迹分布为：</p>
 <script type="math/tex; mode=display">
-P_\theta(\tau)=\rho(s_0)\prod_{t=0}^{T-1}\pi_\theta(a_t|s_t)\,P(s_{t+1}|s_t,a_t)</script><p>回报（return）记为 $R(\tau)$。优化目标：</p>
+P_\theta(\tau)=\rho(s_0)\prod_{t=0}^{T-1}\pi_\theta(a_t|s_t)\,P(s_{t+1}|s_t,a_t)</script><p>回报（return）记为 ($R(\tau)$)。优化目标：</p>
 <script type="math/tex; mode=display">
 J(\theta)=\mathbb{E}_{\tau\sim P_\theta}[R(\tau)]
 =\sum_{\tau}P_\theta(\tau)R(\tau)</script><blockquote>
 <p>这里写成求和是离散轨迹情形；连续情形就是积分，推导一致。</p>
 </blockquote>
 <hr>
-<h4 id="2-1-2-对期望求导（第一性原理）"><a href="#2-1-2-对期望求导（第一性原理）" class="headerlink" title="2.1.2 对期望求导（第一性原理）"></a>2.1.2 对期望求导（第一性原理）</h4><p>直接对 $\theta$ 求导：</p>
+<h4 id="2-1-2-对期望求导（第一性原理）"><a href="#2-1-2-对期望求导（第一性原理）" class="headerlink" title="2.1.2 对期望求导（第一性原理）"></a>2.1.2 对期望求导（第一性原理）</h4><p>直接对 ($\theta$) 求导：</p>
 <script type="math/tex; mode=display">
-\nabla_\theta J(\theta)=\sum_\tau \nabla_\theta P_\theta(\tau)\,R(\tau)</script><p>困难在于 $\nabla<em>\theta P</em>\theta(\tau)$ 不好用：它不在“期望形式”，不利于采样估计。关键 trick 是把 $\nabla P$ 变成 $P\nabla\log P$。</p>
+\nabla_\theta J(\theta)=\sum_\tau \nabla_\theta P_\theta(\tau)\,R(\tau)</script><p>困难在于 ($\nabla<em>\theta P</em>\theta(\tau)$) 不好用：它不在“期望形式”，不利于采样估计。关键 trick 是把 ($\nabla P$) 变成 ($P\nabla\log P$)。</p>
 <blockquote>
 <p>对这里做几个阐述：</p>
 <h2 id="1-“不在期望形式”到底是什么意思？"><a href="#1-“不在期望形式”到底是什么意思？" class="headerlink" title="1) “不在期望形式”到底是什么意思？"></a>1) “不在期望形式”到底是什么意思？</h2><p>你现在有：</p>
 <script type="math/tex; mode=display">
-\nabla_\theta J(\theta)=\sum_\tau \nabla_\theta P_\theta(\tau)\,R(\tau)</script><p>这当然是对的。但问题是：在强化学习/LLM 里，$\tau$ 的空间巨大（指数级），你无法枚举求和，所以你想做的是用采样来近似这个和：</p>
+\nabla_\theta J(\theta)=\sum_\tau \nabla_\theta P_\theta(\tau)\,R(\tau)</script><p>这当然是对的。但问题是：在强化学习/LLM 里，($\tau$) 的空间巨大（指数级），你无法枚举求和，所以你想做的是用采样来近似这个和：</p>
 <script type="math/tex; mode=display">
 \sum_\tau (\cdot) \approx \frac{1}{N}\sum_{i=1}^N (\cdot)\Big|_{\tau_i}</script><p>而 <strong>Monte Carlo 采样近似</strong>之所以成立，要求你写成下面这种结构：</p>
 <script type="math/tex; mode=display">
 \sum_\tau P_\theta(\tau)\,f(\tau)
 \quad\Rightarrow\quad
-\mathbb{E}_{\tau\sim P_\theta}[f(\tau)]</script><p>因为你采样的是 $\tau<em>i\sim P</em>\theta$，也就是用 $P_\theta$ 当“权重”。</p>
+\mathbb{E}_{\tau\sim P_\theta}[f(\tau)]</script><p>因为你采样的是 ($\tau<em>i\sim P</em>\theta$)，也就是用 ($P_\theta$) 当“权重”。</p>
 <p>但你的式子是：</p>
 <script type="math/tex; mode=display">
-\sum_\tau \nabla_\theta P_\theta(\tau)\,R(\tau)</script><p>这里的“权重”不是 $P<em>\theta(\tau)$，而是 $\nabla</em>\theta P_\theta(\tau)$，它既：</p>
+\sum_\tau \nabla_\theta P_\theta(\tau)\,R(\tau)</script><p>这里的“权重”不是 ($P<em>\theta(\tau)$)，而是 ($\nabla</em>\theta P_\theta(\tau)$)，它既：</p>
 <ul>
 <li>不是概率分布（不非负、和不为 1）</li>
 <li>也不是你能用“从某个分布采样”的方式自然得到的权重</li>
@@ -731,10 +731,10 @@ J(\theta)=\mathbb{E}_{\tau\sim P_\theta}[R(\tau)]
 <p>你没法直接把它解释成 “对某个可采样分布的期望”，因此无法用“采样均值”去构造一个自然的无偏估计器。</p>
 </blockquote>
 <hr>
-<h2 id="2-“不利于采样估计”具体卡在哪里？"><a href="#2-“不利于采样估计”具体卡在哪里？" class="headerlink" title="2) “不利于采样估计”具体卡在哪里？"></a>2) “不利于采样估计”具体卡在哪里？</h2><p>假设你硬要用 $\tau<em>i\sim P</em>\theta(\tau)$ 来采样（这是你唯一能采样的分布：用策略 rollout）。</p>
+<h2 id="2-“不利于采样估计”具体卡在哪里？"><a href="#2-“不利于采样估计”具体卡在哪里？" class="headerlink" title="2) “不利于采样估计”具体卡在哪里？"></a>2) “不利于采样估计”具体卡在哪里？</h2><p>假设你硬要用 ($\tau<em>i\sim P</em>\theta(\tau)$) 来采样（这是你唯一能采样的分布：用策略 rollout）。</p>
 <p>那么你想要无偏估计：</p>
 <script type="math/tex; mode=display">
-\sum_\tau \nabla_\theta P_\theta(\tau)\,R(\tau)</script><p>通常的套路是乘除以 $P_\theta(\tau)$：</p>
+\sum_\tau \nabla_\theta P_\theta(\tau)\,R(\tau)</script><p>通常的套路是乘除以 ($P_\theta(\tau)$)：</p>
 <script type="math/tex; mode=display">
 \sum_\tau \nabla_\theta P_\theta(\tau)\,R(\tau)
 =
@@ -745,17 +745,17 @@ J(\theta)=\mathbb{E}_{\tau\sim P_\theta}[R(\tau)]
 \frac{\nabla_\theta P_\theta(\tau)}{P_\theta(\tau)}=\nabla_\theta \log P_\theta(\tau)</script><p>所以“不利于采样估计”的含义是：</p>
 <ul>
 <li>如果你不做这步变形，你不知道该用什么分布采样，也不知道单样本该怎么计算贡献</li>
-<li>做了这步变形后，你就能用 $\tau\sim P<em>\theta$ 采样，并且每条样本只需要算 $R(\tau)$ 和 $\nabla \log P</em>\theta(\tau)$ 就能得到无偏估计</li>
+<li>做了这步变形后，你就能用 ($\tau\sim P<em>\theta$) 采样，并且每条样本只需要算 ($R(\tau)$) 和 ($\nabla \log P</em>\theta(\tau)$) 就能得到无偏估计</li>
 </ul>
 <hr>
 <h2 id="3-“关键-trick-的逻辑”其实就是把“导数权重”换成“概率权重”"><a href="#3-“关键-trick-的逻辑”其实就是把“导数权重”换成“概率权重”" class="headerlink" title="3) “关键 trick 的逻辑”其实就是把“导数权重”换成“概率权重”"></a>3) “关键 trick 的逻辑”其实就是把“导数权重”换成“概率权重”</h2><p>你可以把 log-likelihood trick 解释成一句非常具体的话：</p>
 <blockquote>
-<p>我们只能从 $P<em>\theta(\tau)$ 这个概率分布采样，<br>所以必须把求和写成 $\sum</em>\tau P_\theta(\tau)\times (\text{某个函数})$，<br>才能用 Monte Carlo 平均来估计它。</p>
+<p>我们只能从 ($P<em>\theta(\tau)$) 这个概率分布采样，<br>所以必须把求和写成 ($\sum</em>\tau P_\theta(\tau)\times (\text{某个函数})$)，<br>才能用 Monte Carlo 平均来估计它。</p>
 </blockquote>
 <p>而</p>
 <script type="math/tex; mode=display">
-\nabla_\theta P_\theta(\tau)=P_\theta(\tau)\nabla_\theta\log P_\theta(\tau)</script><h2 id="正好完成这件事：把“不可采样的权重-nabla-P-”变成“可采样的权重-P-”乘上一个可计算的校正项-nabla-log-P-。"><a href="#正好完成这件事：把“不可采样的权重-nabla-P-”变成“可采样的权重-P-”乘上一个可计算的校正项-nabla-log-P-。" class="headerlink" title="正好完成这件事：把“不可采样的权重 $\nabla P$”变成“可采样的权重 $P$”乘上一个可计算的校正项 $\nabla\log P$。"></a>正好完成这件事：把“不可采样的权重 $\nabla P$”变成“可采样的权重 $P$”乘上一个可计算的校正项 $\nabla\log P$。</h2></blockquote>
-<h4 id="2-1-3-Log-likelihood-trick-Score-function-identity"><a href="#2-1-3-Log-likelihood-trick-Score-function-identity" class="headerlink" title="2.1.3 Log-likelihood trick / Score function identity"></a>2.1.3 Log-likelihood trick / Score function identity</h4><p>对任意可微且 $P_\theta(\tau)&gt;0$ 的概率，有：</p>
+\nabla_\theta P_\theta(\tau)=P_\theta(\tau)\nabla_\theta\log P_\theta(\tau)</script><h2 id="正好完成这件事：把“不可采样的权重-nabla-P-”变成“可采样的权重-P-”乘上一个可计算的校正项-nabla-log-P-。"><a href="#正好完成这件事：把“不可采样的权重-nabla-P-”变成“可采样的权重-P-”乘上一个可计算的校正项-nabla-log-P-。" class="headerlink" title="正好完成这件事：把“不可采样的权重 ($\nabla P$)”变成“可采样的权重 ($P$)”乘上一个可计算的校正项 ($\nabla\log P$)。"></a>正好完成这件事：把“不可采样的权重 ($\nabla P$)”变成“可采样的权重 ($P$)”乘上一个可计算的校正项 ($\nabla\log P$)。</h2></blockquote>
+<h4 id="2-1-3-Log-likelihood-trick-Score-function-identity"><a href="#2-1-3-Log-likelihood-trick-Score-function-identity" class="headerlink" title="2.1.3 Log-likelihood trick / Score function identity"></a>2.1.3 Log-likelihood trick / Score function identity</h4><p>对任意可微且 ($P_\theta(\tau)&gt;0$) 的概率，有：</p>
 <script type="math/tex; mode=display">
 \nabla_\theta \log P_\theta(\tau)
 =\frac{1}{P_\theta(\tau)}\nabla_\theta P_\theta(\tau)
@@ -766,10 +766,10 @@ J(\theta)=\mathbb{E}_{\tau\sim P_\theta}[R(\tau)]
 =\sum_\tau P_\theta(\tau)\,R(\tau)\,\nabla_\theta \log P_\theta(\tau)
 =\mathbb{E}_{\tau\sim P_\theta}\big[R(\tau)\nabla_\theta \log P_\theta(\tau)\big]</script><p>这一步非常关键：我们得到一个“期望形式”的梯度，因此可以 Monte Carlo 采样估计。</p>
 <hr>
-<h4 id="2-1-4-将轨迹对数概率拆开（环境项消失）"><a href="#2-1-4-将轨迹对数概率拆开（环境项消失）" class="headerlink" title="2.1.4 将轨迹对数概率拆开（环境项消失）"></a>2.1.4 将轨迹对数概率拆开（环境项消失）</h4><p>把 $\log P_\theta(\tau)$ 展开：</p>
+<h4 id="2-1-4-将轨迹对数概率拆开（环境项消失）"><a href="#2-1-4-将轨迹对数概率拆开（环境项消失）" class="headerlink" title="2.1.4 将轨迹对数概率拆开（环境项消失）"></a>2.1.4 将轨迹对数概率拆开（环境项消失）</h4><p>把 ($\log P_\theta(\tau)$) 展开：</p>
 <script type="math/tex; mode=display">
 \log P_\theta(\tau)
-=\log\rho(s_0)+\sum_{t=0}^{T-1}\log\pi_\theta(a_t|s_t)+\sum_{t=0}^{T-1}\log P(s_{t+1}|s_t,a_t)</script><p>注意：环境转移 $P(s_{t+1}|s_t,a_t)$ 与初始分布 $\rho(s_0)$ <strong>不依赖 $\theta$</strong>（$\theta$ 只参数化策略），因此</p>
+=\log\rho(s_0)+\sum_{t=0}^{T-1}\log\pi_\theta(a_t|s_t)+\sum_{t=0}^{T-1}\log P(s_{t+1}|s_t,a_t)</script><p>注意：环境转移 ($P(s_{t+1}|s_t,a_t)$) 与初始分布 ($\rho(s_0)$) <strong>不依赖 ($\theta$)</strong>（($\theta$) 只参数化策略），因此</p>
 <script type="math/tex; mode=display">
 \nabla_\theta \log P_\theta(\tau)=\sum_{t=0}^{T-1}\nabla_\theta \log\pi_\theta(a_t|s_t)</script><p>代回得到经典策略梯度定理（蒙特卡洛形式）：</p>
 <script type="math/tex; mode=display">
@@ -780,10 +780,10 @@ J(\theta)=\mathbb{E}_{\tau\sim P_\theta}[R(\tau)]
 R(\tau)\sum_{t=0}^{T-1}\nabla_\theta \log\pi_\theta(a_t|s_t)
 \right]
 }</script><blockquote>
-<p>这也解释了一个常见误解：<br>强化学习里我们并不是“对环境求导”，而是把梯度写成只包含 $\nabla\log\pi$ 的形式，环境只通过采样产生 $R(\tau)$ 影响更新。</p>
+<p>这也解释了一个常见误解：<br>强化学习里我们并不是“对环境求导”，而是把梯度写成只包含 ($\nabla\log\pi$) 的形式，环境只通过采样产生 ($R(\tau)$) 影响更新。</p>
 </blockquote>
 <hr>
-<h4 id="2-1-5-采样估计（有限-batch）"><a href="#2-1-5-采样估计（有限-batch）" class="headerlink" title="2.1.5 采样估计（有限 batch）"></a>2.1.5 采样估计（有限 batch）</h4><p>用 $N$ 条轨迹采样 $\tau<em>i\sim P</em>\theta$：</p>
+<h4 id="2-1-5-采样估计（有限-batch）"><a href="#2-1-5-采样估计（有限-batch）" class="headerlink" title="2.1.5 采样估计（有限 batch）"></a>2.1.5 采样估计（有限 batch）</h4><p>用 ($N$) 条轨迹采样 ($\tau<em>i\sim P</em>\theta$)：</p>
 <script type="math/tex; mode=display">
 \widehat{\nabla_\theta J}
 =\frac{1}{N}\sum_{i=1}^N
@@ -791,19 +791,19 @@ R(\tau_i)\sum_{t}\nabla_\theta \log\pi_\theta(a_{i,t}|s_{i,t})</script><p>这就
 <hr>
 <h3 id="2-2-数值案例说明：离散-2-动作系统，枚举所有轨迹验证一致性"><a href="#2-2-数值案例说明：离散-2-动作系统，枚举所有轨迹验证一致性" class="headerlink" title="2.2 数值案例说明：离散 2 动作系统，枚举所有轨迹验证一致性"></a>2.2 数值案例说明：离散 2 动作系统，枚举所有轨迹验证一致性</h3><p>为了让“求导形式 = 期望形式”变成可检查的事实，我们构造一个能完全枚举的 toy。</p>
 <h4 id="场景设定（一步轨迹）"><a href="#场景设定（一步轨迹）" class="headerlink" title="场景设定（一步轨迹）"></a>场景设定（一步轨迹）</h4><ul>
-<li>单状态 $s$，两动作 $A,B$</li>
-<li>策略参数 $\theta$ 直接表示 $p=\pi<em>\theta(B)$，因此 $\pi</em>\theta(A)=1-p$</li>
-<li>回报：若选 $B$ 得 10 分，若选 $A$ 得 0 分</li>
+<li>单状态 ($s$)，两动作 ($A,B$)</li>
+<li>策略参数 ($\theta$) 直接表示 ($p=\pi<em>\theta(B)$)，因此 ($\pi</em>\theta(A)=1-p$)</li>
+<li>回报：若选 ($B$) 得 10 分，若选 ($A$) 得 0 分</li>
 </ul>
 <p>则目标函数：</p>
 <script type="math/tex; mode=display">
 J(p)=\mathbb{E}[R]=p\cdot 10+(1-p)\cdot 0 = 10p</script><p><strong>解析求导</strong>：</p>
 <script type="math/tex; mode=display">
 \frac{dJ}{dp}=10</script><hr>
-<h4 id="用“期望形式策略梯度”再算一遍"><a href="#用“期望形式策略梯度”再算一遍" class="headerlink" title="用“期望形式策略梯度”再算一遍"></a>用“期望形式策略梯度”再算一遍</h4><p>轨迹只有两种：$\tau=A$ 或 $\tau=B$</p>
+<h4 id="用“期望形式策略梯度”再算一遍"><a href="#用“期望形式策略梯度”再算一遍" class="headerlink" title="用“期望形式策略梯度”再算一遍"></a>用“期望形式策略梯度”再算一遍</h4><p>轨迹只有两种：($\tau=A$) 或 ($\tau=B$)</p>
 <ul>
-<li>$P(\tau=B)=p$，$R(B)=10$</li>
-<li>$P(\tau=A)=1-p$，$R(A)=0$</li>
+<li>($P(\tau=B)=p$)，($R(B)=10$)</li>
+<li>($P(\tau=A)=1-p$)，($R(A)=0$)</li>
 </ul>
 <p>并且：</p>
 <script type="math/tex; mode=display">
@@ -815,7 +815,7 @@ J(p)=\mathbb{E}[R]=p\cdot 10+(1-p)\cdot 0 = 10p</script><p><strong>解析求导<
 =p\cdot 10\cdot \frac{1}{p} + (1-p)\cdot 0\cdot\left(-\frac{1}{1-p}\right)
 =10</script><p>与解析求导完全一致。</p>
 <blockquote>
-<p>这例子回答了我们对话里的关键争议：<br><strong>并不是“不能对 $\mathbb{E}[R]$ 求导”，而是大问题里轨迹空间巨大、无法枚举求和，只能用采样估计期望。</strong></p>
+<p>这例子回答了我们对话里的关键争议：<br><strong>并不是“不能对 ($\mathbb{E}[R]$) 求导”，而是大问题里轨迹空间巨大、无法枚举求和，只能用采样估计期望。</strong></p>
 </blockquote>
 <hr>
 
