@@ -1,12 +1,25 @@
+
+
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
   
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
   
-  <title>CS336 Language Modeling: Tensors, Operations &amp; Training | ZYXian31&#39;s Blog</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="课程概述本讲座深入探讨了语言模型训练的核心组件，从底层的张量操作到完整的训练循环。重点关注资源利用（内存和计算）的精确计算。 主要内容结构 张量基础 → 模型构建 → 优化器 → 训练循环 资源核算：内存（GB）+ 计算（FLOPs）   💡 动机：快速计算题问题1：训练时间估算70B参数模型，15T tokens，1024 H100s需要多长时间？ 1234total_flops &#x3D; 6 *">
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="ZYXian31">
+  <meta name="keywords" content="机器学习,深度学习,LLM">
+  
+    <meta name="description" content="课程概述本讲座深入探讨了语言模型训练的核心组件，从底层的张量操作到完整的训练循环。重点关注资源利用（内存和计算）的精确计算。 主要内容结构 张量基础 → 模型构建 → 优化器 → 训练循环 资源核算：内存（GB）+ 计算（FLOPs）   💡 动机：快速计算题问题1：训练时间估算70B参数模型，15T tokens，1024 H100s需要多长时间？ 1234total_flops &#x3D; 6 *">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CS336 Language Modeling: Tensors, Operations &amp; Training">
 <meta property="og:url" content="https://zyxian31.github.io/2025/07/05/CS336-Spring2025-Lec2/index.html">
@@ -19,107 +32,267 @@
 <meta property="article:tag" content="CS336">
 <meta property="article:tag" content="深度学习">
 <meta property="article:tag" content="LLM">
-<meta name="twitter:card" content="summary">
-  
-    <link rel="alternate" href="/atom.xml" title="ZYXian31's Blog" type="application/atom+xml">
-  
-  
-    <link rel="shortcut icon" href="/favicon.png">
+<meta name="twitter:card" content="summary_large_image">
   
   
   
-<link rel="stylesheet" href="/css/style.css">
+  <title>CS336 Language Modeling: Tensors, Operations &amp; Training - ZYXian31&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/KaTeX/0.16.2/katex.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"zyxian31.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
 
   
-    
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
-
-  
-  
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
-
 <meta name="generator" content="Hexo 7.3.0"></head>
 
+
 <body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/" id="logo">ZYXian31&#39;s Blog</a>
-      </h1>
-      
-        <h2 id="subtitle-wrap">
-          <a href="/" id="subtitle">技术学习笔记</a>
-        </h2>
-      
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
     </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="CS336 Language Modeling: Tensors, Operations &amp; Training"></span>
+          
+        </div>
+
         
-          <a class="main-nav-link" href="/">Home</a>
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-07-05 14:54" pubdate>
+          2025年7月5日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
         
-          <a class="main-nav-link" href="/archives">Archives</a>
+          1.4k 字
         
-      </nav>
-      <nav id="sub-nav">
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
         
         
-          <a class="nav-icon" href="/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
         
-        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://ZYXian31.github.io"></form>
+          12 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
       </div>
+
+      
     </div>
   </div>
-</header>
+</div>
 
-      <div class="outer">
-        <section id="main"><article id="post-CS336-Spring2025-Lec2" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2025/07/05/CS336-Spring2025-Lec2/" class="article-date">
-  <time class="dt-published" datetime="2025-07-05T06:54:38.000Z" itemprop="datePublished">2025-07-05</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
-  </div>
+</div>
 
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 class="p-name article-title" itemprop="headline name">
-      CS336 Language Modeling: Tensors, Operations &amp; Training
-    </h1>
-  
+  </header>
 
-      </header>
+  <main>
     
-    <div class="e-content article-entry" itemprop="articleBody">
       
-        <h2 id="课程概述"><a href="#课程概述" class="headerlink" title="课程概述"></a>课程概述</h2><p>本讲座深入探讨了语言模型训练的核心组件，从底层的张量操作到完整的训练循环。重点关注<strong>资源利用</strong>（内存和计算）的精确计算。</p>
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">CS336 Language Modeling: Tensors, Operations &amp; Training</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="课程概述"><a href="#课程概述" class="headerlink" title="课程概述"></a>课程概述</h2><p>本讲座深入探讨了语言模型训练的核心组件，从底层的张量操作到完整的训练循环。重点关注<strong>资源利用</strong>（内存和计算）的精确计算。</p>
 <h3 id="主要内容结构"><a href="#主要内容结构" class="headerlink" title="主要内容结构"></a>主要内容结构</h3><ul>
 <li><strong>张量基础</strong> → <strong>模型构建</strong> → <strong>优化器</strong> → <strong>训练循环</strong></li>
 <li><strong>资源核算</strong>：内存（GB）+ 计算（FLOPs）</li>
 </ul>
 <hr>
 <h2 id="💡-动机：快速计算题"><a href="#💡-动机：快速计算题" class="headerlink" title="💡 动机：快速计算题"></a>💡 动机：快速计算题</h2><h3 id="问题1：训练时间估算"><a href="#问题1：训练时间估算" class="headerlink" title="问题1：训练时间估算"></a>问题1：训练时间估算</h3><p><strong>70B参数模型，15T tokens，1024 H100s需要多长时间？</strong></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">total_flops = <span class="number">6</span> * <span class="number">70e9</span> * <span class="number">15e12</span>  <span class="comment"># 6倍规则</span></span><br><span class="line">mfu = <span class="number">0.5</span>  <span class="comment"># 模型FLOPs利用率</span></span><br><span class="line">flops_per_day = h100_flop_per_sec * mfu * <span class="number">1024</span> * <span class="number">60</span> * <span class="number">60</span> * <span class="number">24</span></span><br><span class="line">days = total_flops / flops_per_day</span><br></pre></td></tr></table></figure>
-
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python">total_flops = <span class="hljs-number">6</span> * <span class="hljs-number">70e9</span> * <span class="hljs-number">15e12</span>  <span class="hljs-comment"># 6倍规则</span><br>mfu = <span class="hljs-number">0.5</span>  <span class="hljs-comment"># 模型FLOPs利用率</span><br>flops_per_day = h100_flop_per_sec * mfu * <span class="hljs-number">1024</span> * <span class="hljs-number">60</span> * <span class="hljs-number">60</span> * <span class="hljs-number">24</span><br>days = total_flops / flops_per_day<br></code></pre></td></tr></table></figure>
 <h3 id="问题2：内存限制"><a href="#问题2：内存限制" class="headerlink" title="问题2：内存限制"></a>问题2：内存限制</h3><p><strong>8个H100上用AdamW能训练多大的模型？</strong></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">h100_bytes = <span class="number">80e9</span>  <span class="comment"># 80GB</span></span><br><span class="line">bytes_per_parameter = <span class="number">4</span> + <span class="number">4</span> + (<span class="number">4</span> + <span class="number">4</span>)  <span class="comment"># 参数+梯度+优化器状态</span></span><br><span class="line">num_parameters = (h100_bytes * <span class="number">8</span>) / bytes_per_parameter</span><br></pre></td></tr></table></figure>
-
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python">h100_bytes = <span class="hljs-number">80e9</span>  <span class="hljs-comment"># 80GB</span><br>bytes_per_parameter = <span class="hljs-number">4</span> + <span class="hljs-number">4</span> + (<span class="hljs-number">4</span> + <span class="hljs-number">4</span>)  <span class="hljs-comment"># 参数+梯度+优化器状态</span><br>num_parameters = (h100_bytes * <span class="hljs-number">8</span>) / bytes_per_parameter<br></code></pre></td></tr></table></figure>
 <hr>
-<h2 id="📊-张量与内存"><a href="#📊-张量与内存" class="headerlink" title="📊 张量与内存"></a>📊 张量与内存</h2><h3 id="数据类型对比"><a href="#数据类型对比" class="headerlink" title="数据类型对比"></a>数据类型对比</h3><table>
+<h2 id="📊-张量与内存"><a href="#📊-张量与内存" class="headerlink" title="📊 张量与内存"></a>📊 张量与内存</h2><h3 id="数据类型对比"><a href="#数据类型对比" class="headerlink" title="数据类型对比"></a>数据类型对比</h3><div class="table-container">
+<table>
 <thead>
 <tr>
 <th>类型</th>
@@ -128,7 +301,8 @@
 <th>劣势</th>
 </tr>
 </thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td><strong>float32</strong></td>
 <td>4</td>
 <td>高精度，稳定</td>
@@ -152,17 +326,17 @@
 <td>极省内存</td>
 <td>精度最低，需特殊硬件</td>
 </tr>
-</tbody></table>
+</tbody>
+</table>
+</div>
 <hr>
 <h2 id="⚡-计算量核算（FLOPs）"><a href="#⚡-计算量核算（FLOPs）" class="headerlink" title="⚡ 计算量核算（FLOPs）"></a>⚡ 计算量核算（FLOPs）</h2><h3 id="核心公式"><a href="#核心公式" class="headerlink" title="核心公式"></a>核心公式</h3><ul>
 <li><strong>前向传播</strong>：<code>2 × (数据点数) × (参数数)</code> FLOPs</li>
 <li><strong>反向传播</strong>：<code>4 × (数据点数) × (参数数)</code> FLOPs</li>
 <li><strong>总计</strong>：<code>6 × (数据点数) × (参数数)</code> FLOPs</li>
 </ul>
-<h3 id="矩阵乘法：A-m×n-×-B-n×p"><a href="#矩阵乘法：A-m×n-×-B-n×p" class="headerlink" title="矩阵乘法：A(m×n) × B(n×p)"></a>矩阵乘法：<code>A(m×n) × B(n×p)</code></h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FLOPs = 2 × m × n × p</span><br></pre></td></tr></table></figure>
-
-<h3 id="模型FLOPs利用率（MFU）"><a href="#模型FLOPs利用率（MFU）" class="headerlink" title="模型FLOPs利用率（MFU）"></a>模型FLOPs利用率（MFU）</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MFU = (实际 FLOP/s) / (理论峰值 FLOP/s)</span><br></pre></td></tr></table></figure>
-
+<h3 id="矩阵乘法：A-m×n-×-B-n×p"><a href="#矩阵乘法：A-m×n-×-B-n×p" class="headerlink" title="矩阵乘法：A(m×n) × B(n×p)"></a>矩阵乘法：<code>A(m×n) × B(n×p)</code></h3><figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs abnf"><span class="hljs-attribute">FLOPs</span> <span class="hljs-operator">=</span> <span class="hljs-number">2</span> × m × n × p<br></code></pre></td></tr></table></figure>
+<h3 id="模型FLOPs利用率（MFU）"><a href="#模型FLOPs利用率（MFU）" class="headerlink" title="模型FLOPs利用率（MFU）"></a>模型FLOPs利用率（MFU）</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">MFU = (实际 FLOP/s) / (理论峰值 FLOP/s)<br></code></pre></td></tr></table></figure>
 <ul>
 <li><strong>优秀标准</strong>：MFU ≥ 0.5</li>
 <li><strong>影响因素</strong>：硬件类型、数据类型、算法优化</li>
@@ -171,68 +345,52 @@
 <h2 id="🎯-Einops：优雅的张量操作"><a href="#🎯-Einops：优雅的张量操作" class="headerlink" title="🎯 Einops：优雅的张量操作"></a>🎯 Einops：优雅的张量操作</h2><h3 id="为什么使用Einops？"><a href="#为什么使用Einops？" class="headerlink" title="为什么使用Einops？"></a>为什么使用Einops？</h3><ul>
 <li><strong>可读性</strong>：维度有明确语义</li>
 </ul>
-<h3 id="三大核心操作"><a href="#三大核心操作" class="headerlink" title="三大核心操作"></a>三大核心操作</h3><h4 id="1-einsum：广义矩阵乘法"><a href="#1-einsum：广义矩阵乘法" class="headerlink" title="1. einsum：广义矩阵乘法"></a>1. <code>einsum</code>：广义矩阵乘法</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 传统方式</span></span><br><span class="line">z = x @ y.transpose(-<span class="number">2</span>, -<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Einops方式</span></span><br><span class="line">z = einsum(x, y, <span class="string">&quot;batch seq1 hidden, batch seq2 hidden -&gt; batch seq1 seq2&quot;</span>)</span><br></pre></td></tr></table></figure>
-
-<h4 id="2-reduce：维度约简"><a href="#2-reduce：维度约简" class="headerlink" title="2. reduce：维度约简"></a>2. <code>reduce</code>：维度约简</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 传统方式</span></span><br><span class="line">y = x.mean(dim=-<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Einops方式</span></span><br><span class="line">y = reduce(x, <span class="string">&quot;... hidden -&gt; ...&quot;</span>, <span class="string">&quot;mean&quot;</span>)</span><br></pre></td></tr></table></figure>
-
-<h4 id="3-rearrange：重新排列"><a href="#3-rearrange：重新排列" class="headerlink" title="3. rearrange：重新排列"></a>3. <code>rearrange</code>：重新排列</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 分解维度</span></span><br><span class="line">x = rearrange(x, <span class="string">&quot;... (heads hidden) -&gt; ... heads hidden&quot;</span>, heads=<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 合并维度</span></span><br><span class="line">x = rearrange(x, <span class="string">&quot;... heads hidden -&gt; ... (heads hidden)&quot;</span>)</span><br></pre></td></tr></table></figure>
-
+<h3 id="三大核心操作"><a href="#三大核心操作" class="headerlink" title="三大核心操作"></a>三大核心操作</h3><h4 id="1-einsum：广义矩阵乘法"><a href="#1-einsum：广义矩阵乘法" class="headerlink" title="1. einsum：广义矩阵乘法"></a>1. <code>einsum</code>：广义矩阵乘法</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 传统方式</span><br>z = x @ y.transpose(-<span class="hljs-number">2</span>, -<span class="hljs-number">1</span>)<br><br><span class="hljs-comment"># Einops方式</span><br>z = einsum(x, y, <span class="hljs-string">&quot;batch seq1 hidden, batch seq2 hidden -&gt; batch seq1 seq2&quot;</span>)<br></code></pre></td></tr></table></figure>
+<h4 id="2-reduce：维度约简"><a href="#2-reduce：维度约简" class="headerlink" title="2. reduce：维度约简"></a>2. <code>reduce</code>：维度约简</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 传统方式</span><br>y = x.mean(dim=-<span class="hljs-number">1</span>)<br><br><span class="hljs-comment"># Einops方式</span><br>y = reduce(x, <span class="hljs-string">&quot;... hidden -&gt; ...&quot;</span>, <span class="hljs-string">&quot;mean&quot;</span>)<br></code></pre></td></tr></table></figure>
+<h4 id="3-rearrange：重新排列"><a href="#3-rearrange：重新排列" class="headerlink" title="3. rearrange：重新排列"></a>3. <code>rearrange</code>：重新排列</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 分解维度</span><br>x = rearrange(x, <span class="hljs-string">&quot;... (heads hidden) -&gt; ... heads hidden&quot;</span>, heads=<span class="hljs-number">2</span>)<br><br><span class="hljs-comment"># 合并维度</span><br>x = rearrange(x, <span class="hljs-string">&quot;... heads hidden -&gt; ... (heads hidden)&quot;</span>)<br></code></pre></td></tr></table></figure>
 <hr>
 <h2 id="🧠-模型构建"><a href="#🧠-模型构建" class="headerlink" title="🧠 模型构建"></a>🧠 模型构建</h2><h3 id="参数初始化的关键问题"><a href="#参数初始化的关键问题" class="headerlink" title="参数初始化的关键问题"></a>参数初始化的关键问题</h3><p><strong>问题</strong>：<code>torch.randn(input_dim, output_dim)</code> 会导致输出随输入维度缩放</p>
 <p><strong>解决方案</strong>：Xavier初始化</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 标准初始化（避免输出随输入维度缩放）</span></span><br><span class="line">w = nn.Parameter(torch.randn(input_dim, output_dim) / np.sqrt(input_dim))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 截断正态分布（更安全）</span></span><br><span class="line">w = nn.Parameter(nn.init.trunc_normal_(</span><br><span class="line">    torch.empty(input_dim, output_dim), </span><br><span class="line">    std=<span class="number">1</span>/np.sqrt(input_dim), </span><br><span class="line">    a=-<span class="number">3</span>, b=<span class="number">3</span>  <span class="comment"># 范围约束在 [-3, 3]</span></span><br><span class="line">))</span><br></pre></td></tr></table></figure>
-
-<h3 id="自定义模型示例"><a href="#自定义模型示例" class="headerlink" title="自定义模型示例"></a>自定义模型示例</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Cruncher</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, dim: <span class="built_in">int</span>, num_layers: <span class="built_in">int</span></span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line">        <span class="variable language_">self</span>.layers = nn.ModuleList([</span><br><span class="line">            Linear(dim, dim) <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(num_layers)</span><br><span class="line">        ])</span><br><span class="line">        <span class="variable language_">self</span>.final = Linear(dim, <span class="number">1</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x: torch.Tensor</span>) -&gt; torch.Tensor:</span><br><span class="line">        <span class="keyword">for</span> layer <span class="keyword">in</span> <span class="variable language_">self</span>.layers:</span><br><span class="line">            x = layer(x)</span><br><span class="line">        <span class="keyword">return</span> <span class="variable language_">self</span>.final(x).squeeze(-<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
-
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 标准初始化（避免输出随输入维度缩放）</span><br>w = nn.Parameter(torch.randn(input_dim, output_dim) / np.sqrt(input_dim))<br><br><span class="hljs-comment"># 截断正态分布（更安全）</span><br>w = nn.Parameter(nn.init.trunc_normal_(<br>    torch.empty(input_dim, output_dim), <br>    std=<span class="hljs-number">1</span>/np.sqrt(input_dim), <br>    a=-<span class="hljs-number">3</span>, b=<span class="hljs-number">3</span>  <span class="hljs-comment"># 范围约束在 [-3, 3]</span><br>))<br></code></pre></td></tr></table></figure>
+<h3 id="自定义模型示例"><a href="#自定义模型示例" class="headerlink" title="自定义模型示例"></a>自定义模型示例</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Cruncher</span>(nn.Module):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, dim: <span class="hljs-built_in">int</span>, num_layers: <span class="hljs-built_in">int</span></span>):<br>        <span class="hljs-built_in">super</span>().__init__()<br>        <span class="hljs-variable language_">self</span>.layers = nn.ModuleList([<br>            Linear(dim, dim) <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(num_layers)<br>        ])<br>        <span class="hljs-variable language_">self</span>.final = Linear(dim, <span class="hljs-number">1</span>)<br>    <br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">forward</span>(<span class="hljs-params">self, x: torch.Tensor</span>) -&gt; torch.Tensor:<br>        <span class="hljs-keyword">for</span> layer <span class="hljs-keyword">in</span> <span class="hljs-variable language_">self</span>.layers:<br>            x = layer(x)<br>        <span class="hljs-keyword">return</span> <span class="hljs-variable language_">self</span>.final(x).squeeze(-<span class="hljs-number">1</span>)<br></code></pre></td></tr></table></figure>
 <hr>
-<h2 id="🔧-优化器演进"><a href="#🔧-优化器演进" class="headerlink" title="🔧 优化器演进"></a>🔧 优化器演进</h2><h3 id="优化器家族树"><a href="#优化器家族树" class="headerlink" title="优化器家族树"></a>优化器家族树</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SGD → SGD + momentum → AdaGrad → RMSProp → Adam</span><br></pre></td></tr></table></figure>
-
-<h3 id="各优化器核心思想"><a href="#各优化器核心思想" class="headerlink" title="各优化器核心思想"></a>各优化器核心思想</h3><h4 id="1-SGD-Stochastic-Gradient-Descent"><a href="#1-SGD-Stochastic-Gradient-Descent" class="headerlink" title="1. SGD (Stochastic Gradient Descent)"></a>1. <strong>SGD (Stochastic Gradient Descent)</strong></h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 核心思想：最简单的梯度下降</span></span><br><span class="line"><span class="comment"># 更新公式：θ = θ - lr * grad</span></span><br><span class="line">p.data -= lr * grad</span><br></pre></td></tr></table></figure>
-
+<h2 id="🔧-优化器演进"><a href="#🔧-优化器演进" class="headerlink" title="🔧 优化器演进"></a>🔧 优化器演进</h2><h3 id="优化器家族树"><a href="#优化器家族树" class="headerlink" title="优化器家族树"></a>优化器家族树</h3><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs nginx"><span class="hljs-attribute">SGD</span> → SGD + momentum → AdaGrad → RMSProp → Adam<br></code></pre></td></tr></table></figure>
+<h3 id="各优化器核心思想"><a href="#各优化器核心思想" class="headerlink" title="各优化器核心思想"></a>各优化器核心思想</h3><h4 id="1-SGD-Stochastic-Gradient-Descent"><a href="#1-SGD-Stochastic-Gradient-Descent" class="headerlink" title="1. SGD (Stochastic Gradient Descent)"></a>1. <strong>SGD (Stochastic Gradient Descent)</strong></h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 核心思想：最简单的梯度下降</span><br><span class="hljs-comment"># 更新公式：θ = θ - lr * grad</span><br>p.data -= lr * grad<br></code></pre></td></tr></table></figure>
 <ul>
 <li><strong>优点</strong>：简单，内存效率高</li>
 <li><strong>缺点</strong>：收敛慢，对学习率敏感</li>
 </ul>
-<h4 id="2-SGD-Momentum"><a href="#2-SGD-Momentum" class="headerlink" title="2. SGD + Momentum"></a>2. <strong>SGD + Momentum</strong></h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 核心思想：利用历史梯度信息，加速收敛</span></span><br><span class="line"><span class="comment"># 更新公式：v = β * v + grad; θ = θ - lr * v</span></span><br><span class="line">velocity = beta * velocity + grad</span><br><span class="line">p.data -= lr * velocity</span><br></pre></td></tr></table></figure>
-
+<h4 id="2-SGD-Momentum"><a href="#2-SGD-Momentum" class="headerlink" title="2. SGD + Momentum"></a>2. <strong>SGD + Momentum</strong></h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 核心思想：利用历史梯度信息，加速收敛</span><br><span class="hljs-comment"># 更新公式：v = β * v + grad; θ = θ - lr * v</span><br>velocity = beta * velocity + grad<br>p.data -= lr * velocity<br></code></pre></td></tr></table></figure>
 <ul>
 <li><strong>优点</strong>：收敛更快，能跨越小的局部最优</li>
 </ul>
-<h4 id="3-AdaGrad"><a href="#3-AdaGrad" class="headerlink" title="3. AdaGrad"></a>3. <strong>AdaGrad</strong></h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 核心思想：自适应学习率，频繁更新的参数学习率逐渐减小</span></span><br><span class="line"><span class="comment"># 更新公式：G = G + grad²; θ = θ - lr * grad / √(G + ε)</span></span><br></pre></td></tr></table></figure>
-
+<h4 id="3-AdaGrad"><a href="#3-AdaGrad" class="headerlink" title="3. AdaGrad"></a>3. <strong>AdaGrad</strong></h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 核心思想：自适应学习率，频繁更新的参数学习率逐渐减小</span><br><span class="hljs-comment"># 更新公式：G = G + grad²; θ = θ - lr * grad / √(G + ε)</span><br></code></pre></td></tr></table></figure>
 <ul>
 <li><strong>优点</strong>：自适应学习率，适合稀疏数据</li>
 <li><strong>缺点</strong>：学习率单调递减，可能过早停止学习</li>
 </ul>
-<h4 id="4-RMSProp"><a href="#4-RMSProp" class="headerlink" title="4. RMSProp"></a>4. <strong>RMSProp</strong></h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 核心思想：修复AdaGrad学习率过度衰减问题</span></span><br><span class="line"><span class="comment"># 更新公式：G = β * G + (1-β) * grad²; θ = θ - lr * grad / √(G + ε)</span></span><br></pre></td></tr></table></figure>
-
+<h4 id="4-RMSProp"><a href="#4-RMSProp" class="headerlink" title="4. RMSProp"></a>4. <strong>RMSProp</strong></h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 核心思想：修复AdaGrad学习率过度衰减问题</span><br><span class="hljs-comment"># 更新公式：G = β * G + (1-β) * grad²; θ = θ - lr * grad / √(G + ε)</span><br></code></pre></td></tr></table></figure>
 <ul>
 <li><strong>优点</strong>：解决AdaGrad学习率衰减问题</li>
 </ul>
-<h4 id="5-Adam"><a href="#5-Adam" class="headerlink" title="5. Adam"></a>5. <strong>Adam</strong></h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 核心思想：结合momentum和RMSProp的优点</span></span><br><span class="line"><span class="comment"># 更新公式：m = β₁ * m + (1-β₁) * grad; v = β₂ * v + (1-β₂) * grad²</span></span><br><span class="line"><span class="comment">#          θ = θ - lr * m̂ / (√v̂ + ε)</span></span><br></pre></td></tr></table></figure>
-
+<h4 id="5-Adam"><a href="#5-Adam" class="headerlink" title="5. Adam"></a>5. <strong>Adam</strong></h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 核心思想：结合momentum和RMSProp的优点</span><br><span class="hljs-comment"># 更新公式：m = β₁ * m + (1-β₁) * grad; v = β₂ * v + (1-β₂) * grad²</span><br><span class="hljs-comment">#          θ = θ - lr * m̂ / (√v̂ + ε)</span><br></code></pre></td></tr></table></figure>
 <ul>
 <li><strong>优点</strong>：结合了momentum和自适应学习率</li>
 <li><strong>缺点</strong>：内存占用较大，有时收敛不如SGD</li>
 </ul>
 <hr>
-<h2 id="📈-训练循环与最佳实践"><a href="#📈-训练循环与最佳实践" class="headerlink" title="📈 训练循环与最佳实践"></a>📈 训练循环与最佳实践</h2><h3 id="完整训练循环"><a href="#完整训练循环" class="headerlink" title="完整训练循环"></a>完整训练循环</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">train_step</span>(<span class="params">model, optimizer, get_batch, B</span>):</span><br><span class="line">    <span class="comment"># 获取数据</span></span><br><span class="line">    x, y = get_batch(B)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 前向传播</span></span><br><span class="line">    pred_y = model(x)</span><br><span class="line">    loss = F.mse_loss(pred_y, y)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 反向传播</span></span><br><span class="line">    loss.backward()</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 更新参数</span></span><br><span class="line">    optimizer.step()</span><br><span class="line">    optimizer.zero_grad(set_to_none=<span class="literal">True</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> loss.item()</span><br></pre></td></tr></table></figure>
-
-<h3 id="关键最佳实践"><a href="#关键最佳实践" class="headerlink" title="关键最佳实践"></a>关键最佳实践</h3><h4 id="1-随机性控制"><a href="#1-随机性控制" class="headerlink" title="1. 随机性控制"></a>1. 随机性控制</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">set_seed</span>(<span class="params">seed=<span class="number">0</span></span>):</span><br><span class="line">    torch.manual_seed(seed)</span><br><span class="line">    np.random.seed(seed)</span><br><span class="line">    random.seed(seed)</span><br></pre></td></tr></table></figure>
-
-<h4 id="2-大数据处理"><a href="#2-大数据处理" class="headerlink" title="2. 大数据处理"></a>2. 大数据处理</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用memory mapping避免一次性加载</span></span><br><span class="line">data = np.memmap(<span class="string">&quot;data.npy&quot;</span>, dtype=np.int32)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 异步数据传输</span></span><br><span class="line">x = x.pin_memory().to(device, non_blocking=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure>
-
-<h4 id="3-检查点保存"><a href="#3-检查点保存" class="headerlink" title="3. 检查点保存"></a>3. 检查点保存</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">checkpoint = &#123;</span><br><span class="line">    <span class="string">&quot;model&quot;</span>: model.state_dict(),</span><br><span class="line">    <span class="string">&quot;optimizer&quot;</span>: optimizer.state_dict(),</span><br><span class="line">    <span class="string">&quot;step&quot;</span>: step,</span><br><span class="line">    <span class="string">&quot;loss&quot;</span>: loss</span><br><span class="line">&#125;</span><br><span class="line">torch.save(checkpoint, <span class="string">&quot;checkpoint.pt&quot;</span>)</span><br></pre></td></tr></table></figure>
-
+<h2 id="📈-训练循环与最佳实践"><a href="#📈-训练循环与最佳实践" class="headerlink" title="📈 训练循环与最佳实践"></a>📈 训练循环与最佳实践</h2><h3 id="完整训练循环"><a href="#完整训练循环" class="headerlink" title="完整训练循环"></a>完整训练循环</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">train_step</span>(<span class="hljs-params">model, optimizer, get_batch, B</span>):<br>    <span class="hljs-comment"># 获取数据</span><br>    x, y = get_batch(B)<br>    <br>    <span class="hljs-comment"># 前向传播</span><br>    pred_y = model(x)<br>    loss = F.mse_loss(pred_y, y)<br>    <br>    <span class="hljs-comment"># 反向传播</span><br>    loss.backward()<br>    <br>    <span class="hljs-comment"># 更新参数</span><br>    optimizer.step()<br>    optimizer.zero_grad(set_to_none=<span class="hljs-literal">True</span>)<br>    <br>    <span class="hljs-keyword">return</span> loss.item()<br></code></pre></td></tr></table></figure>
+<h3 id="关键最佳实践"><a href="#关键最佳实践" class="headerlink" title="关键最佳实践"></a>关键最佳实践</h3><h4 id="1-随机性控制"><a href="#1-随机性控制" class="headerlink" title="1. 随机性控制"></a>1. 随机性控制</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">set_seed</span>(<span class="hljs-params">seed=<span class="hljs-number">0</span></span>):<br>    torch.manual_seed(seed)<br>    np.random.seed(seed)<br>    random.seed(seed)<br></code></pre></td></tr></table></figure>
+<h4 id="2-大数据处理"><a href="#2-大数据处理" class="headerlink" title="2. 大数据处理"></a>2. 大数据处理</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 使用memory mapping避免一次性加载</span><br>data = np.memmap(<span class="hljs-string">&quot;data.npy&quot;</span>, dtype=np.int32)<br><br><span class="hljs-comment"># 异步数据传输</span><br>x = x.pin_memory().to(device, non_blocking=<span class="hljs-literal">True</span>)<br></code></pre></td></tr></table></figure>
+<h4 id="3-检查点保存"><a href="#3-检查点保存" class="headerlink" title="3. 检查点保存"></a>3. 检查点保存</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python">checkpoint = &#123;<br>    <span class="hljs-string">&quot;model&quot;</span>: model.state_dict(),<br>    <span class="hljs-string">&quot;optimizer&quot;</span>: optimizer.state_dict(),<br>    <span class="hljs-string">&quot;step&quot;</span>: step,<br>    <span class="hljs-string">&quot;loss&quot;</span>: loss<br>&#125;<br>torch.save(checkpoint, <span class="hljs-string">&quot;checkpoint.pt&quot;</span>)<br></code></pre></td></tr></table></figure>
 <hr>
 <h2 id="🎨-混合精度训练"><a href="#🎨-混合精度训练" class="headerlink" title="🎨 混合精度训练"></a>🎨 混合精度训练</h2><h3 id="核心思想"><a href="#核心思想" class="headerlink" title="核心思想"></a>核心思想</h3><p><strong>默认高精度，如果降低精度没有影响则降低精度</strong></p>
 <h3 id="策略"><a href="#策略" class="headerlink" title="策略"></a>策略</h3><ul>
-<li><strong>前向传播</strong>：使用 bfloat16&#x2F;fp8（节省内存和计算）</li>
+<li><strong>前向传播</strong>：使用 bfloat16/fp8（节省内存和计算）</li>
 <li><strong>参数存储</strong>：使用 float32（保证精度）</li>
 <li><strong>梯度计算</strong>：使用 float32（保证稳定性）</li>
 </ul>
-<h3 id="PyTorch-AMP-实现"><a href="#PyTorch-AMP-实现" class="headerlink" title="PyTorch AMP 实现"></a>PyTorch AMP 实现</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">scaler = GradScaler()</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> autocast():</span><br><span class="line">    outputs = model(inputs)</span><br><span class="line">    loss = criterion(outputs, targets)</span><br><span class="line"></span><br><span class="line">scaler.scale(loss).backward()</span><br><span class="line">scaler.step(optimizer)</span><br><span class="line">scaler.update()</span><br></pre></td></tr></table></figure>
-
+<h3 id="PyTorch-AMP-实现"><a href="#PyTorch-AMP-实现" class="headerlink" title="PyTorch AMP 实现"></a>PyTorch AMP 实现</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python">scaler = GradScaler()<br><br><span class="hljs-keyword">with</span> autocast():<br>    outputs = model(inputs)<br>    loss = criterion(outputs, targets)<br><br>scaler.scale(loss).backward()<br>scaler.step(optimizer)<br>scaler.update()<br></code></pre></td></tr></table></figure>
 <hr>
 <h2 id="📊-资源核算总结"><a href="#📊-资源核算总结" class="headerlink" title="📊 资源核算总结"></a>📊 资源核算总结</h2><h3 id="内存组成"><a href="#内存组成" class="headerlink" title="内存组成"></a>内存组成</h3><ol>
 <li><strong>模型参数</strong></li>
@@ -240,8 +398,7 @@
 <li><strong>梯度</strong>（与参数同量级）</li>
 <li><strong>激活值</strong>（取决于batch size和序列长度）</li>
 </ol>
-<h3 id="计算量估算"><a href="#计算量估算" class="headerlink" title="计算量估算"></a>计算量估算</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 每个训练步骤的总FLOPs</span></span><br><span class="line">total_flops = <span class="number">6</span> * batch_size * seq_len * num_parameters</span><br><span class="line"></span><br><span class="line"><span class="comment"># 考虑实际利用率</span></span><br><span class="line">effective_flops = total_flops * mfu</span><br></pre></td></tr></table></figure>
-
+<h3 id="计算量估算"><a href="#计算量估算" class="headerlink" title="计算量估算"></a>计算量估算</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 每个训练步骤的总FLOPs</span><br>total_flops = <span class="hljs-number">6</span> * batch_size * seq_len * num_parameters<br><br><span class="hljs-comment"># 考虑实际利用率</span><br>effective_flops = total_flops * mfu<br></code></pre></td></tr></table></figure>
 <hr>
 <h2 id="🔗-延伸阅读"><a href="#🔗-延伸阅读" class="headerlink" title="🔗 延伸阅读"></a>🔗 延伸阅读</h2><h3 id="核心资源"><a href="#核心资源" class="headerlink" title="核心资源"></a>核心资源</h3><ul>
 <li><a target="_blank" rel="noopener" href="https://github.com/stanford-cs336/assignment1-basics/blob/main/cs336_spring2025_assignment1_basics.pdf">Assignment 1 Handout</a></li>
@@ -264,157 +421,380 @@
 <p>💡 <strong>记住</strong>：Modern AI训练不仅是算法问题，更是工程优化问题！</p>
 </blockquote>
 
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
       
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://zyxian31.github.io/2025/07/05/CS336-Spring2025-Lec2/" data-id="cmm7gp0ql000b5xudaf0gd96z" data-title="CS336 Language Modeling: Tensors, Operations &amp; Training" class="article-share-link"><span class="fa fa-share">分享</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CS336/" rel="tag">CS336</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/LLM/" rel="tag">LLM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a></li></ul>
 
-    </footer>
-  </div>
+<span class="category-chains">
+  
   
     
-<nav id="article-nav">
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="category-chain-item">学习笔记</a>
   
-    <a href="/2025/07/05/CS336-Spring2025-Lec3/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">前一篇</strong>
-      <div class="article-nav-title">
-        
-          CS336 Lecture 3: LM架构与训练 - 学习笔记
-        
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/CS336/" class="print-no-link">#CS336</a>
+      
+        <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" class="print-no-link">#深度学习</a>
+      
+        <a href="/tags/LLM/" class="print-no-link">#LLM</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>CS336 Language Modeling: Tensors, Operations &amp; Training</div>
+      <div>https://zyxian31.github.io/2025/07/05/CS336-Spring2025-Lec2/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>ZYXian31</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年7月5日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/07/05/CS336-Spring2025-Lec3/" title="CS336 Lecture 3: LM架构与训练 - 学习笔记">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">CS336 Lecture 3: LM架构与训练 - 学习笔记</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/1970/01/01/hello-world/" title="Hello World">
+                        <span class="hidden-mobile">Hello World</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
       </div>
-    </a>
-  
-  
-    <a href="/1970/01/01/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">后一篇</strong>
-      <div class="article-nav-title">Hello World</div>
-    </a>
-  
-</nav>
-
-  
-</article>
-
-
-</section>
-        
-          <aside id="sidebar">
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">分类</h3>
-    <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a></li></ul>
     </div>
-  </div>
 
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">标签</h3>
-    <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CS336/" rel="tag">CS336</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LLM/" rel="tag">LLM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RLHF/" rel="tag">RLHF</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Transformer/" rel="tag">Transformer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/" rel="tag">强化学习</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">标签云</h3>
-    <div class="widget tagcloud">
-      <a href="/tags/CS336/" style="font-size: 15px;">CS336</a> <a href="/tags/LLM/" style="font-size: 15px;">LLM</a> <a href="/tags/RLHF/" style="font-size: 15px;">RLHF</a> <a href="/tags/Transformer/" style="font-size: 10px;">Transformer</a> <a href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/" style="font-size: 15px;">强化学习</a> <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" style="font-size: 15px;">机器学习</a> <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" style="font-size: 20px;">深度学习</a>
-    </div>
-  </div>
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">归档</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/03/">三月 2026</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/01/">一月 2026</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/07/">七月 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/1970/01/">一月 1970</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">最新文章</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/2026/03/01/from-gradient-to-rlhf_2/">从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part II）</a>
-          </li>
-        
-          <li>
-            <a href="/2026/03/01/from-gradient-to-rlhf_1/">从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part I）</a>
-          </li>
-        
-          <li>
-            <a href="/2026/01/06/claude-code-usage/">claude-code usage</a>
-          </li>
-        
-          <li>
-            <a href="/2025/07/05/CS336-Spring2025-Lec3/">CS336 Lecture 3: LM架构与训练 - 学习笔记</a>
-          </li>
-        
-          <li>
-            <a href="/2025/07/05/CS336-Spring2025-Lec2/">CS336 Language Modeling: Tensors, Operations &amp; Training</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-
-  
-</aside>
-        
-      </div>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
+    <div class="side-col d-none d-lg-block col-lg-2">
       
-      &copy; 2026 ZYXian31<br>
-      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
-    </div>
-  </div>
-</footer>
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
 
     </div>
-    <nav id="mobile-nav">
+  </div>
+</div>
+
+
+
+
+
   
-    <a href="/" class="mobile-nav-link">Home</a>
+
+
+
   
-    <a href="/archives" class="mobile-nav-link">Archives</a>
+
+
+
   
-</nav>
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
     
 
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
 
-<script src="/js/jquery-3.6.4.min.js"></script>
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
 
 
 
   
-<script src="/fancybox/jquery.fancybox.min.js"></script>
+    <script  src="/js/img-lazyload.js" ></script>
+  
 
 
 
 
-<script src="/js/script.js"></script>
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
 
 
 
 
 
-  </div>
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
 </body>
 </html>

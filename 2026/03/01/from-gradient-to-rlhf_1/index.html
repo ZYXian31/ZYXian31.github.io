@@ -1,12 +1,25 @@
+
+
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
   
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
   
-  <title>从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part I） | ZYXian31&#39;s Blog</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="0. 预备说明：确定性梯度 vs 随机梯度估计器 目的：解决“梯度为什么会有方差？”这一误解  很多读者（包括我最初讨论时的直觉）会认为：梯度是反向传播算出来的，既然计算图确定、数值确定，梯度怎么会有方差？ 这类疑问的关键在于：我们讨论的是两件不同的东西：  确定性梯度：对一个确定的目标函数（以及确定的数据）求导，结果是确定的数。 随机梯度估计器：目标函数是一个期望（Expectation），我们">
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="ZYXian31">
+  <meta name="keywords" content="机器学习,深度学习,LLM">
+  
+    <meta name="description" content="0. 预备说明：确定性梯度 vs 随机梯度估计器 目的：解决“梯度为什么会有方差？”这一误解  很多读者（包括我最初讨论时的直觉）会认为：梯度是反向传播算出来的，既然计算图确定、数值确定，梯度怎么会有方差？ 这类疑问的关键在于：我们讨论的是两件不同的东西：  确定性梯度：对一个确定的目标函数（以及确定的数据）求导，结果是确定的数。 随机梯度估计器：目标函数是一个期望（Expectation），我们">
 <meta property="og:type" content="article">
 <meta property="og:title" content="从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part I）">
 <meta property="og:url" content="https://zyxian31.github.io/2026/03/01/from-gradient-to-rlhf_1/index.html">
@@ -20,94 +33,255 @@
 <meta property="article:tag" content="机器学习">
 <meta property="article:tag" content="强化学习">
 <meta property="article:tag" content="RLHF">
-<meta name="twitter:card" content="summary">
-  
-    <link rel="alternate" href="/atom.xml" title="ZYXian31's Blog" type="application/atom+xml">
-  
-  
-    <link rel="shortcut icon" href="/favicon.png">
+<meta name="twitter:card" content="summary_large_image">
   
   
   
-<link rel="stylesheet" href="/css/style.css">
+  <title>从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part I） - ZYXian31&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/KaTeX/0.16.2/katex.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"zyxian31.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
 
   
-    
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
-
-  
-  
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
-
 <meta name="generator" content="Hexo 7.3.0"></head>
 
+
 <body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/" id="logo">ZYXian31&#39;s Blog</a>
-      </h1>
-      
-        <h2 id="subtitle-wrap">
-          <a href="/" id="subtitle">技术学习笔记</a>
-        </h2>
-      
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
     </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part I）"></span>
+          
+        </div>
+
         
-          <a class="main-nav-link" href="/">Home</a>
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-03-01 13:20" pubdate>
+          2026年3月1日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
         
-          <a class="main-nav-link" href="/archives">Archives</a>
+          1.2k 字
         
-      </nav>
-      <nav id="sub-nav">
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
         
         
-          <a class="nav-icon" href="/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
         
-        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://ZYXian31.github.io"></form>
+          10 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
       </div>
+
+      
     </div>
   </div>
-</header>
+</div>
 
-      <div class="outer">
-        <section id="main"><article id="post-from-gradient-to-rlhf_1" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2026/03/01/from-gradient-to-rlhf_1/" class="article-date">
-  <time class="dt-published" datetime="2026-03-01T05:20:00.000Z" itemprop="datePublished">2026-03-01</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
-  </div>
+</div>
 
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 class="p-name article-title" itemprop="headline name">
-      从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part I）
-    </h1>
-  
+  </header>
 
-      </header>
+  <main>
     
-    <div class="e-content article-entry" itemprop="articleBody">
       
-        <h2 id="0-预备说明：确定性梯度-vs-随机梯度估计器"><a href="#0-预备说明：确定性梯度-vs-随机梯度估计器" class="headerlink" title="0. 预备说明：确定性梯度 vs 随机梯度估计器"></a>0. 预备说明：确定性梯度 vs 随机梯度估计器</h2><blockquote>
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part I）</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="0-预备说明：确定性梯度-vs-随机梯度估计器"><a href="#0-预备说明：确定性梯度-vs-随机梯度估计器" class="headerlink" title="0. 预备说明：确定性梯度 vs 随机梯度估计器"></a>0. 预备说明：确定性梯度 vs 随机梯度估计器</h2><blockquote>
 <p>目的：解决“梯度为什么会有方差？”这一误解</p>
 </blockquote>
 <p>很多读者（包括我最初讨论时的直觉）会认为：梯度是反向传播算出来的，既然计算图确定、数值确定，<strong>梯度怎么会有方差</strong>？</p>
@@ -118,37 +292,38 @@
 </ul>
 <p>下面把这两者严格区分开。</p>
 <hr>
-<h3 id="0-1-固定数据下的梯度是确定的"><a href="#0-1-固定数据下的梯度是确定的" class="headerlink" title="0.1 固定数据下的梯度是确定的"></a>0.1 固定数据下的梯度是确定的</h3><p>以监督学习为例。给定一个固定的数据集 ($D&#x3D;{(x_i,y_i)}_{i&#x3D;1}^N$)，定义经验风险：</p>
-<p>$$<br>L(\theta)&#x3D;\frac{1}{N}\sum_{i&#x3D;1}^{N}\ell\big(f_\theta(x_i),y_i\big)<br>$$</p>
-<p>这里：</p>
+<h3 id="0-1-固定数据下的梯度是确定的"><a href="#0-1-固定数据下的梯度是确定的" class="headerlink" title="0.1 固定数据下的梯度是确定的"></a>0.1 固定数据下的梯度是确定的</h3><p>以监督学习为例。给定一个固定的数据集 ($D={(x<em>i,y_i)}</em>{i=1}^N$)，定义经验风险：</p>
+<script type="math/tex; mode=display">
+L(\theta)=\frac{1}{N}\sum_{i=1}^{N}\ell\big(f_\theta(x_i),y_i\big)</script><p>这里：</p>
 <ul>
 <li>数据集 ($D$) 是固定的（常量）</li>
 <li>模型 ($f_\theta$) 是确定的可微函数</li>
 <li>损失 ($\ell(\cdot)$) 是确定的可微函数</li>
 </ul>
 <p>因此，梯度</p>
-<p>$$<br>\nabla_\theta L(\theta)<br>$$</p>
-<p>在给定 ($D$) 与 ($\theta$) 时是一个确定的向量：你在同一台机器上重复计算（忽略浮点误差）会得到同一个值。</p>
+<script type="math/tex; mode=display">
+\nabla_\theta L(\theta)</script><p>在给定 ($D$) 与 ($\theta$) 时是一个确定的向量：你在同一台机器上重复计算（忽略浮点误差）会得到同一个值。</p>
 <blockquote>
-<p>注意：工程上我们常说 “SGD 的梯度有噪声&#x2F;方差”，那是因为我们用 mini-batch 近似全量数据梯度；但<strong>对一个固定 mini-batch</strong>，梯度依然是确定的。<br>也就是说：监督学习里“随机性”来自我们人为抽样 mini-batch，而不是来自模型输出必须被采样。</p>
+<p>注意：工程上我们常说 “SGD 的梯度有噪声/方差”，那是因为我们用 mini-batch 近似全量数据梯度；但<strong>对一个固定 mini-batch</strong>，梯度依然是确定的。<br>也就是说：监督学习里“随机性”来自我们人为抽样 mini-batch，而不是来自模型输出必须被采样。</p>
 </blockquote>
 <hr>
 <h3 id="0-2-策略梯度是随机变量"><a href="#0-2-策略梯度是随机变量" class="headerlink" title="0.2 策略梯度是随机变量"></a>0.2 策略梯度是随机变量</h3><p>强化学习与 LLM-RLHF 里，目标通常是<strong>最大化期望回报</strong>：</p>
-<p>$$<br>J(\theta)&#x3D;\mathbb{E}<em>{\tau\sim P</em>\theta(\tau)}[R(\tau)]<br>$$</p>
-<p>这里出现了本节核心对象：($\tau$)（trajectory，轨迹）。</p>
+<script type="math/tex; mode=display">
+J(\theta)=\mathbb{E}_{\tau\sim P_\theta(\tau)}[R(\tau)]</script><p>这里出现了本节核心对象：($\tau$)（trajectory，轨迹）。</p>
 <h4 id="0-2-1-哪些东西是随机变量？"><a href="#0-2-1-哪些东西是随机变量？" class="headerlink" title="0.2.1 哪些东西是随机变量？"></a>0.2.1 哪些东西是随机变量？</h4><p><strong>随机变量不是 ($\nabla_\theta J(\theta)$) 这个数学对象本身</strong>，而是我们在实践中用来估计它的“单次采样梯度”：</p>
 <ul>
-<li>轨迹：($\tau&#x3D;(s_0,a_0,s_1,a_1,\dots)$) 是随机变量</li>
+<li>轨迹：($\tau=(s_0,a_0,s_1,a_1,\dots)$) 是随机变量</li>
 <li>回报：($R(\tau)$) 依赖于随机轨迹，因此也是随机变量</li>
 <li>单次采样的梯度估计器：</li>
 </ul>
-<p>$$<br>g(\tau)&#x3D;R(\tau)\nabla_\theta\log P_\theta(\tau)<br>$$</p>
-<p>是随机变量（因为它是随机轨迹 ($\tau$) 的函数）。</p>
+<script type="math/tex; mode=display">
+g(\tau)=R(\tau)\nabla_\theta\log P_\theta(\tau)</script><p>是随机变量（因为它是随机轨迹 ($\tau$) 的函数）。</p>
 <p>真正想要的梯度是期望：</p>
-<p>$$<br>\nabla_\theta J(\theta)&#x3D;\mathbb{E}<em>{\tau\sim P</em>\theta}[g(\tau)]<br>$$</p>
-<p>而训练时我们拿到的是有限条采样轨迹的平均：</p>
-<p>$$<br>\widehat{\nabla_\theta J}&#x3D;\frac{1}{N}\sum_{i&#x3D;1}^N g(\tau_i)<br>\quad,\quad \tau_i\sim P_\theta<br>$$</p>
-<p>由于 ($\tau_i$) 是随机采样的，这个估计 ($\widehat{\nabla_\theta J}$) 自然就会在不同 batch 之间波动——这就是“方差”的来源。</p>
+<script type="math/tex; mode=display">
+\nabla_\theta J(\theta)=\mathbb{E}_{\tau\sim P_\theta}[g(\tau)]</script><p>而训练时我们拿到的是有限条采样轨迹的平均：</p>
+<script type="math/tex; mode=display">
+\widehat{\nabla_\theta J}=\frac{1}{N}\sum_{i=1}^N g(\tau_i)
+\quad,\quad \tau_i\sim P_\theta</script><p>由于 ($\tau<em>i$) 是随机采样的，这个估计 ($\widehat{\nabla</em>\theta J}$) 自然就会在不同 batch 之间波动——这就是“方差”的来源。</p>
 <hr>
 <h4 id="0-2-2-为什么固定数据下梯度就不是随机变量，而策略梯度是？"><a href="#0-2-2-为什么固定数据下梯度就不是随机变量，而策略梯度是？" class="headerlink" title="0.2.2 为什么固定数据下梯度就不是随机变量，而策略梯度是？"></a>0.2.2 为什么固定数据下梯度就不是随机变量，而策略梯度是？</h4><p>对比的关键在于：“输入是否是随机生成的”。</p>
 <ul>
@@ -158,17 +333,19 @@
 <p>更直白地说：</p>
 <ul>
 <li>监督学习：样本在磁盘里，训练时只是读取</li>
-<li>强化学习 &#x2F; RLHF：样本要“生成出来”（rollout &#x2F; sampling），生成过程本身带随机性</li>
+<li>强化学习 / RLHF：样本要“生成出来”（rollout / sampling），生成过程本身带随机性</li>
 </ul>
 <p>所以两者的“随机性地位”不同：</p>
 <ul>
 <li>监督学习里，随机性通常是你为了省计算故意抽 mini-batch（可关掉）</li>
-<li>策略梯度里，随机性来自策略的随机采样与环境随机性（通常关不掉，除非你用完全确定性策略且环境确定，且仍然存在探索&#x2F;可导性问题）</li>
+<li>策略梯度里，随机性来自策略的随机采样与环境随机性（通常关不掉，除非你用完全确定性策略且环境确定，且仍然存在探索/可导性问题）</li>
 </ul>
 <hr>
 <h4 id="0-2-3-随机性具体体现在哪里？从什么分布采样？"><a href="#0-2-3-随机性具体体现在哪里？从什么分布采样？" class="headerlink" title="0.2.3 随机性具体体现在哪里？从什么分布采样？"></a>0.2.3 随机性具体体现在哪里？从什么分布采样？</h4><p>要回答“从什么分布采样”，我们把轨迹分布 ($P_\theta(\tau)$) 展开：</p>
-<h1 id="P-theta-tau"><a href="#P-theta-tau" class="headerlink" title="$$P_\theta(\tau)"></a>$$<br>P_\theta(\tau)</h1><p>\rho(s_0)\prod_{t&#x3D;0}^{T-1}\pi_\theta(a_t|s_t),P(s_{t+1}|s_t,a_t)<br>$$</p>
-<p>其中：</p>
+<script type="math/tex; mode=display">
+P_\theta(\tau)
+=
+\rho(s_0)\prod_{t=0}^{T-1}\pi_\theta(a_t|s_t)\,P(s_{t+1}|s_t,a_t)</script><p>其中：</p>
 <ul>
 <li>($\rho(s_0)$)：初始状态分布</li>
 <li>($\pi_\theta(a_t|s_t)$)：策略分布（由模型给出）</li>
@@ -176,52 +353,59 @@
 </ul>
 <p>这告诉我们：轨迹的随机性至少来自两处：</p>
 <ol>
-<li><strong>动作采样</strong>：($a_t\sim \pi_\theta(\cdot|s_t)$)</li>
+<li><strong>动作采样</strong>：($a<em>t\sim \pi</em>\theta(\cdot|s_t)$)</li>
 <li><strong>环境随机性</strong>：($s_{t+1}\sim P(\cdot|s_t,a_t)$)</li>
 </ol>
 <p>在 LLM-RLHF 中，环境可以理解为“生成过程 + reward 评价”，最核心的随机性来自：</p>
-<p>$$<br>y_t \sim \pi_\theta(\cdot|y_{&lt;t},x)<br>$$</p>
-<p>即每个 token 的采样。</p>
+<script type="math/tex; mode=display">
+y_t \sim \pi_\theta(\cdot|y_{<t},x)</script><p>即每个 token 的采样。</p>
 <blockquote>
-<p>即使 reward model 是确定函数 ($r(y)$)，由于 ($y$) 是从 ($\pi_\theta$) 随机采样得到，($R&#x3D;r(y)$) 作为随机变量仍然会有方差：<br>$$<br>\mathrm{Var}(R)&#x3D;\mathrm{Var}<em>{y\sim\pi</em>\theta}[r(y)]<br>$$</p>
-</blockquote>
+<p>即使 reward model 是确定函数 ($r(y)$)，由于 ($y$) 是从 ($\pi_\theta$) 随机采样得到，($R=r(y)$) 作为随机变量仍然会有方差：</p>
+<script type="math/tex; mode=display">
+\mathrm{Var}(R)=\mathrm{Var}_{y\sim\pi_\theta}[r(y)]</script></blockquote>
 <hr>
 <h4 id="0-2-4-一个极简数值例子：单-token-的梯度为什么会波动？"><a href="#0-2-4-一个极简数值例子：单-token-的梯度为什么会波动？" class="headerlink" title="0.2.4 一个极简数值例子：单 token 的梯度为什么会波动？"></a>0.2.4 一个极简数值例子：单 token 的梯度为什么会波动？</h4><p>很多人（包括我在讨论中）会误以为“梯度波动来自数值精度”。实际上，不需要任何数值误差，<strong>采样本身就足以制造方差</strong>。</p>
-<p>假设某一步 token 只有两个候选 A &#x2F; B：</p>
-<p>$$<br>\pi(A)&#x3D;0.9,\quad \pi(B)&#x3D;0.1<br>$$</p>
-<p>把参数简化为控制 ($\pi(B)$) 的 logit ($z_B$)。则（softmax&#x2F;sigmoid 的标准结果）：</p>
+<p>假设某一步 token 只有两个候选 A / B：</p>
+<script type="math/tex; mode=display">
+\pi(A)=0.9,\quad \pi(B)=0.1</script><p>把参数简化为控制 ($\pi(B)$) 的 logit ($z_B$)。则（softmax/sigmoid 的标准结果）：</p>
 <ul>
 <li>如果采到 B：</li>
 </ul>
-<p>$$<br>u&#x3D;\nabla_{z_B}\log\pi(B)&#x3D;1-\pi(B)&#x3D;0.9<br>$$</p>
-<ul>
+<script type="math/tex; mode=display">
+u=\nabla_{z_B}\log\pi(B)=1-\pi(B)=0.9</script><ul>
 <li>如果采到 A：</li>
 </ul>
-<p>$$<br>u&#x3D;\nabla_{z_B}\log\pi(A)&#x3D;-\pi(B)&#x3D;-0.1<br>$$</p>
-<p>因此 ($u$) 是随机变量：</p>
-<p>$$<br>u&#x3D;<br>\begin{cases}<br>0.9 &amp; \text{概率 }0.1 \<br>-0.1 &amp; \text{概率 }0.9<br>\end{cases}<br>$$</p>
-<p>它的期望是 0（这是一个重要恒等式）：</p>
-<p>$$<br>\mathbb{E}[u]&#x3D;0.1\cdot 0.9 + 0.9\cdot (-0.1)&#x3D;0<br>$$</p>
-<p>但二阶矩非零：</p>
-<p>$$<br>\mathbb{E}[u^2]&#x3D;0.1\cdot 0.9^2+0.9\cdot 0.1^2<br>&#x3D;0.1\cdot 0.81+0.9\cdot 0.01<br>&#x3D;0.09<br>$$</p>
-<p>所以方差：</p>
-<p>$$<br>\mathrm{Var}(u)&#x3D;0.09<br>$$</p>
-<p>这说明：<strong>即便完全没有数值误差，单 token 的 log-prob 梯度也会因采样而波动。</strong></p>
+<script type="math/tex; mode=display">
+u=\nabla_{z_B}\log\pi(A)=-\pi(B)=-0.1</script><p>因此 ($u$) 是随机变量：</p>
+<script type="math/tex; mode=display">
+u=
+\begin{cases}
+0.9 & \text{概率 }0.1 \\
+-0.1 & \text{概率 }0.9
+\end{cases}</script><p>它的期望是 0（这是一个重要恒等式）：</p>
+<script type="math/tex; mode=display">
+\mathbb{E}[u]=0.1\cdot 0.9 + 0.9\cdot (-0.1)=0</script><p>但二阶矩非零：</p>
+<script type="math/tex; mode=display">
+\mathbb{E}[u^2]=0.1\cdot 0.9^2+0.9\cdot 0.1^2
+=0.1\cdot 0.81+0.9\cdot 0.01
+=0.09</script><p>所以方差：</p>
+<script type="math/tex; mode=display">
+\mathrm{Var}(u)=0.09</script><p>这说明：<strong>即便完全没有数值误差，单 token 的 log-prob 梯度也会因采样而波动。</strong></p>
 <p>一旦你把多个 token 的梯度相加、再乘上回报 ($R$)，方差会进一步累积和放大——这就是后文“策略梯度方差大”的根源之一。</p>
 <hr>
 <h4 id="0-2-5-为什么不能“解析地”计算期望梯度，而必须采样估计？"><a href="#0-2-5-为什么不能“解析地”计算期望梯度，而必须采样估计？" class="headerlink" title="0.2.5 为什么不能“解析地”计算期望梯度，而必须采样估计？"></a>0.2.5 为什么不能“解析地”计算期望梯度，而必须采样估计？</h4><p>你可能会问：既然</p>
-<p>$$<br>\nabla_\theta J(\theta)&#x3D;\mathbb{E}<em>{\tau\sim P</em>\theta}[g(\tau)]<br>$$</p>
-<p>那我能不能把这个期望直接算出来？</p>
+<script type="math/tex; mode=display">
+\nabla_\theta J(\theta)=\mathbb{E}_{\tau\sim P_\theta}[g(\tau)]</script><p>那我能不能把这个期望直接算出来？</p>
 <p>理论上，如果你能枚举所有轨迹 ($\tau$)，当然可以：</p>
-<p>$$<br>\nabla_\theta J(\theta)&#x3D;\sum_\tau P_\theta(\tau)g(\tau)<br>$$</p>
-<p>但在实际问题里，这条路基本不可行，原因是<strong>轨迹空间爆炸</strong>：</p>
+<script type="math/tex; mode=display">
+\nabla_\theta J(\theta)=\sum_\tau P_\theta(\tau)g(\tau)</script><p>但在实际问题里，这条路基本不可行，原因是<strong>轨迹空间爆炸</strong>：</p>
 <ul>
 <li>离散动作空间大小为 ($|\mathcal{A}|$)</li>
-<li>序列&#x2F;轨迹长度为 ($T$)</li>
+<li>序列/轨迹长度为 ($T$)</li>
 </ul>
 <p>仅动作序列数就有：</p>
-<p>$$<br>|\mathcal{A}|^T<br>$$</p>
-<p>在 LLM 中更夸张：</p>
+<script type="math/tex; mode=display">
+|\mathcal{A}|^T</script><p>在 LLM 中更夸张：</p>
 <ul>
 <li>token 词表 ($|V|$) 可能是 50k</li>
 <li>序列长度 ($T$) 动辄几百上千</li>
@@ -229,11 +413,14 @@
 <p>序列数 ($|V|^T$) 天文级，无法枚举，也无法精确求和。</p>
 <p>同时，轨迹分布还包含环境转移 ($P(s’|s,a)$)，真实世界或复杂仿真里它是黑箱，你甚至没有解析形式可用。</p>
 <p>因此实际只能用 Monte Carlo：</p>
-<p>$$<br>\nabla_\theta J(\theta)<br>\approx<br>\frac{1}{N}\sum_{i&#x3D;1}^{N} g(\tau_i)<br>\quad,\quad \tau_i\sim P_\theta<br>$$</p>
-<p>这一步把“解析求和”换成“随机采样平均”，代价就是：</p>
+<script type="math/tex; mode=display">
+\nabla_\theta J(\theta)
+\approx
+\frac{1}{N}\sum_{i=1}^{N} g(\tau_i)
+\quad,\quad \tau_i\sim P_\theta</script><p>这一步把“解析求和”换成“随机采样平均”，代价就是：</p>
 <ul>
 <li>估计器有方差</li>
-<li>方差随 ($N$) 增大而下降（大致 ($\propto 1&#x2F;N$)），但样本成本很高</li>
+<li>方差随 ($N$) 增大而下降（大致 ($\propto 1/N$)），但样本成本很高</li>
 </ul>
 <hr>
 <h2 id="0-3-工程视角：SFT-与-RLHF-中梯度随机性的本质差别"><a href="#0-3-工程视角：SFT-与-RLHF-中梯度随机性的本质差别" class="headerlink" title="0.3 工程视角：SFT 与 RLHF 中梯度随机性的本质差别"></a>0.3 工程视角：SFT 与 RLHF 中梯度随机性的本质差别</h2><p>理解策略梯度为什么有方差，最直观的方法就是对比：</p>
@@ -244,12 +431,18 @@
 <p>它们都训练同一个模型，但梯度的随机性来源完全不同。</p>
 <hr>
 <h3 id="0-3-1-SFT：Teacher-Forcing-下的“条件确定性梯度”"><a href="#0-3-1-SFT：Teacher-Forcing-下的“条件确定性梯度”" class="headerlink" title="0.3.1 SFT：Teacher Forcing 下的“条件确定性梯度”"></a>0.3.1 SFT：Teacher Forcing 下的“条件确定性梯度”</h3><p>在 SFT 中，我们有固定的数据对：</p>
-<p>$$<br>(x, y_1, y_2, \dots, y_T)<br>$$</p>
-<p>训练目标是最大化条件似然：</p>
-<h1 id="L-theta"><a href="#L-theta" class="headerlink" title="$$L(\theta)"></a>$$<br>L(\theta)</h1><p>\sum_{t&#x3D;1}^{T}<br>\log \pi_\theta(y_t \mid y_{&lt;t}, x)<br>$$</p>
-<p>梯度为：</p>
-<h1 id="nabla-theta-L-theta"><a href="#nabla-theta-L-theta" class="headerlink" title="$$\nabla_\theta L(\theta)"></a>$$<br>\nabla_\theta L(\theta)</h1><p>\sum_{t&#x3D;1}^{T}<br>\nabla_\theta \log \pi_\theta(y_t \mid y_{&lt;t}, x)<br>$$</p>
-<p>关键点：</p>
+<script type="math/tex; mode=display">
+(x, y_1, y_2, \dots, y_T)</script><p>训练目标是最大化条件似然：</p>
+<script type="math/tex; mode=display">
+L(\theta)
+=
+\sum_{t=1}^{T}
+\log \pi_\theta(y_t \mid y_{<t}, x)</script><p>梯度为：</p>
+<script type="math/tex; mode=display">
+\nabla_\theta L(\theta)
+=
+\sum_{t=1}^{T}
+\nabla_\theta \log \pi_\theta(y_t \mid y_{<t}, x)</script><p>关键点：</p>
 <ul>
 <li>所有 token (y_t) 是<strong>数据集给定的固定值</strong></li>
 <li>不存在采样</li>
@@ -265,21 +458,27 @@
 </ul>
 <hr>
 <h3 id="0-3-2-RLHF：必须采样，随机性不可消除"><a href="#0-3-2-RLHF：必须采样，随机性不可消除" class="headerlink" title="0.3.2 RLHF：必须采样，随机性不可消除"></a>0.3.2 RLHF：必须采样，随机性不可消除</h3><p>在 RLHF 中，我们优化：</p>
-<h1 id="J-theta"><a href="#J-theta" class="headerlink" title="$$J(\theta)"></a>$$<br>J(\theta)</h1><p>\mathbb{E}<em>{y \sim \pi</em>\theta(\cdot|x)}<br>[r(y)]<br>$$</p>
-<p>训练步骤是：</p>
+<script type="math/tex; mode=display">
+J(\theta)
+=
+\mathbb{E}_{y \sim \pi_\theta(\cdot|x)}
+[r(y)]</script><p>训练步骤是：</p>
 <ol>
 <li>用当前模型 <strong>采样生成文本</strong>：</li>
 </ol>
-<p>$$<br>y \sim \pi_\theta(\cdot|x)<br>$$</p>
-<ol start="2">
+<script type="math/tex; mode=display">
+y \sim \pi_\theta(\cdot|x)</script><ol>
 <li>用 reward model 计算分数：</li>
 </ol>
-<p>$$<br>R &#x3D; r(y)<br>$$</p>
-<ol start="3">
+<script type="math/tex; mode=display">
+R = r(y)</script><ol>
 <li>用策略梯度更新：</li>
 </ol>
-<h1 id="g"><a href="#g" class="headerlink" title="$$g"></a>$$<br>g</h1><p>R \sum_{t&#x3D;1}^{T}<br>\nabla_\theta \log \pi_\theta(y_t|y_{&lt;t},x)<br>$$</p>
-<p>注意这里的根本差异：</p>
+<script type="math/tex; mode=display">
+g
+=
+R \sum_{t=1}^{T}
+\nabla_\theta \log \pi_\theta(y_t|y_{<t},x)</script><p>注意这里的根本差异：</p>
 <ul>
 <li>在 SFT 中，(y_t) 来自数据集（常量）</li>
 <li>在 RLHF 中，(y_t) 来自模型分布（随机变量）</li>
@@ -296,39 +495,39 @@
 <li>环境是确定性的</li>
 </ul>
 <p>只要生成是采样的：</p>
-<p>$$<br>y \sim \pi_\theta<br>$$</p>
-<p>梯度估计器就不可避免是随机变量。</p>
+<script type="math/tex; mode=display">
+y \sim \pi_\theta</script><p>梯度估计器就不可避免是随机变量。</p>
 <hr>
 <h3 id="0-3-3-一个极简对比示例"><a href="#0-3-3-一个极简对比示例" class="headerlink" title="0.3.3 一个极简对比示例"></a>0.3.3 一个极简对比示例</h3><p>假设 prompt 相同：</p>
 <h4 id="SFT-情况"><a href="#SFT-情况" class="headerlink" title="SFT 情况"></a>SFT 情况</h4><p>数据给定：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Question: 2+2=?</span><br><span class="line">Answer: 4</span><br></pre></td></tr></table></figure>
-
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">Question</span>: <span class="hljs-number">2</span>+<span class="hljs-number">2</span>=?<br><span class="hljs-attribute">Answer</span>: <span class="hljs-number">4</span><br></code></pre></td></tr></table></figure>
 <p>训练时永远计算：</p>
-<p>$$<br>\nabla_\theta \log \pi_\theta(4|\text{2+2&#x3D;?})<br>$$</p>
-<p>梯度是确定的。</p>
+<script type="math/tex; mode=display">
+\nabla_\theta \log \pi_\theta(4|\text{2+2=?})</script><p>梯度是确定的。</p>
 <hr>
 <h4 id="RLHF-情况"><a href="#RLHF-情况" class="headerlink" title="RLHF 情况"></a>RLHF 情况</h4><p>模型可能生成：</p>
 <ul>
-<li>“4”（reward &#x3D; 1）</li>
-<li>“5”（reward &#x3D; 0）</li>
-<li>“The answer is 4.”（reward &#x3D; 0.9）</li>
+<li>“4”（reward = 1）</li>
+<li>“5”（reward = 0）</li>
+<li>“The answer is 4.”（reward = 0.9）</li>
 </ul>
 <p>不同采样 → 不同 reward → 不同梯度。</p>
 <p>哪怕参数 θ 不变，两次 rollout 得到的梯度也不同。</p>
 <hr>
 <h3 id="0-3-4-为什么-RLHF-不能改成“像-SFT-一样不采样”？"><a href="#0-3-4-为什么-RLHF-不能改成“像-SFT-一样不采样”？" class="headerlink" title="0.3.4 为什么 RLHF 不能改成“像 SFT 一样不采样”？"></a>0.3.4 为什么 RLHF 不能改成“像 SFT 一样不采样”？</h3><p>因为 RLHF 的目标不是拟合固定标签，而是最大化：</p>
-<p>$$<br>\mathbb{E}<em>{y\sim \pi</em>\theta}[r(y)]<br>$$</p>
-<p>如果不采样，就无法估计模型在当前分布下的期望 reward。</p>
+<script type="math/tex; mode=display">
+\mathbb{E}_{y\sim \pi_\theta}[r(y)]</script><p>如果不采样，就无法估计模型在当前分布下的期望 reward。</p>
 <p>你无法提前知道：</p>
 <ul>
 <li>哪些输出当前策略概率高</li>
 <li>哪些输出 reward 高</li>
 </ul>
 <p>因此必须从当前策略分布中采样，估计：</p>
-<p>$$<br>\nabla_\theta J(\theta)<br>$$</p>
-<p>这一步不可避免地引入 Monte Carlo 估计误差。</p>
+<script type="math/tex; mode=display">
+\nabla_\theta J(\theta)</script><p>这一步不可避免地引入 Monte Carlo 估计误差。</p>
 <hr>
-<h3 id="0-3-5-核心对比总结"><a href="#0-3-5-核心对比总结" class="headerlink" title="0.3.5 核心对比总结"></a>0.3.5 核心对比总结</h3><table>
+<h3 id="0-3-5-核心对比总结"><a href="#0-3-5-核心对比总结" class="headerlink" title="0.3.5 核心对比总结"></a>0.3.5 核心对比总结</h3><div class="table-container">
+<table>
 <thead>
 <tr>
 <th></th>
@@ -336,7 +535,8 @@
 <th>RLHF</th>
 </tr>
 </thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td>token 来源</td>
 <td>数据集</td>
 <td>模型采样</td>
@@ -356,7 +556,9 @@
 <td>mini-batch 抽样</td>
 <td>生成采样 + reward 波动</td>
 </tr>
-</tbody></table>
+</tbody>
+</table>
+</div>
 <hr>
 <h3 id="0-3-6-一句话总结"><a href="#0-3-6-一句话总结" class="headerlink" title="0.3.6 一句话总结"></a>0.3.6 一句话总结</h3><blockquote>
 <p>SFT 的梯度是“对固定数据的确定性函数求导”；<br>RLHF 的梯度是“对随机生成样本的期望进行 Monte Carlo 估计”。</p>
@@ -370,28 +572,38 @@
 <p>这也是后文所有“baseline、advantage、PPO、KL 控制”的理论前提。</p>
 <h3 id="本节小结"><a href="#本节小结" class="headerlink" title="本节小结"></a>本节小结</h3><ul>
 <li>对固定数据的梯度是确定的：随机性只来自你是否抽 mini-batch。</li>
-<li>策略梯度训练时用的是“随机梯度估计器” ($g(\tau)$)，随机性来自轨迹&#x2F;文本的采样。</li>
+<li>策略梯度训练时用的是“随机梯度估计器” ($g(\tau)$)，随机性来自轨迹/文本的采样。</li>
 <li>在 LLM-RLHF 中，即使 reward model 是确定函数，reward 作为随机变量仍然会因生成样本不同而波动。</li>
-<li>期望梯度无法解析计算，原因是轨迹&#x2F;序列空间指数爆炸 + 环境黑箱，只能用采样估计，因此方差是内生的。</li>
+<li>期望梯度无法解析计算，原因是轨迹/序列空间指数爆炸 + 环境黑箱，只能用采样估计，因此方差是内生的。</li>
 </ul>
-<h2 id="1-梯度与策略梯度：定义与区别"><a href="#1-梯度与策略梯度：定义与区别" class="headerlink" title="1. 梯度与策略梯度：定义与区别"></a>1. 梯度与策略梯度：定义与区别</h2><p>这一节的目标是把三个概念彻底分开：<strong>梯度</strong>（纯数学对象）、<strong>用梯度做优化</strong>（下降&#x2F;上升只是符号选择）、以及<strong>策略梯度</strong>（强化学习里对“分布参数”求导的特定形式）。后面的推导、方差分析、baseline 和 PPO&#x2F;KL 都建立在这三者的清晰区分之上。</p>
+<h2 id="1-梯度与策略梯度：定义与区别"><a href="#1-梯度与策略梯度：定义与区别" class="headerlink" title="1. 梯度与策略梯度：定义与区别"></a>1. 梯度与策略梯度：定义与区别</h2><p>这一节的目标是把三个概念彻底分开：<strong>梯度</strong>（纯数学对象）、<strong>用梯度做优化</strong>（下降/上升只是符号选择）、以及<strong>策略梯度</strong>（强化学习里对“分布参数”求导的特定形式）。后面的推导、方差分析、baseline 和 PPO/KL 都建立在这三者的清晰区分之上。</p>
 <hr>
 <h3 id="1-1-梯度定义"><a href="#1-1-梯度定义" class="headerlink" title="1.1 梯度定义"></a>1.1 梯度定义</h3><h4 id="1-1-1-数学定义（严格形式）"><a href="#1-1-1-数学定义（严格形式）" class="headerlink" title="1.1.1 数学定义（严格形式）"></a>1.1.1 数学定义（严格形式）</h4><p>设有一个从参数空间到实数的可微函数：</p>
-<p>$$<br>f:\mathbb{R}^d \rightarrow \mathbb{R},\quad f&#x3D;f(\theta)<br>$$</p>
-<p>它在点 ($\theta$) 的<strong>梯度</strong>定义为偏导数组成的向量：</p>
-<h1 id="nabla-theta-f-theta"><a href="#nabla-theta-f-theta" class="headerlink" title="$$\nabla_\theta f(\theta)"></a>$$<br>\nabla_\theta f(\theta)</h1><p>\left(<br>\frac{\partial f}{\partial \theta_1},<br>\frac{\partial f}{\partial \theta_2},<br>\dots,<br>\frac{\partial f}{\partial \theta_d}<br>\right)^\top<br>$$</p>
-<p>它满足一个关键的“局部线性近似”性质：对任意小扰动 ($\Delta \theta$)，有</p>
-<p>$$<br>f(\theta+\Delta\theta)<br>\approx<br>f(\theta) + \nabla_\theta f(\theta)^\top \Delta\theta<br>$$</p>
-<p>这句话的意义是：在足够小的邻域里，($f$) 的变化近似由内积 ($\nabla f \cdot \Delta\theta$) 决定。</p>
+<script type="math/tex; mode=display">
+f:\mathbb{R}^d \rightarrow \mathbb{R},\quad f=f(\theta)</script><p>它在点 ($\theta$) 的<strong>梯度</strong>定义为偏导数组成的向量：</p>
+<script type="math/tex; mode=display">
+\nabla_\theta f(\theta)
+=
+\left(
+\frac{\partial f}{\partial \theta_1},
+\frac{\partial f}{\partial \theta_2},
+\dots,
+\frac{\partial f}{\partial \theta_d}
+\right)^\top</script><p>它满足一个关键的“局部线性近似”性质：对任意小扰动 ($\Delta \theta$)，有</p>
+<script type="math/tex; mode=display">
+f(\theta+\Delta\theta)
+\approx
+f(\theta) + \nabla_\theta f(\theta)^\top \Delta\theta</script><p>这句话的意义是：在足够小的邻域里，($f$) 的变化近似由内积 ($\nabla f \cdot \Delta\theta$) 决定。</p>
 <hr>
 <h4 id="1-1-2-直观含义（可操作的解释）"><a href="#1-1-2-直观含义（可操作的解释）" class="headerlink" title="1.1.2 直观含义（可操作的解释）"></a>1.1.2 直观含义（可操作的解释）</h4><ul>
 <li>梯度给出“<strong>函数增长最快的方向</strong>”：在所有单位方向向量 ($v$) 中，使 ($f(\theta+\epsilon v)$) 增大最快的方向就是梯度方向。</li>
 </ul>
 <p>更形式地说，方向导数为：</p>
-<p>$$<br>D_v f(\theta)&#x3D;\lim_{\epsilon\to 0}\frac{f(\theta+\epsilon v)-f(\theta)}{\epsilon}<br>&#x3D; \nabla_\theta f(\theta)^\top v<br>$$</p>
-<p>当 ($|v|&#x3D;1$) 时，最大值由柯西–施瓦茨不等式得到：</p>
-<p>$$<br>\nabla f(\theta)^\top v \le |\nabla f(\theta)||v| &#x3D; |\nabla f(\theta)|<br>$$</p>
-<p>等号当且仅当 ($v$) 与 ($\nabla f$) 同向成立。因此：</p>
+<script type="math/tex; mode=display">
+D_v f(\theta)=\lim_{\epsilon\to 0}\frac{f(\theta+\epsilon v)-f(\theta)}{\epsilon}
+= \nabla_\theta f(\theta)^\top v</script><p>当 ($|v|=1$) 时，最大值由柯西–施瓦茨不等式得到：</p>
+<script type="math/tex; mode=display">
+\nabla f(\theta)^\top v \le |\nabla f(\theta)||v| = |\nabla f(\theta)|</script><p>等号当且仅当 ($v$) 与 ($\nabla f$) 同向成立。因此：</p>
 <ul>
 <li><strong>沿着 ($\nabla f$) 走，($f$) 增加最快；</strong></li>
 <li><strong>沿着 ($-\nabla f$) 走，($f$) 减少最快。</strong></li>
@@ -404,105 +616,114 @@
 <li><strong>最大化</strong>一个目标（例如回报）</li>
 </ul>
 <p>两者在数学上互为相反数。若最大化 ($J(\theta)$)，等价于最小化 ($-J(\theta)$)：</p>
-<p>$$<br>\max_\theta J(\theta)<br>\quad\Longleftrightarrow\quad<br>\min_\theta -J(\theta)<br>$$</p>
-<p>因此更新规则只是符号选择：</p>
+<script type="math/tex; mode=display">
+\max_\theta J(\theta)
+\quad\Longleftrightarrow\quad
+\min_\theta -J(\theta)</script><p>因此更新规则只是符号选择：</p>
 <ul>
 <li>最小化（梯度下降）：</li>
 </ul>
-<p>$$<br>\theta \leftarrow \theta - \alpha \nabla_\theta L(\theta)<br>$$</p>
-<ul>
+<script type="math/tex; mode=display">
+\theta \leftarrow \theta - \alpha \nabla_\theta L(\theta)</script><ul>
 <li>最大化（梯度上升）：</li>
 </ul>
-<p>$$<br>\theta \leftarrow \theta + \alpha \nabla_\theta J(\theta)<br>$$</p>
-<p>这里 ($\alpha&gt;0$) 是学习率。</p>
+<script type="math/tex; mode=display">
+\theta \leftarrow \theta + \alpha \nabla_\theta J(\theta)</script><p>这里 ($\alpha&gt;0$) 是学习率。</p>
 <blockquote>
 <p>关键结论：<strong>采用上升还是下降，完全由你的优化目标是“最大化”还是“最小化”决定。</strong><br>算法本质仍是“沿着局部一阶近似的最陡方向移动”。</p>
 </blockquote>
 <hr>
 <h3 id="1-3-策略梯度定义"><a href="#1-3-策略梯度定义" class="headerlink" title="1.3 策略梯度定义"></a>1.3 策略梯度定义</h3><p>强化学习中，我们的“模型”不是直接输出一个数，而是输出一个<strong>策略（policy）</strong>：给定状态 (s)，输出对动作 (a) 的概率分布。</p>
-<p>$$<br>\pi_\theta(a|s)<br>$$</p>
-<p>其中 ($\theta$) 是策略参数（例如神经网络参数），($\pi_\theta(a|s)$) 是在状态 ($s$) 选择动作 ($a$) 的概率。</p>
+<script type="math/tex; mode=display">
+\pi_\theta(a|s)</script><p>其中 ($\theta$) 是策略参数（例如神经网络参数），($\pi_\theta(a|s)$) 是在状态 ($s$) 选择动作 ($a$) 的概率。</p>
 <p>强化学习的优化目标通常写成<strong>期望回报</strong>：</p>
-<p>$$<br>J(\theta)&#x3D;\mathbb{E}<em>{\tau\sim P</em>\theta(\tau)}[R(\tau)]<br>$$</p>
-<ul>
+<script type="math/tex; mode=display">
+J(\theta)=\mathbb{E}_{\tau\sim P_\theta(\tau)}[R(\tau)]</script><ul>
 <li>($\tau$) 是轨迹（trajectory），包含状态、动作序列：($(s_0,a_0,s_1,a_1,\dots)$)</li>
-<li>($P_\theta(\tau)$) 是在策略 ($\pi_\theta$) 下产生轨迹的概率分布</li>
+<li>($P<em>\theta(\tau)$) 是在策略 ($\pi</em>\theta$) 下产生轨迹的概率分布</li>
 <li>($R(\tau)$) 是该轨迹的回报（return）</li>
 </ul>
 <p>于是，“策略梯度（policy gradient）”指的就是：</p>
-<p>$$<br>\nabla_\theta J(\theta)<br>$$</p>
-<p>也就是：<strong>对策略参数求导，让期望回报变大。</strong></p>
+<script type="math/tex; mode=display">
+\nabla_\theta J(\theta)</script><p>也就是：<strong>对策略参数求导，让期望回报变大。</strong></p>
 <blockquote>
 <p>和监督学习最重要的不同点在于：<br>这里的目标函数是一个对“轨迹分布”取期望的量，($\theta$) 影响的是 ($P_\theta(\tau)$)（即采样分布），而不是直接给出一个可微的标量输出供你对齐标签。</p>
 </blockquote>
 <p>在 LLM 的 RLHF 里，策略就是语言模型的 token 分布：</p>
-<p>$$<br>\pi_\theta(y_t|y_{&lt;t},x)<br>$$</p>
-<p>轨迹是完整生成序列 ($y&#x3D;(y_1,\dots,y_T)$)，回报是 reward model 对整段输出的评分 ($r(y)$)。形式完全一致：</p>
-<p>$$<br>J(\theta)&#x3D;\mathbb{E}<em>{y\sim \pi</em>\theta(\cdot|x)}[r(y)]<br>$$</p>
-<hr>
+<script type="math/tex; mode=display">
+\pi_\theta(y_t|y_{<t},x)</script><p>轨迹是完整生成序列 ($y=(y_1,\dots,y_T)$)，回报是 reward model 对整段输出的评分 ($r(y)$)。形式完全一致：</p>
+<script type="math/tex; mode=display">
+J(\theta)=\mathbb{E}_{y\sim \pi_\theta(\cdot|x)}[r(y)]</script><hr>
 <h3 id="1-4-监督学习-vs-强化学习的差异"><a href="#1-4-监督学习-vs-强化学习的差异" class="headerlink" title="1.4 监督学习 vs 强化学习的差异"></a>1.4 监督学习 vs 强化学习的差异</h3><p>这一节只强调最核心、与后文推导直接相关的差异：<strong>优化对象、数据生成机制、以及梯度信号的来源</strong>。</p>
 <h4 id="1-4-1-优化对象不同：拟合标签-vs-优化期望回报"><a href="#1-4-1-优化对象不同：拟合标签-vs-优化期望回报" class="headerlink" title="1.4.1 优化对象不同：拟合标签 vs 优化期望回报"></a>1.4.1 优化对象不同：拟合标签 vs 优化期望回报</h4><ul>
-<li>监督学习：数据集提供“正确答案&#x2F;标签”，目标是最小化预测误差</li>
+<li>监督学习：数据集提供“正确答案/标签”，目标是最小化预测误差</li>
 </ul>
-<p>$$<br>\min_\theta \mathbb{E}<em>{(x,y)\sim D}\big[\ell(f</em>\theta(x),y)\big]<br>$$</p>
-<ul>
+<script type="math/tex; mode=display">
+\min_\theta \mathbb{E}_{(x,y)\sim D}\big[\ell(f_\theta(x),y)\big]</script><ul>
 <li>强化学习：没有逐步标签，目标是最大化交互产生的期望回报</li>
 </ul>
-<p>$$<br>\max_\theta \mathbb{E}<em>{\tau\sim P</em>\theta}[R(\tau)]<br>$$</p>
-<p>监督学习里的误差信号来自“标签差”，强化学习里来自“回报好坏”。</p>
+<script type="math/tex; mode=display">
+\max_\theta \mathbb{E}_{\tau\sim P_\theta}[R(\tau)]</script><p>监督学习里的误差信号来自“标签差”，强化学习里来自“回报好坏”。</p>
 <hr>
 <h4 id="1-4-2-数据生成机制不同：离线固定数据-vs-在线采样轨迹"><a href="#1-4-2-数据生成机制不同：离线固定数据-vs-在线采样轨迹" class="headerlink" title="1.4.2 数据生成机制不同：离线固定数据 vs 在线采样轨迹"></a>1.4.2 数据生成机制不同：离线固定数据 vs 在线采样轨迹</h4><ul>
 <li>监督学习：样本 ((x,y)) 在数据集里是固定的，你读取它们并计算梯度</li>
-<li>强化学习：样本（轨迹）需要由当前策略去环境中<strong>生成&#x2F;采样</strong>出来</li>
+<li>强化学习：样本（轨迹）需要由当前策略去环境中<strong>生成/采样</strong>出来</li>
 </ul>
 <p>这一点决定了：强化学习里你讨论的不是“对固定样本的梯度”，而是“对随机采样轨迹的梯度估计器”（这也是为什么后文必须谈方差、baseline、PPO 等稳定化技术）。</p>
 <hr>
-<h4 id="1-4-3-可微性链路不同：计算图可见-vs-黑箱环境-采样节点"><a href="#1-4-3-可微性链路不同：计算图可见-vs-黑箱环境-采样节点" class="headerlink" title="1.4.3 可微性链路不同：计算图可见 vs 黑箱环境&#x2F;采样节点"></a>1.4.3 可微性链路不同：计算图可见 vs 黑箱环境&#x2F;采样节点</h4><ul>
-<li><p>监督学习的计算图通常是：<br>$$<br>\theta \rightarrow f_\theta(x) \rightarrow \ell(\cdot,y)<br>$$<br>全部在模型内部，端到端可微。</p>
+<h4 id="1-4-3-可微性链路不同：计算图可见-vs-黑箱环境-采样节点"><a href="#1-4-3-可微性链路不同：计算图可见-vs-黑箱环境-采样节点" class="headerlink" title="1.4.3 可微性链路不同：计算图可见 vs 黑箱环境/采样节点"></a>1.4.3 可微性链路不同：计算图可见 vs 黑箱环境/采样节点</h4><ul>
+<li><p>监督学习的计算图通常是：</p>
+<script type="math/tex; mode=display">
+\theta \rightarrow f_\theta(x) \rightarrow \ell(\cdot,y)</script><p>全部在模型内部，端到端可微。</p>
 </li>
-<li><p>强化学习的交互链路通常是：<br>$$<br>\theta \rightarrow \pi_\theta(a|s) \rightarrow \text{采样 }a \rightarrow \text{环境} \rightarrow R<br>$$<br>其中“采样动作”和“环境转移”通常不可微或不可得解析形式。</p>
+<li><p>强化学习的交互链路通常是：</p>
+<script type="math/tex; mode=display">
+\theta \rightarrow \pi_\theta(a|s) \rightarrow \text{采样 }a \rightarrow \text{环境} \rightarrow R</script><p>其中“采样动作”和“环境转移”通常不可微或不可得解析形式。</p>
 </li>
 </ul>
-<p>因此强化学习要用“对分布求导”的方式（后文的 log-likelihood trick &#x2F; score function）把梯度写成可采样估计的形式。</p>
+<p>因此强化学习要用“对分布求导”的方式（后文的 log-likelihood trick / score function）把梯度写成可采样估计的形式。</p>
 <hr>
 <h4 id="1-4-4-信号结构不同：稠密监督-vs-延迟回报（信用分配）"><a href="#1-4-4-信号结构不同：稠密监督-vs-延迟回报（信用分配）" class="headerlink" title="1.4.4 信号结构不同：稠密监督 vs 延迟回报（信用分配）"></a>1.4.4 信号结构不同：稠密监督 vs 延迟回报（信用分配）</h4><p>监督学习通常每个样本都有直接误差信号；强化学习常见设置是回报在轨迹末端或稀疏出现，导致信用分配（credit assignment）更难、方差更大。LLM 的 RLHF 就属于典型的“序列末端给分”的结构：reward 对整段生成打分，但梯度要分摊到每个 token 的采样决策上。</p>
 <hr>
 <p><strong>本节小结</strong></p>
 <ul>
-<li>梯度是局部一阶变化率向量；下降&#x2F;上升仅由目标的最小化&#x2F;最大化决定。</li>
-<li>策略梯度是强化学习中对 ($J(\theta)&#x3D;\mathbb{E}[R]$) 求导，其核心是：($\theta$) 改变的是采样分布而非直接标签误差。</li>
+<li>梯度是局部一阶变化率向量；下降/上升仅由目标的最小化/最大化决定。</li>
+<li>策略梯度是强化学习中对 ($J(\theta)=\mathbb{E}[R]$) 求导，其核心是：($\theta$) 改变的是采样分布而非直接标签误差。</li>
 <li>监督学习与强化学习的关键差异在于数据生成与可微链路：前者“固定数据 + 直接误差”，后者“采样轨迹 + 分布求导”，这自然引出后文的 log-likelihood trick 与方差控制工具。</li>
 </ul>
 <h2 id="2-从第一性原理推导策略梯度"><a href="#2-从第一性原理推导策略梯度" class="headerlink" title="2. 从第一性原理推导策略梯度"></a>2. 从第一性原理推导策略梯度</h2><p>本节要解决两件事：</p>
 <ol>
-<li><strong>数学上</strong>：从 ($J(\theta)&#x3D;\mathbb{E}[R]$) 出发推导出可采样估计的梯度形式</li>
+<li><strong>数学上</strong>：从 ($J(\theta)=\mathbb{E}[R]$) 出发推导出可采样估计的梯度形式</li>
 <li><strong>概念上</strong>：澄清“不是不能对 ($\mathbb{E}[R]$) 求导，而是不能解析枚举求导；需要通过采样估计”</li>
 </ol>
 <h3 id="2-1-数学推导（含中间-trick）"><a href="#2-1-数学推导（含中间-trick）" class="headerlink" title="2.1 数学推导（含中间 trick）"></a>2.1 数学推导（含中间 trick）</h3><h4 id="2-1-1-目标函数：期望回报"><a href="#2-1-1-目标函数：期望回报" class="headerlink" title="2.1.1 目标函数：期望回报"></a>2.1.1 目标函数：期望回报</h4><p>定义轨迹（trajectory）：</p>
-<p>$$<br>\tau&#x3D;(s_0,a_0,s_1,a_1,\dots,s_T)<br>$$</p>
-<p>策略为 ($\pi_\theta(a|s)$)，轨迹分布为：</p>
-<p>$$<br>P_\theta(\tau)&#x3D;\rho(s_0)\prod_{t&#x3D;0}^{T-1}\pi_\theta(a_t|s_t),P(s_{t+1}|s_t,a_t)<br>$$</p>
-<p>回报（return）记为 ($R(\tau)$)。优化目标：</p>
-<p>$$<br>J(\theta)&#x3D;\mathbb{E}<em>{\tau\sim P</em>\theta}[R(\tau)]<br>&#x3D;\sum_{\tau}P_\theta(\tau)R(\tau)<br>$$</p>
-<blockquote>
+<script type="math/tex; mode=display">
+\tau=(s_0,a_0,s_1,a_1,\dots,s_T)</script><p>策略为 ($\pi_\theta(a|s)$)，轨迹分布为：</p>
+<script type="math/tex; mode=display">
+P_\theta(\tau)=\rho(s_0)\prod_{t=0}^{T-1}\pi_\theta(a_t|s_t)\,P(s_{t+1}|s_t,a_t)</script><p>回报（return）记为 ($R(\tau)$)。优化目标：</p>
+<script type="math/tex; mode=display">
+J(\theta)=\mathbb{E}_{\tau\sim P_\theta}[R(\tau)]
+=\sum_{\tau}P_\theta(\tau)R(\tau)</script><blockquote>
 <p>这里写成求和是离散轨迹情形；连续情形就是积分，推导一致。</p>
 </blockquote>
 <hr>
 <h4 id="2-1-2-对期望求导（第一性原理）"><a href="#2-1-2-对期望求导（第一性原理）" class="headerlink" title="2.1.2 对期望求导（第一性原理）"></a>2.1.2 对期望求导（第一性原理）</h4><p>直接对 ($\theta$) 求导：</p>
-<p>$$<br>\nabla_\theta J(\theta)&#x3D;\sum_\tau \nabla_\theta P_\theta(\tau),R(\tau)<br>$$</p>
-<p>困难在于 ($\nabla_\theta P_\theta(\tau)$) 不好用：它不在“期望形式”，不利于采样估计。关键 trick 是把 ($\nabla P$) 变成 ($P\nabla\log P$)。</p>
+<script type="math/tex; mode=display">
+\nabla_\theta J(\theta)=\sum_\tau \nabla_\theta P_\theta(\tau)\,R(\tau)</script><p>困难在于 ($\nabla<em>\theta P</em>\theta(\tau)$) 不好用：它不在“期望形式”，不利于采样估计。关键 trick 是把 ($\nabla P$) 变成 ($P\nabla\log P$)。</p>
 <blockquote>
 <p>对这里做几个阐述：</p>
 <h2 id="1-“不在期望形式”到底是什么意思？"><a href="#1-“不在期望形式”到底是什么意思？" class="headerlink" title="1) “不在期望形式”到底是什么意思？"></a>1) “不在期望形式”到底是什么意思？</h2><p>你现在有：</p>
-<p>$$<br>\nabla_\theta J(\theta)&#x3D;\sum_\tau \nabla_\theta P_\theta(\tau),R(\tau)<br>$$</p>
-<p>这当然是对的。但问题是：在强化学习&#x2F;LLM 里，($\tau$) 的空间巨大（指数级），你无法枚举求和，所以你想做的是用采样来近似这个和：</p>
-<p>$$<br>\sum_\tau (\cdot) \approx \frac{1}{N}\sum_{i&#x3D;1}^N (\cdot)\Big|_{\tau_i}<br>$$</p>
-<p>而 <strong>Monte Carlo 采样近似</strong>之所以成立，要求你写成下面这种结构：</p>
-<p>$$<br>\sum_\tau P_\theta(\tau),f(\tau)<br>\quad\Rightarrow\quad<br>\mathbb{E}<em>{\tau\sim P</em>\theta}[f(\tau)]<br>$$</p>
-<p>因为你采样的是 ($\tau_i\sim P_\theta$)，也就是用 ($P_\theta$) 当“权重”。</p>
+<script type="math/tex; mode=display">
+\nabla_\theta J(\theta)=\sum_\tau \nabla_\theta P_\theta(\tau)\,R(\tau)</script><p>这当然是对的。但问题是：在强化学习/LLM 里，($\tau$) 的空间巨大（指数级），你无法枚举求和，所以你想做的是用采样来近似这个和：</p>
+<script type="math/tex; mode=display">
+\sum_\tau (\cdot) \approx \frac{1}{N}\sum_{i=1}^N (\cdot)\Big|_{\tau_i}</script><p>而 <strong>Monte Carlo 采样近似</strong>之所以成立，要求你写成下面这种结构：</p>
+<script type="math/tex; mode=display">
+\sum_\tau P_\theta(\tau)\,f(\tau)
+\quad\Rightarrow\quad
+\mathbb{E}_{\tau\sim P_\theta}[f(\tau)]</script><p>因为你采样的是 ($\tau<em>i\sim P</em>\theta$)，也就是用 ($P_\theta$) 当“权重”。</p>
 <p>但你的式子是：</p>
-<p>$$<br>\sum_\tau \nabla_\theta P_\theta(\tau),R(\tau)<br>$$</p>
-<p>这里的“权重”不是 ($P_\theta(\tau)$)，而是 ($\nabla_\theta P_\theta(\tau)$)，它既：</p>
+<script type="math/tex; mode=display">
+\sum_\tau \nabla_\theta P_\theta(\tau)\,R(\tau)</script><p>这里的“权重”不是 ($P<em>\theta(\tau)$)，而是 ($\nabla</em>\theta P_\theta(\tau)$)，它既：</p>
 <ul>
 <li>不是概率分布（不非负、和不为 1）</li>
 <li>也不是你能用“从某个分布采样”的方式自然得到的权重</li>
@@ -512,225 +733,470 @@
 <p>你没法直接把它解释成 “对某个可采样分布的期望”，因此无法用“采样均值”去构造一个自然的无偏估计器。</p>
 </blockquote>
 <hr>
-<h2 id="2-“不利于采样估计”具体卡在哪里？"><a href="#2-“不利于采样估计”具体卡在哪里？" class="headerlink" title="2) “不利于采样估计”具体卡在哪里？"></a>2) “不利于采样估计”具体卡在哪里？</h2><p>假设你硬要用 ($\tau_i\sim P_\theta(\tau)$) 来采样（这是你唯一能采样的分布：用策略 rollout）。</p>
+<h2 id="2-“不利于采样估计”具体卡在哪里？"><a href="#2-“不利于采样估计”具体卡在哪里？" class="headerlink" title="2) “不利于采样估计”具体卡在哪里？"></a>2) “不利于采样估计”具体卡在哪里？</h2><p>假设你硬要用 ($\tau<em>i\sim P</em>\theta(\tau)$) 来采样（这是你唯一能采样的分布：用策略 rollout）。</p>
 <p>那么你想要无偏估计：</p>
-<p>$$<br>\sum_\tau \nabla_\theta P_\theta(\tau),R(\tau)<br>$$</p>
-<p>通常的套路是乘除以 ($P_\theta(\tau)$)：</p>
-<h1 id="sum-tau-nabla-theta-P-theta-tau-R-tau"><a href="#sum-tau-nabla-theta-P-theta-tau-R-tau" class="headerlink" title="$$\sum_\tau \nabla_\theta P_\theta(\tau),R(\tau)"></a>$$<br>\sum_\tau \nabla_\theta P_\theta(\tau),R(\tau)</h1><h1 id="sum-tau-P-theta-tau-underbrace-frac-nabla-theta-P-theta-tau-P-theta-tau-R-tau-f-tau"><a href="#sum-tau-P-theta-tau-underbrace-frac-nabla-theta-P-theta-tau-P-theta-tau-R-tau-f-tau" class="headerlink" title="\sum_\tau P_\theta(\tau),\underbrace{\frac{\nabla_\theta P_\theta(\tau)}{P_\theta(\tau)}R(\tau)}_{f(\tau)}"></a>\sum_\tau P_\theta(\tau),\underbrace{\frac{\nabla_\theta P_\theta(\tau)}{P_\theta(\tau)}R(\tau)}_{f(\tau)}</h1><p>\mathbb{E}<em>{\tau\sim P</em>\theta}\left[\frac{\nabla_\theta P_\theta(\tau)}{P_\theta(\tau)}R(\tau)\right]<br>$$</p>
-<p>你会发现：<strong>这一步本质上就是 log-likelihood trick</strong>，因为：</p>
-<p>$$<br>\frac{\nabla_\theta P_\theta(\tau)}{P_\theta(\tau)}&#x3D;\nabla_\theta \log P_\theta(\tau)<br>$$</p>
-<p>所以“不利于采样估计”的含义是：</p>
+<script type="math/tex; mode=display">
+\sum_\tau \nabla_\theta P_\theta(\tau)\,R(\tau)</script><p>通常的套路是乘除以 ($P_\theta(\tau)$)：</p>
+<script type="math/tex; mode=display">
+\sum_\tau \nabla_\theta P_\theta(\tau)\,R(\tau)
+=
+\sum_\tau P_\theta(\tau)\,\underbrace{\frac{\nabla_\theta P_\theta(\tau)}{P_\theta(\tau)}R(\tau)}_{f(\tau)}
+=
+\mathbb{E}_{\tau\sim P_\theta}\left[\frac{\nabla_\theta P_\theta(\tau)}{P_\theta(\tau)}R(\tau)\right]</script><p>你会发现：<strong>这一步本质上就是 log-likelihood trick</strong>，因为：</p>
+<script type="math/tex; mode=display">
+\frac{\nabla_\theta P_\theta(\tau)}{P_\theta(\tau)}=\nabla_\theta \log P_\theta(\tau)</script><p>所以“不利于采样估计”的含义是：</p>
 <ul>
 <li>如果你不做这步变形，你不知道该用什么分布采样，也不知道单样本该怎么计算贡献</li>
-<li>做了这步变形后，你就能用 ($\tau\sim P_\theta$) 采样，并且每条样本只需要算 ($R(\tau)$) 和 ($\nabla \log P_\theta(\tau)$) 就能得到无偏估计</li>
+<li>做了这步变形后，你就能用 ($\tau\sim P<em>\theta$) 采样，并且每条样本只需要算 ($R(\tau)$) 和 ($\nabla \log P</em>\theta(\tau)$) 就能得到无偏估计</li>
 </ul>
 <hr>
 <h2 id="3-“关键-trick-的逻辑”其实就是把“导数权重”换成“概率权重”"><a href="#3-“关键-trick-的逻辑”其实就是把“导数权重”换成“概率权重”" class="headerlink" title="3) “关键 trick 的逻辑”其实就是把“导数权重”换成“概率权重”"></a>3) “关键 trick 的逻辑”其实就是把“导数权重”换成“概率权重”</h2><p>你可以把 log-likelihood trick 解释成一句非常具体的话：</p>
 <blockquote>
-<p>我们只能从 ($P_\theta(\tau)$) 这个概率分布采样，<br>所以必须把求和写成 ($\sum_\tau P_\theta(\tau)\times (\text{某个函数})$)，<br>才能用 Monte Carlo 平均来估计它。</p>
+<p>我们只能从 ($P<em>\theta(\tau)$) 这个概率分布采样，<br>所以必须把求和写成 ($\sum</em>\tau P_\theta(\tau)\times (\text{某个函数})$)，<br>才能用 Monte Carlo 平均来估计它。</p>
 </blockquote>
 <p>而</p>
-<p>$$<br>\nabla_\theta P_\theta(\tau)&#x3D;P_\theta(\tau)\nabla_\theta\log P_\theta(\tau)<br>$$</p>
-<p>正好完成这件事：把“不可采样的权重 ($\nabla P$)”变成“可采样的权重 ($P$)”乘上一个可计算的校正项 ($\nabla\log P$)。</p>
-</blockquote>
-<hr>
-<h4 id="2-1-3-Log-likelihood-trick-Score-function-identity"><a href="#2-1-3-Log-likelihood-trick-Score-function-identity" class="headerlink" title="2.1.3 Log-likelihood trick &#x2F; Score function identity"></a>2.1.3 Log-likelihood trick &#x2F; Score function identity</h4><p>对任意可微且 ($P_\theta(\tau)&gt;0$) 的概率，有：</p>
-<p>$$<br>\nabla_\theta \log P_\theta(\tau)<br>&#x3D;\frac{1}{P_\theta(\tau)}\nabla_\theta P_\theta(\tau)<br>\quad\Rightarrow\quad<br>\nabla_\theta P_\theta(\tau)&#x3D;P_\theta(\tau)\nabla_\theta \log P_\theta(\tau)<br>$$</p>
-<p>将其代回：</p>
-<p>$$<br>\nabla_\theta J(\theta)<br>&#x3D;\sum_\tau P_\theta(\tau),R(\tau),\nabla_\theta \log P_\theta(\tau)<br>&#x3D;\mathbb{E}<em>{\tau\sim P</em>\theta}\big[R(\tau)\nabla_\theta \log P_\theta(\tau)\big]<br>$$</p>
-<p>这一步非常关键：我们得到一个“期望形式”的梯度，因此可以 Monte Carlo 采样估计。</p>
+<script type="math/tex; mode=display">
+\nabla_\theta P_\theta(\tau)=P_\theta(\tau)\nabla_\theta\log P_\theta(\tau)</script><h2 id="正好完成这件事：把“不可采样的权重-nabla-P-”变成“可采样的权重-P-”乘上一个可计算的校正项-nabla-log-P-。"><a href="#正好完成这件事：把“不可采样的权重-nabla-P-”变成“可采样的权重-P-”乘上一个可计算的校正项-nabla-log-P-。" class="headerlink" title="正好完成这件事：把“不可采样的权重 ($\nabla P$)”变成“可采样的权重 ($P$)”乘上一个可计算的校正项 ($\nabla\log P$)。"></a>正好完成这件事：把“不可采样的权重 ($\nabla P$)”变成“可采样的权重 ($P$)”乘上一个可计算的校正项 ($\nabla\log P$)。</h2></blockquote>
+<h4 id="2-1-3-Log-likelihood-trick-Score-function-identity"><a href="#2-1-3-Log-likelihood-trick-Score-function-identity" class="headerlink" title="2.1.3 Log-likelihood trick / Score function identity"></a>2.1.3 Log-likelihood trick / Score function identity</h4><p>对任意可微且 ($P_\theta(\tau)&gt;0$) 的概率，有：</p>
+<script type="math/tex; mode=display">
+\nabla_\theta \log P_\theta(\tau)
+=\frac{1}{P_\theta(\tau)}\nabla_\theta P_\theta(\tau)
+\quad\Rightarrow\quad
+\nabla_\theta P_\theta(\tau)=P_\theta(\tau)\nabla_\theta \log P_\theta(\tau)</script><p>将其代回：</p>
+<script type="math/tex; mode=display">
+\nabla_\theta J(\theta)
+=\sum_\tau P_\theta(\tau)\,R(\tau)\,\nabla_\theta \log P_\theta(\tau)
+=\mathbb{E}_{\tau\sim P_\theta}\big[R(\tau)\nabla_\theta \log P_\theta(\tau)\big]</script><p>这一步非常关键：我们得到一个“期望形式”的梯度，因此可以 Monte Carlo 采样估计。</p>
 <hr>
 <h4 id="2-1-4-将轨迹对数概率拆开（环境项消失）"><a href="#2-1-4-将轨迹对数概率拆开（环境项消失）" class="headerlink" title="2.1.4 将轨迹对数概率拆开（环境项消失）"></a>2.1.4 将轨迹对数概率拆开（环境项消失）</h4><p>把 ($\log P_\theta(\tau)$) 展开：</p>
-<p>$$<br>\log P_\theta(\tau)<br>&#x3D;\log\rho(s_0)+\sum_{t&#x3D;0}^{T-1}\log\pi_\theta(a_t|s_t)+\sum_{t&#x3D;0}^{T-1}\log P(s_{t+1}|s_t,a_t)<br>$$</p>
-<p>注意：环境转移 ($P(s_{t+1}|s_t,a_t)$) 与初始分布 ($\rho(s_0)$) <strong>不依赖 ($\theta$)</strong>（($\theta$) 只参数化策略），因此</p>
-<p>$$<br>\nabla_\theta \log P_\theta(\tau)&#x3D;\sum_{t&#x3D;0}^{T-1}\nabla_\theta \log\pi_\theta(a_t|s_t)<br>$$</p>
-<p>代回得到经典策略梯度定理（蒙特卡洛形式）：</p>
-<p>$$<br>\boxed{<br>\nabla_\theta J(\theta)&#x3D;<br>\mathbb{E}<em>{\tau\sim P</em>\theta}<br>\left[<br>R(\tau)\sum_{t&#x3D;0}^{T-1}\nabla_\theta \log\pi_\theta(a_t|s_t)<br>\right]<br>}<br>$$</p>
-<blockquote>
+<script type="math/tex; mode=display">
+\log P_\theta(\tau)
+=\log\rho(s_0)+\sum_{t=0}^{T-1}\log\pi_\theta(a_t|s_t)+\sum_{t=0}^{T-1}\log P(s_{t+1}|s_t,a_t)</script><p>注意：环境转移 ($P(s_{t+1}|s_t,a_t)$) 与初始分布 ($\rho(s_0)$) <strong>不依赖 ($\theta$)</strong>（($\theta$) 只参数化策略），因此</p>
+<script type="math/tex; mode=display">
+\nabla_\theta \log P_\theta(\tau)=\sum_{t=0}^{T-1}\nabla_\theta \log\pi_\theta(a_t|s_t)</script><p>代回得到经典策略梯度定理（蒙特卡洛形式）：</p>
+<script type="math/tex; mode=display">
+\boxed{
+\nabla_\theta J(\theta)=
+\mathbb{E}_{\tau\sim P_\theta}
+\left[
+R(\tau)\sum_{t=0}^{T-1}\nabla_\theta \log\pi_\theta(a_t|s_t)
+\right]
+}</script><blockquote>
 <p>这也解释了一个常见误解：<br>强化学习里我们并不是“对环境求导”，而是把梯度写成只包含 ($\nabla\log\pi$) 的形式，环境只通过采样产生 ($R(\tau)$) 影响更新。</p>
 </blockquote>
 <hr>
-<h4 id="2-1-5-采样估计（有限-batch）"><a href="#2-1-5-采样估计（有限-batch）" class="headerlink" title="2.1.5 采样估计（有限 batch）"></a>2.1.5 采样估计（有限 batch）</h4><p>用 ($N$) 条轨迹采样 ($\tau_i\sim P_\theta$)：</p>
-<p>$$<br>\widehat{\nabla_\theta J}<br>&#x3D;\frac{1}{N}\sum_{i&#x3D;1}^N<br>R(\tau_i)\sum_{t}\nabla_\theta \log\pi_\theta(a_{i,t}|s_{i,t})<br>$$</p>
-<p>这就是策略梯度在工程里训练时真正用到的“梯度估计器”。它是随机变量，因此有方差（第 3 节会系统展开）。</p>
+<h4 id="2-1-5-采样估计（有限-batch）"><a href="#2-1-5-采样估计（有限-batch）" class="headerlink" title="2.1.5 采样估计（有限 batch）"></a>2.1.5 采样估计（有限 batch）</h4><p>用 ($N$) 条轨迹采样 ($\tau<em>i\sim P</em>\theta$)：</p>
+<script type="math/tex; mode=display">
+\widehat{\nabla_\theta J}
+=\frac{1}{N}\sum_{i=1}^N
+R(\tau_i)\sum_{t}\nabla_\theta \log\pi_\theta(a_{i,t}|s_{i,t})</script><p>这就是策略梯度在工程里训练时真正用到的“梯度估计器”。它是随机变量，因此有方差（第 3 节会系统展开）。</p>
 <hr>
-<h3 id="2-2-数值案例说明：离散-2-动作系统，枚举所有轨迹验证一致性"><a href="#2-2-数值案例说明：离散-2-动作系统，枚举所有轨迹验证一致性" class="headerlink" title="2.2 数值案例说明：离散 2 动作系统，枚举所有轨迹验证一致性"></a>2.2 数值案例说明：离散 2 动作系统，枚举所有轨迹验证一致性</h3><p>为了让“求导形式 &#x3D; 期望形式”变成可检查的事实，我们构造一个能完全枚举的 toy。</p>
+<h3 id="2-2-数值案例说明：离散-2-动作系统，枚举所有轨迹验证一致性"><a href="#2-2-数值案例说明：离散-2-动作系统，枚举所有轨迹验证一致性" class="headerlink" title="2.2 数值案例说明：离散 2 动作系统，枚举所有轨迹验证一致性"></a>2.2 数值案例说明：离散 2 动作系统，枚举所有轨迹验证一致性</h3><p>为了让“求导形式 = 期望形式”变成可检查的事实，我们构造一个能完全枚举的 toy。</p>
 <h4 id="场景设定（一步轨迹）"><a href="#场景设定（一步轨迹）" class="headerlink" title="场景设定（一步轨迹）"></a>场景设定（一步轨迹）</h4><ul>
 <li>单状态 ($s$)，两动作 ($A,B$)</li>
-<li>策略参数 ($\theta$) 直接表示 ($p&#x3D;\pi_\theta(B)$)，因此 ($\pi_\theta(A)&#x3D;1-p$)</li>
+<li>策略参数 ($\theta$) 直接表示 ($p=\pi<em>\theta(B)$)，因此 ($\pi</em>\theta(A)=1-p$)</li>
 <li>回报：若选 ($B$) 得 10 分，若选 ($A$) 得 0 分</li>
 </ul>
 <p>则目标函数：</p>
-<p>$$<br>J(p)&#x3D;\mathbb{E}[R]&#x3D;p\cdot 10+(1-p)\cdot 0 &#x3D; 10p<br>$$</p>
-<p><strong>解析求导</strong>：</p>
-<p>$$<br>\frac{dJ}{dp}&#x3D;10<br>$$</p>
-<hr>
-<h4 id="用“期望形式策略梯度”再算一遍"><a href="#用“期望形式策略梯度”再算一遍" class="headerlink" title="用“期望形式策略梯度”再算一遍"></a>用“期望形式策略梯度”再算一遍</h4><p>轨迹只有两种：($\tau&#x3D;A$) 或 ($\tau&#x3D;B$)</p>
+<script type="math/tex; mode=display">
+J(p)=\mathbb{E}[R]=p\cdot 10+(1-p)\cdot 0 = 10p</script><p><strong>解析求导</strong>：</p>
+<script type="math/tex; mode=display">
+\frac{dJ}{dp}=10</script><hr>
+<h4 id="用“期望形式策略梯度”再算一遍"><a href="#用“期望形式策略梯度”再算一遍" class="headerlink" title="用“期望形式策略梯度”再算一遍"></a>用“期望形式策略梯度”再算一遍</h4><p>轨迹只有两种：($\tau=A$) 或 ($\tau=B$)</p>
 <ul>
-<li>($P(\tau&#x3D;B)&#x3D;p$)，($R(B)&#x3D;10$)</li>
-<li>($P(\tau&#x3D;A)&#x3D;1-p$)，($R(A)&#x3D;0$)</li>
+<li>($P(\tau=B)=p$)，($R(B)=10$)</li>
+<li>($P(\tau=A)=1-p$)，($R(A)=0$)</li>
 </ul>
 <p>并且：</p>
-<p>$$<br>\frac{d}{dp}\log P(\tau&#x3D;B)&#x3D;\frac{d}{dp}\log p&#x3D;\frac{1}{p}<br>$$<br>$$<br>\frac{d}{dp}\log P(\tau&#x3D;A)&#x3D;\frac{d}{dp}\log(1-p)&#x3D;-\frac{1}{1-p}<br>$$</p>
-<p>期望形式：</p>
-<p>$$<br>\frac{dJ}{dp}<br>&#x3D;\mathbb{E}\big[R(\tau)\frac{d}{dp}\log P(\tau)\big]<br>&#x3D;p\cdot 10\cdot \frac{1}{p} + (1-p)\cdot 0\cdot\left(-\frac{1}{1-p}\right)<br>&#x3D;10<br>$$</p>
-<p>与解析求导完全一致。</p>
+<script type="math/tex; mode=display">
+\frac{d}{dp}\log P(\tau=B)=\frac{d}{dp}\log p=\frac{1}{p}</script><script type="math/tex; mode=display">
+\frac{d}{dp}\log P(\tau=A)=\frac{d}{dp}\log(1-p)=-\frac{1}{1-p}</script><p>期望形式：</p>
+<script type="math/tex; mode=display">
+\frac{dJ}{dp}
+=\mathbb{E}\big[R(\tau)\frac{d}{dp}\log P(\tau)\big]
+=p\cdot 10\cdot \frac{1}{p} + (1-p)\cdot 0\cdot\left(-\frac{1}{1-p}\right)
+=10</script><p>与解析求导完全一致。</p>
 <blockquote>
 <p>这例子回答了我们对话里的关键争议：<br><strong>并不是“不能对 ($\mathbb{E}[R]$) 求导”，而是大问题里轨迹空间巨大、无法枚举求和，只能用采样估计期望。</strong></p>
 </blockquote>
 <hr>
 
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
       
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://zyxian31.github.io/2026/03/01/from-gradient-to-rlhf_1/" data-id="cmm7gp0qn000e5xud2bep4pbb" data-title="从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part I）" class="article-share-link"><span class="fa fa-share">分享</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RLHF/" rel="tag">RLHF</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/" rel="tag">强化学习</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a></li></ul>
 
-    </footer>
-  </div>
+<span class="category-chains">
+  
   
     
-<nav id="article-nav">
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="category-chain-item">学习笔记</a>
   
-    <a href="/2026/03/01/from-gradient-to-rlhf_2/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">前一篇</strong>
-      <div class="article-nav-title">
-        
-          从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part II）
-        
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" class="print-no-link">#深度学习</a>
+      
+        <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" class="print-no-link">#机器学习</a>
+      
+        <a href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/" class="print-no-link">#强化学习</a>
+      
+        <a href="/tags/RLHF/" class="print-no-link">#RLHF</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part I）</div>
+      <div>https://zyxian31.github.io/2026/03/01/from-gradient-to-rlhf_1/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>ZYXian31</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年3月1日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/03/01/from-gradient-to-rlhf_2/" title="从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part II）">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part II）</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/01/06/claude-code-usage/" title="claude-code usage">
+                        <span class="hidden-mobile">claude-code usage</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
       </div>
-    </a>
-  
-  
-    <a href="/2026/01/06/claude-code-usage/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">后一篇</strong>
-      <div class="article-nav-title">claude-code usage</div>
-    </a>
-  
-</nav>
-
-  
-</article>
-
-
-</section>
-        
-          <aside id="sidebar">
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">分类</h3>
-    <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a></li></ul>
     </div>
-  </div>
 
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">标签</h3>
-    <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CS336/" rel="tag">CS336</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LLM/" rel="tag">LLM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RLHF/" rel="tag">RLHF</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Transformer/" rel="tag">Transformer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/" rel="tag">强化学习</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">标签云</h3>
-    <div class="widget tagcloud">
-      <a href="/tags/CS336/" style="font-size: 15px;">CS336</a> <a href="/tags/LLM/" style="font-size: 15px;">LLM</a> <a href="/tags/RLHF/" style="font-size: 15px;">RLHF</a> <a href="/tags/Transformer/" style="font-size: 10px;">Transformer</a> <a href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/" style="font-size: 15px;">强化学习</a> <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" style="font-size: 15px;">机器学习</a> <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" style="font-size: 20px;">深度学习</a>
-    </div>
-  </div>
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">归档</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/03/">三月 2026</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/01/">一月 2026</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/07/">七月 2025</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/1970/01/">一月 1970</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">最新文章</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/2026/03/01/from-gradient-to-rlhf_2/">从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part II）</a>
-          </li>
-        
-          <li>
-            <a href="/2026/03/01/from-gradient-to-rlhf_1/">从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part I）</a>
-          </li>
-        
-          <li>
-            <a href="/2026/01/06/claude-code-usage/">claude-code usage</a>
-          </li>
-        
-          <li>
-            <a href="/2025/07/05/CS336-Spring2025-Lec3/">CS336 Lecture 3: LM架构与训练 - 学习笔记</a>
-          </li>
-        
-          <li>
-            <a href="/2025/07/05/CS336-Spring2025-Lec2/">CS336 Language Modeling: Tensors, Operations &amp; Training</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-
-  
-</aside>
-        
-      </div>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
+    <div class="side-col d-none d-lg-block col-lg-2">
       
-      &copy; 2026 ZYXian31<br>
-      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
-    </div>
-  </div>
-</footer>
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
 
     </div>
-    <nav id="mobile-nav">
+  </div>
+</div>
+
+
+
+
+
   
-    <a href="/" class="mobile-nav-link">Home</a>
+
+
+
   
-    <a href="/archives" class="mobile-nav-link">Archives</a>
+
+
+
   
-</nav>
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
     
 
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
 
-<script src="/js/jquery-3.6.4.min.js"></script>
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
 
 
 
   
-<script src="/fancybox/jquery.fancybox.min.js"></script>
+    <script  src="/js/img-lazyload.js" ></script>
+  
 
 
 
 
-<script src="/js/script.js"></script>
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
 
 
 
 
 
-  </div>
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
 </body>
 </html>
