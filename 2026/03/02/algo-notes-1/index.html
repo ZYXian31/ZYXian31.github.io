@@ -19,15 +19,15 @@
   <meta name="author" content="ZYXian31">
   <meta name="keywords" content="机器学习,深度学习,LLM">
   
-    <meta name="description" content="目标不是记答案，而是训练&quot;高手式解题流程&quot;：题型归类 → 建模 → 不变量 → 模板迁移。 内容已精简，但保留核心抽象。  ① 49. 字母异位词分组 题目 给定字符串数组，将字母异位词分组。 示例： 输入: [&quot;eat&quot;,&quot;tea&quot;,&quot;tan&quot;,&quot;ate&quot;,&quot;nat&quot;,&amp;quo">
+    <meta name="description" content="① 49. 字母异位词分组 题目 给定字符串数组，将字母异位词分组。 示例： 输入: [&quot;eat&quot;,&quot;tea&quot;,&quot;tan&quot;,&quot;ate&quot;,&quot;nat&quot;,&quot;bat&quot;] 输出: [[&quot;bat&quot;],[&quot;nat&quot;,&quot;tan&quot;],[&amp;">
 <meta property="og:type" content="article">
 <meta property="og:title" content="算法刷题方法论记录（一）">
 <meta property="og:url" content="https://zyxian31.github.io/2026/03/02/algo-notes-1/index.html">
 <meta property="og:site_name" content="ZYXian31&#39;s Blog">
-<meta property="og:description" content="目标不是记答案，而是训练&quot;高手式解题流程&quot;：题型归类 → 建模 → 不变量 → 模板迁移。 内容已精简，但保留核心抽象。  ① 49. 字母异位词分组 题目 给定字符串数组，将字母异位词分组。 示例： 输入: [&quot;eat&quot;,&quot;tea&quot;,&quot;tan&quot;,&quot;ate&quot;,&quot;nat&quot;,&amp;quo">
+<meta property="og:description" content="① 49. 字母异位词分组 题目 给定字符串数组，将字母异位词分组。 示例： 输入: [&quot;eat&quot;,&quot;tea&quot;,&quot;tan&quot;,&quot;ate&quot;,&quot;nat&quot;,&quot;bat&quot;] 输出: [[&quot;bat&quot;],[&quot;nat&quot;,&quot;tan&quot;],[&amp;">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-03-02T06:30:00.000Z">
-<meta property="article:modified_time" content="2026-03-02T15:50:50.075Z">
+<meta property="article:modified_time" content="2026-03-02T15:59:46.327Z">
 <meta property="article:author" content="ZYXian31">
 <meta property="article:tag" content="算法">
 <meta property="article:tag" content="LeetCode">
@@ -232,7 +232,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.2k 字
+          1.8k 字
         
       </span>
     
@@ -243,7 +243,7 @@
         
         
         
-          10 分钟
+          15 分钟
         
       </span>
     
@@ -285,10 +285,7 @@
             
               <div class="markdown-body">
                 
-                <p>目标不是记答案，而是训练&quot;高手式解题流程&quot;：<strong>题型归类 → 建模 → 不变量 → 模板迁移</strong>。</p>
-<p>内容已精简，但保留核心抽象。</p>
-<hr>
-<h2 id="①-49-字母异位词分组">① 49. 字母异位词分组</h2>
+                <h2 id="①-49-字母异位词分组">① 49. 字母异位词分组</h2>
 <h3 id="题目">题目</h3>
 <p>给定字符串数组，将字母异位词分组。</p>
 <p>示例：</p>
@@ -588,6 +585,111 @@ nums<span class="token punctuation">[</span>start<span class="token punctuation"
 <li>是否可以用哈希避免重复计算？</li>
 </ol>
 <p>当你不再记&quot;题目&quot;，而是记&quot;模型&quot;，刷题才会开始真正进阶。</p>
+<h2 id="附-1：通用解题推导流程">附 1：通用解题推导流程</h2>
+<p>当你拿到一道题，强制问自己这 6 个问题：</p>
+<hr>
+<h3 id="①-是组合问题还是连续区间问题？">① 是组合问题还是连续区间问题？</h3>
+<ul>
+<li>选若干元素 → 组合 / 子集 / k-sum</li>
+<li>连续区间 → 滑窗 / 双指针</li>
+<li>每个位置依赖左右 → 前后缀</li>
+<li>无顺序要求 → 哈希</li>
+</ul>
+<p>例如：</p>
+<ul>
+<li>三数之和 → 选 3 个数 → 组合问题</li>
+<li>接雨水 → 每个位置依赖左右 → 边界问题</li>
+</ul>
+<p>👉 第一层分类：结构识别</p>
+<hr>
+<h3 id="②-有没有“单调性”？">② 有没有“单调性”？</h3>
+<ul>
+<li>有序数组？</li>
+<li>可以排序吗？</li>
+<li>排序后是否更简单？</li>
+</ul>
+<p>很多题一排序，结构直接暴露：</p>
+<ul>
+<li>三数之和 → 排序后可双指针</li>
+<li>盛水容器 → 双指针</li>
+<li>去重问题 → 排序后更简单</li>
+</ul>
+<p>👉 排序是结构放大器。</p>
+<hr>
+<h3 id="③-能否固定一个变量降维？">③ 能否固定一个变量降维？</h3>
+<p>这是最重要的技巧。</p>
+<p>三数之和：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-id" data-language="id"><code class="language-id">3-sum → 固定一个 → 2-sum<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+<p>四数之和：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-id" data-language="id"><code class="language-id">4-sum → 固定一个 → 3-sum<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+<p>这叫：</p>
+<blockquote>
+<p>降维打击</p>
+</blockquote>
+<hr>
+<h3 id="④-有没有“局部决定全局”的不变量？">④ 有没有“局部决定全局”的不变量？</h3>
+<p>例如：</p>
+<ul>
+<li>盛水容器 → 面积由短板决定</li>
+<li>接雨水 → 水位由较矮边界决定</li>
+<li>滑窗 → 窗口内必须满足某个条件</li>
+</ul>
+<p>如果能找到“谁决定当前状态”，
+基本就能双指针或贪心。</p>
+<hr>
+<h3 id="⑤-是否存在“重复计算”？">⑤ 是否存在“重复计算”？</h3>
+<p>如果有：</p>
+<ul>
+<li>用哈希缓存</li>
+<li>用 set 去重</li>
+<li>用记忆化</li>
+<li>用前缀和</li>
+</ul>
+<p>例如：</p>
+<ul>
+<li>最长连续序列 → 避免重复扩展</li>
+<li>异位词分组 → 避免两两比较</li>
+</ul>
+<hr>
+<h3 id="⑥-时间复杂度卡在哪里？">⑥ 时间复杂度卡在哪里？</h3>
+<p>问自己：</p>
+<ul>
+<li>O(n²) 会不会超？</li>
+<li>O(n log n) 能不能接受？</li>
+</ul>
+<p>复杂度约束会逼出结构。</p>
+<p>例如：</p>
+<ul>
+<li>最长连续序列要求 O(n) → 不能排序 → 只能哈希</li>
+</ul>
+<hr>
+<h2 id="附-2：三数之和演示">附 2：三数之和演示</h2>
+<p>你第一次见这题时该怎么推？</p>
+<hr>
+<p>① 是组合问题（选 3 个数）</p>
+<p>② O(n³) 太大 → 必须降维</p>
+<p>③ 固定一个数 → 变 Two Sum</p>
+<p>④ Two Sum 如果数组有序，可以双指针</p>
+<p>⑤ 排序 → 去重更简单</p>
+<p>⑥ 复杂度 O(n²) 可以接受</p>
+<p>模型是推出来的，不是记住的。</p>
+<hr>
+<h2 id="附-3：接雨水演示">附 3：接雨水演示</h2>
+<p>① 每个位置能接多少水 → 看左右</p>
+<p>② 左右边界限制水位</p>
+<p>③ 水位 = min(左最高, 右最高)</p>
+<p>④ 可以预处理左右最大值</p>
+<p>⑤ 也可以双指针维护左右最大值</p>
+<p>结构自然出现。</p>
+<hr>
+<h2 id="附-4：一个提升思维的练习">附 4：一个提升思维的练习</h2>
+<p>以后每做一道题，必须写：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-id" data-language="id"><code class="language-id">1. 结构类型：
+2. 是否可排序：
+3. 是否可降维：
+4. 是否存在不变量：
+5. 是否存在重复计算：
+6. 复杂度下限：<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
                 
               </div>
