@@ -9,9 +9,9 @@ body {
 figure {
   border-radius: 10px !important;
   overflow: hidden !important;
-  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.28) !important;
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.18) !important;
   margin: 1.8em 0 !important;
-  background: #2d2d2d !important;
+  background: #ffffff !important;
 }
 
 /* Remove extra margin on the inner wrapper/pre */
@@ -23,6 +23,8 @@ figure .code-wrapper pre {
   margin: 0 !important;
   border-radius: 0 !important;
   border: none !important;
+  background: #ffffff !important;
+  color: #1e1e1e !important;
 }
 
 /* ===== macOS header bar ===== */
@@ -101,7 +103,48 @@ figure .code-wrapper pre {
   display: none !important;
 }
 
-/* Line numbers fix: show gutter only */
+/* Line numbers: light theme */
 .line-numbers .line-numbers-rows {
-  border-right: 1px solid #555 !important;
+  border-right: 1px solid #e0e0e0 !important;
 }
+
+.line-numbers-rows > span::before {
+  color: #aaaaaa !important;
+}
+
+/* ===== LeetCode / Monaco Light Theme Token Colors ===== */
+/* Matches VS Code default light theme used by LeetCode */
+
+.token.keyword                        { color: #0000ff !important; }
+.token.builtin                        { color: #0070c1 !important; }
+.token.class-name                     { color: #267f99 !important; }
+.token.function                       { color: #795e26 !important; }
+.token.function-variable.function     { color: #795e26 !important; }
+.token.string,
+.token.string-interpolation           { color: #a31515 !important; }
+.token.template-string                { color: #a31515 !important; }
+.token.number                         { color: #098658 !important; }
+.token.boolean                        { color: #0000ff !important; }
+.token.constant                       { color: #001080 !important; }
+.token.symbol                         { color: #001080 !important; }
+.token.variable                       { color: #001080 !important; }
+.token.parameter                      { color: #001080 !important; }
+.token.property                       { color: #001080 !important; }
+.token.attr-name                      { color: #001080 !important; }
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata                          { color: #6a9955 !important; }
+.token.decorator,
+.token.annotation                     { color: #267f99 !important; }
+.token.tag                            { color: #800000 !important; }
+.token.attr-value                     { color: #a31515 !important; }
+.token.regex                          { color: #811f3f !important; }
+.token.important                      { color: #0000ff !important; font-weight: bold !important; }
+.token.operator,
+.token.entity,
+.token.url,
+.token.punctuation                    { color: #000000 !important; }
+.token.namespace                      { color: #267f99 !important; }
+.token.deleted                        { color: #a31515 !important; }
+.token.inserted                       { color: #098658 !important; }
