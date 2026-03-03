@@ -27,7 +27,7 @@
 <meta property="og:description" content="① 49. 字母异位词分组 题目 给定字符串数组，将字母异位词分组。 示例： 输入: [&quot;eat&quot;,&quot;tea&quot;,&quot;tan&quot;,&quot;ate&quot;,&quot;nat&quot;,&quot;bat&quot;] 输出: [[&quot;bat&quot;],[&quot;nat&quot;,&quot;tan&quot;],[&amp;">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-03-02T06:30:00.000Z">
-<meta property="article:modified_time" content="2026-03-02T15:59:46.327Z">
+<meta property="article:modified_time" content="2026-03-03T03:01:26.689Z">
 <meta property="article:author" content="ZYXian31">
 <meta property="article:tag" content="算法">
 <meta property="article:tag" content="LeetCode">
@@ -75,13 +75,14 @@
 
   
 <link rel="stylesheet" href="/css/custom-toc.css">
+<link rel="stylesheet" href="/css/custom-code.css">
 
 
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"zyxian31.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":6},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"zyxian31.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":false,"default":"TEXT"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":6},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -611,7 +612,7 @@ nums<span class="token punctuation">[</span>start<span class="token punctuation"
 <p>很多题一排序，结构直接暴露：</p>
 <ul>
 <li>三数之和 → 排序后可双指针</li>
-<li>盛水容器 → 双指针</li>
+<li>盛水容器 → 不能排序，直接双指针</li>
 <li>去重问题 → 排序后更简单</li>
 </ul>
 <p>👉 排序是结构放大器。</p>
@@ -835,9 +836,6 @@ nums<span class="token punctuation">[</span>start<span class="token punctuation"
 
 
 
-  
-
-
 
   
 
@@ -990,11 +988,6 @@ nums<span class="token punctuation">[</span>start<span class="token punctuation"
 
   <script  src="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
-  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
-
-  <script>Fluid.plugins.codeWidget();</script>
-
-
   
 <script>
   Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
@@ -1050,6 +1043,7 @@ nums<span class="token punctuation">[</span>start<span class="token punctuation"
 
   
 <script src="/js/custom-toc.js"></script>
+<script src="/js/custom-code.js"></script>
 
 
 

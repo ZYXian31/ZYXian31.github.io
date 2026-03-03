@@ -1,0 +1,107 @@
+/* ===== Warm cream page background (like Image 2) ===== */
+body {
+  background-color: #f9f5ee !important;
+}
+
+/* ===== macOS-style code blocks ===== */
+
+/* Outer figure container */
+figure {
+  border-radius: 10px !important;
+  overflow: hidden !important;
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.28) !important;
+  margin: 1.8em 0 !important;
+  background: #2d2d2d !important;
+}
+
+/* Remove extra margin on the inner wrapper/pre */
+figure .code-wrapper {
+  margin: 0 !important;
+}
+
+figure .code-wrapper pre {
+  margin: 0 !important;
+  border-radius: 0 !important;
+  border: none !important;
+}
+
+/* ===== macOS header bar ===== */
+.code-mac-header {
+  display: flex;
+  align-items: center;
+  height: 38px;
+  background: #3a3c40;
+  padding: 0 14px;
+  position: relative;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+/* Traffic light dots */
+.code-mac-dots {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  z-index: 1;
+}
+
+.code-mac-dots .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.code-mac-dots .dot.red    { background: #ff5f56; }
+.code-mac-dots .dot.yellow { background: #ffbd2e; }
+.code-mac-dots .dot.green  { background: #27c93f; }
+
+/* Language label — centered in header */
+.code-mac-lang {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.72em;
+  color: #888;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Copy button — right side of header */
+.code-mac-copy {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: 1px solid #666;
+  border-radius: 4px;
+  color: #aaa;
+  font-size: 0.7em;
+  padding: 2px 8px;
+  cursor: pointer;
+  line-height: 1.6;
+  transition: all 0.15s ease;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  letter-spacing: 0.03em;
+}
+
+.code-mac-copy:hover {
+  background: #555;
+  color: #eee;
+  border-color: #888;
+}
+
+/* Hide Fluid's built-in code widget tools (replaced by our header) */
+.code-widget-wrap,
+.code-widget-wrap *,
+.code-block-tool,
+.highlight .gutter {
+  display: none !important;
+}
+
+/* Line numbers fix: show gutter only */
+.line-numbers .line-numbers-rows {
+  border-right: 1px solid #555 !important;
+}
