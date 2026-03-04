@@ -1,0 +1,1032 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="ZYXian31">
+  <meta name="keywords" content="机器学习,深度学习,LLM">
+  
+    <meta name="description" content="今天在刷二叉树相关题目时，通过不断调试代码以及和 AI 讨论，我获得了一些非常关键的认识。主要集中在：  避免递归中的隐式 O(n²) 避免重复计算 正确理解 Python 作用域 正确使用回溯恢复状态  本文记录五道典型树题的完整思考过程，包括：  当时的思考背景 写出的代码 出现的问题 优化思路 最终最优解   题目一：Binary Tree Inorder Traversal 题目描述 给定">
+<meta property="og:type" content="article">
+<meta property="og:title" content="算法刷题方法论记录（四）：一天刷树题的五个认知（附错误复盘）">
+<meta property="og:url" content="https://zyxian31.github.io/2026/03/05/algo-notes-4/index.html">
+<meta property="og:site_name" content="ZYXian31&#39;s Blog">
+<meta property="og:description" content="今天在刷二叉树相关题目时，通过不断调试代码以及和 AI 讨论，我获得了一些非常关键的认识。主要集中在：  避免递归中的隐式 O(n²) 避免重复计算 正确理解 Python 作用域 正确使用回溯恢复状态  本文记录五道典型树题的完整思考过程，包括：  当时的思考背景 写出的代码 出现的问题 优化思路 最终最优解   题目一：Binary Tree Inorder Traversal 题目描述 给定">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-03-04T17:15:00.000Z">
+<meta property="article:modified_time" content="2026-03-04T17:20:08.421Z">
+<meta property="article:author" content="ZYXian31">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="LeetCode">
+<meta property="article:tag" content="二叉树">
+<meta property="article:tag" content="递归">
+<meta property="article:tag" content="踩坑复盘">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>算法刷题方法论记录（四）：一天刷树题的五个认知（附错误复盘） - ZYXian31&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/custom-toc.css">
+<link rel="stylesheet" href="/css/custom-code.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"zyxian31.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":false,"default":"TEXT"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":6},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<!-- hexo injector head_end start --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="算法刷题方法论记录（四）：一天刷树题的五个认知（附错误复盘）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-03-05 01:15" pubdate>
+          2026年3月5日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          12 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">算法刷题方法论记录（四）：一天刷树题的五个认知（附错误复盘）</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>今天在刷二叉树相关题目时，通过不断调试代码以及和 AI 讨论，我获得了一些非常关键的认识。主要集中在：</p>
+<ul>
+<li>避免递归中的<strong>隐式 O(n²)</strong></li>
+<li>避免<strong>重复计算</strong></li>
+<li>正确理解 <strong>Python 作用域</strong></li>
+<li>正确使用<strong>回溯恢复状态</strong></li>
+</ul>
+<p>本文记录五道典型树题的完整思考过程，包括：</p>
+<ul>
+<li>当时的思考背景</li>
+<li>写出的代码</li>
+<li>出现的问题</li>
+<li>优化思路</li>
+<li>最终最优解</li>
+</ul>
+<hr>
+<h1>题目一：Binary Tree Inorder Traversal</h1>
+<h2 id="题目描述">题目描述</h2>
+<p>给定一个二叉树的根节点 <code>root</code>，返回它的<strong>中序遍历结果</strong>。</p>
+<p>中序遍历顺序为：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">左子树 → 根节点 → 右子树<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+<p>例如：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">输入:
+root &#x3D; [1,null,2,3]
+
+    1
+     \
+      2
+     &#x2F;
+    3
+
+输出:
+[1,3,2]<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<hr>
+<h1>我的最初思路</h1>
+<p>递归求：</p>
+<ol>
+<li>左子树中序遍历</li>
+<li>当前节点</li>
+<li>右子树中序遍历</li>
+</ol>
+<p>代码如下：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">Solution</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">inorderTraversal</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> root<span class="token punctuation">:</span> Optional<span class="token punctuation">[</span>TreeNode<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> List<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> <span class="token keyword">not</span> root<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+        left_res <span class="token operator">=</span> self<span class="token punctuation">.</span>inorderTraversal<span class="token punctuation">(</span>root<span class="token punctuation">.</span>left<span class="token punctuation">)</span>
+        right_res <span class="token operator">=</span> self<span class="token punctuation">.</span>inorderTraversal<span class="token punctuation">(</span>root<span class="token punctuation">.</span>right<span class="token punctuation">)</span>
+
+        <span class="token keyword">return</span> left_res <span class="token operator">+</span> <span class="token punctuation">[</span>root<span class="token punctuation">.</span>val<span class="token punctuation">]</span> <span class="token operator">+</span> right_res<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<hr>
+<h1>代码的问题</h1>
+<p>问题出在这里：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">return left_res + [root.val] + right_res<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+<p><code>+</code> 会：</p>
+<ul>
+<li>创建新列表</li>
+<li>复制所有元素</li>
+</ul>
+<p>因此：</p>
+<p><strong>每一层递归都会复制数组。</strong></p>
+<hr>
+<h1>时间复杂度退化</h1>
+<p>理论上中序遍历应该是 O(n)，但由于列表复制，最坏情况会变成 O(n²)。</p>
+<p>例如退化树：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">1
+ \
+  2
+   \
+    3
+     \
+      ...<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<p>复制量：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">1 + 2 + 3 + ... + (n-1)
+&#x3D; O(n²)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></div></figure>
+<p>同时还会产生很多临时列表，占用额外空间。</p>
+<hr>
+<h1>更优写法</h1>
+<p>避免列表拼接，使用<strong>共享数组</strong>。</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">Solution</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">inorderTraversal</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> root<span class="token punctuation">:</span> Optional<span class="token punctuation">[</span>TreeNode<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> List<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+        res <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+        <span class="token keyword">def</span> <span class="token function">dfs</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> <span class="token keyword">not</span> node<span class="token punctuation">:</span>
+                <span class="token keyword">return</span>
+            dfs<span class="token punctuation">(</span>node<span class="token punctuation">.</span>left<span class="token punctuation">)</span>
+            res<span class="token punctuation">.</span>append<span class="token punctuation">(</span>node<span class="token punctuation">.</span>val<span class="token punctuation">)</span>
+            dfs<span class="token punctuation">(</span>node<span class="token punctuation">.</span>right<span class="token punctuation">)</span>
+
+        dfs<span class="token punctuation">(</span>root<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> res<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<p>复杂度：时间 O(n)，空间 O(h)。</p>
+<hr>
+<h1>核心思路</h1>
+<p><strong>递归过程中不要构造新列表。</strong> 使用共享数组 + <code>append</code>。</p>
+<hr>
+<h1>题目二：Maximum Depth of Binary Tree</h1>
+<h2 id="题目描述-2">题目描述</h2>
+<p>给定一棵二叉树，返回其最大深度。</p>
+<p>最大深度是指从根节点到最远叶子节点的最长路径上的节点数。</p>
+<p>例如：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">输入:
+root &#x3D; [3,9,20,null,null,15,7]
+
+        3
+       &#x2F; \
+      9  20
+         &#x2F; \
+        15  7
+
+输出:
+3<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<hr>
+<h1>我的思考</h1>
+<p>用 DFS：</p>
+<ul>
+<li><code>depth</code> 记录当前深度</li>
+<li><code>max_depth</code> 记录最大深度</li>
+</ul>
+<p>代码：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">Solution</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">maxDepth</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> root<span class="token punctuation">:</span> Optional<span class="token punctuation">[</span>TreeNode<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token builtin">int</span><span class="token punctuation">:</span>
+
+        depth<span class="token punctuation">,</span> max_depth <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span>
+
+        <span class="token keyword">def</span> <span class="token function">dfs</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> <span class="token keyword">not</span> node<span class="token punctuation">:</span>
+                <span class="token keyword">return</span> depth
+
+            depth <span class="token operator">+=</span> <span class="token number">1</span>
+            max_depth <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span>max_depth<span class="token punctuation">,</span> depth<span class="token punctuation">)</span>
+
+            dfs<span class="token punctuation">(</span>node<span class="token punctuation">.</span>left<span class="token punctuation">)</span>
+            dfs<span class="token punctuation">(</span>node<span class="token punctuation">.</span>right<span class="token punctuation">)</span>
+
+            depth <span class="token operator">-=</span> <span class="token number">1</span>
+
+        dfs<span class="token punctuation">(</span>root<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> max_depth<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<hr>
+<h1>出现的错误</h1>
+<p>运行时报错：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">UnboundLocalError<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+<p>原因：Python 规则——<strong>函数内赋值默认创建局部变量</strong>。</p>
+<p>这里 <code>depth += 1</code> 和 <code>max_depth = ...</code> 会让 Python 认为 <code>depth</code>、<code>max_depth</code> 是 <code>dfs</code> 的局部变量，但在赋值前已经读取了它们。</p>
+<hr>
+<h1>修复方式</h1>
+<p>使用 <code>nonlocal</code>：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">Solution</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">maxDepth</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> root<span class="token punctuation">:</span> Optional<span class="token punctuation">[</span>TreeNode<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token builtin">int</span><span class="token punctuation">:</span>
+        depth<span class="token punctuation">,</span> max_depth <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span>
+
+        <span class="token keyword">def</span> <span class="token function">dfs</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">nonlocal</span> depth<span class="token punctuation">,</span> max_depth
+
+            <span class="token keyword">if</span> <span class="token keyword">not</span> node<span class="token punctuation">:</span>
+                <span class="token keyword">return</span>
+
+            depth <span class="token operator">+=</span> <span class="token number">1</span>
+            max_depth <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span>max_depth<span class="token punctuation">,</span> depth<span class="token punctuation">)</span>
+
+            dfs<span class="token punctuation">(</span>node<span class="token punctuation">.</span>left<span class="token punctuation">)</span>
+            dfs<span class="token punctuation">(</span>node<span class="token punctuation">.</span>right<span class="token punctuation">)</span>
+
+            depth <span class="token operator">-=</span> <span class="token number">1</span>
+
+        dfs<span class="token punctuation">(</span>root<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> max_depth<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<hr>
+<h1>核心思路</h1>
+<p>函数内修改外层变量必须使用 <code>nonlocal</code>。</p>
+<hr>
+<h1>题目三：Diameter of Binary Tree</h1>
+<h2 id="题目描述-3">题目描述</h2>
+<p>给定一棵二叉树，返回它的<strong>直径</strong>。</p>
+<p>直径定义为任意两个节点之间的最长路径长度（边数），路径不一定经过根节点。</p>
+<p>示例：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">        1
+       &#x2F; \
+      2   3
+     &#x2F; \
+    4   5
+
+输出:
+3
+
+路径:
+4 → 2 → 1 → 3<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<hr>
+<h1>我的初始思路</h1>
+<p>直径公式：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">left_height + right_height<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+<p>于是写成：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">diameter(node):
+    d &#x3D; height(node.left) + height(node.right)
+    return max(d, diameter(node.left), diameter(node.right))<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre></div></figure>
+<hr>
+<h1>问题</h1>
+<p><code>height()</code> 会被反复调用，例如：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">height(node)
+height(node.left)
+height(node.left.left)
+...<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<p>大量重复计算，最坏复杂度 O(n²)。</p>
+<hr>
+<h1>正确思路</h1>
+<p>把&quot;求高度&quot;和&quot;更新直径&quot;<strong>合并在一次 DFS 中完成</strong>。</p>
+<hr>
+<h1>最优代码</h1>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">Solution</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">diameterOfBinaryTree</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> root<span class="token punctuation">:</span> Optional<span class="token punctuation">[</span>TreeNode<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token builtin">int</span><span class="token punctuation">:</span>
+        ans <span class="token operator">=</span> <span class="token number">0</span>
+
+        <span class="token keyword">def</span> <span class="token function">height</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">nonlocal</span> ans
+            <span class="token keyword">if</span> <span class="token keyword">not</span> node<span class="token punctuation">:</span>
+                <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span>
+
+            lh <span class="token operator">=</span> height<span class="token punctuation">(</span>node<span class="token punctuation">.</span>left<span class="token punctuation">)</span>
+            rh <span class="token operator">=</span> height<span class="token punctuation">(</span>node<span class="token punctuation">.</span>right<span class="token punctuation">)</span>
+
+            ans <span class="token operator">=</span> <span class="token builtin">max</span><span class="token punctuation">(</span>ans<span class="token punctuation">,</span> lh <span class="token operator">+</span> rh <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">)</span>
+
+            <span class="token keyword">return</span> <span class="token number">1</span> <span class="token operator">+</span> <span class="token builtin">max</span><span class="token punctuation">(</span>lh<span class="token punctuation">,</span> rh<span class="token punctuation">)</span>
+
+        height<span class="token punctuation">(</span>root<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> ans<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<hr>
+<h1>核心思路</h1>
+<p><strong>后序遍历时同时计算高度和直径</strong>，避免重复计算。</p>
+<hr>
+<h1>题目四：Construct Binary Tree from Preorder and Inorder</h1>
+<h2 id="题目描述-4">题目描述</h2>
+<p>给定两种遍历结果 <code>preorder</code> 和 <code>inorder</code>，构造原始二叉树。</p>
+<p>示例：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">preorder &#x3D; [3,9,20,15,7]
+inorder  &#x3D; [9,3,15,20,7]<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></div></figure>
+<p>构造：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">  3
+ &#x2F; \
+9  20
+   &#x2F; \
+  15  7<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<hr>
+<h1>我的最初代码</h1>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">Solution</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">buildTree</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> preorder<span class="token punctuation">,</span> inorder<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        n <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>preorder<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> n <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+            <span class="token keyword">return</span> <span class="token boolean">None</span>
+
+        mid_val <span class="token operator">=</span> preorder<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+
+        i <span class="token operator">=</span> <span class="token number">0</span>
+        <span class="token keyword">while</span> i <span class="token operator">&lt;</span> n <span class="token keyword">and</span> inorder<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">!=</span> mid_val<span class="token punctuation">:</span>
+            i <span class="token operator">+=</span> <span class="token number">1</span>
+
+        left <span class="token operator">=</span> self<span class="token punctuation">.</span>buildTree<span class="token punctuation">(</span>preorder<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token number">1</span><span class="token operator">+</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> inorder<span class="token punctuation">[</span><span class="token punctuation">:</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>
+        right <span class="token operator">=</span> self<span class="token punctuation">.</span>buildTree<span class="token punctuation">(</span>preorder<span class="token punctuation">[</span><span class="token number">1</span><span class="token operator">+</span>i<span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">,</span> inorder<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+        <span class="token keyword">return</span> TreeNode<span class="token punctuation">(</span>mid_val<span class="token punctuation">,</span> left<span class="token punctuation">,</span> right<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<hr>
+<h1>存在的问题</h1>
+<p><strong>1. 每层线性扫描 inorder：</strong> <code>while inorder[i] != root</code> 每次 O(n)，递归 n 次 → O(n²)。</p>
+<p><strong>2. 切片复制数组：</strong> <code>preorder[1:1+i]</code> 每次都会创建新数组，总体复制量 O(n²)。</p>
+<hr>
+<h1>最优思路</h1>
+<ol>
+<li>使用<strong>哈希表</strong> <code>value → index</code></li>
+<li>递归传<strong>区间下标</strong></li>
+</ol>
+<hr>
+<h1>最优代码</h1>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">Solution</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">buildTree</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> preorder<span class="token punctuation">,</span> inorder<span class="token punctuation">)</span><span class="token punctuation">:</span>
+
+        idx <span class="token operator">=</span> <span class="token punctuation">&#123;</span>v<span class="token punctuation">:</span>i <span class="token keyword">for</span> i<span class="token punctuation">,</span>v <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>inorder<span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
+        pre_i <span class="token operator">=</span> <span class="token number">0</span>
+
+        <span class="token keyword">def</span> <span class="token function">dfs</span><span class="token punctuation">(</span>l<span class="token punctuation">,</span> r<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">nonlocal</span> pre_i
+
+            <span class="token keyword">if</span> l <span class="token operator">></span> r<span class="token punctuation">:</span>
+                <span class="token keyword">return</span> <span class="token boolean">None</span>
+
+            val <span class="token operator">=</span> preorder<span class="token punctuation">[</span>pre_i<span class="token punctuation">]</span>
+            pre_i <span class="token operator">+=</span> <span class="token number">1</span>
+
+            root <span class="token operator">=</span> TreeNode<span class="token punctuation">(</span>val<span class="token punctuation">)</span>
+
+            mid <span class="token operator">=</span> idx<span class="token punctuation">[</span>val<span class="token punctuation">]</span>
+
+            root<span class="token punctuation">.</span>left <span class="token operator">=</span> dfs<span class="token punctuation">(</span>l<span class="token punctuation">,</span> mid<span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+            root<span class="token punctuation">.</span>right <span class="token operator">=</span> dfs<span class="token punctuation">(</span>mid<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">,</span> r<span class="token punctuation">)</span>
+
+            <span class="token keyword">return</span> root
+
+        <span class="token keyword">return</span> dfs<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>inorder<span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<hr>
+<h1>核心思路</h1>
+<p>避免切片和线性查找，改为<strong>哈希表 + 下标区间</strong>。</p>
+<hr>
+<h1>题目五：Path Sum III</h1>
+<h2 id="题目描述-5">题目描述</h2>
+<p>给定一棵二叉树和一个整数 <code>targetSum</code>，求路径和等于 <code>targetSum</code> 的路径数量。</p>
+<p>路径必须从父到子，但不一定从根开始，也不一定到叶子结束。</p>
+<hr>
+<h1>我的代码</h1>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python">cur_sum <span class="token operator">+=</span> node<span class="token punctuation">.</span>val
+mp<span class="token punctuation">[</span>cur_sum<span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token number">1</span>
+
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+
+cur_sum <span class="token operator">-=</span> node<span class="token punctuation">.</span>val
+mp<span class="token punctuation">[</span>cur_sum<span class="token punctuation">]</span> <span class="token operator">-=</span> <span class="token number">1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<hr>
+<h1>错误原因</h1>
+<p>回溯时 <code>cur_sum -= node.val</code> 已经变成<strong>父节点前缀和</strong>，但我们需要删除的是<strong>当前节点前缀和</strong>。</p>
+<hr>
+<h1>正确做法</h1>
+<p>不要修改 <code>cur_sum</code>，只需：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">mp[cur_sum] -&#x3D; 1<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+<hr>
+<h1>修正代码</h1>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> collections <span class="token keyword">import</span> defaultdict
+
+<span class="token keyword">class</span> <span class="token class-name">Solution</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">pathSum</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> root<span class="token punctuation">,</span> targetSum<span class="token punctuation">)</span><span class="token punctuation">:</span>
+
+        mp <span class="token operator">=</span> defaultdict<span class="token punctuation">(</span><span class="token builtin">int</span><span class="token punctuation">)</span>
+        mp<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">1</span>
+
+        res <span class="token operator">=</span> <span class="token number">0</span>
+
+        <span class="token keyword">def</span> <span class="token function">dfs</span><span class="token punctuation">(</span>node<span class="token punctuation">,</span> cur_sum<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">nonlocal</span> res
+
+            <span class="token keyword">if</span> <span class="token keyword">not</span> node<span class="token punctuation">:</span>
+                <span class="token keyword">return</span>
+
+            cur_sum <span class="token operator">+=</span> node<span class="token punctuation">.</span>val
+
+            res <span class="token operator">+=</span> mp<span class="token punctuation">[</span>cur_sum <span class="token operator">-</span> targetSum<span class="token punctuation">]</span>
+
+            mp<span class="token punctuation">[</span>cur_sum<span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token number">1</span>
+
+            dfs<span class="token punctuation">(</span>node<span class="token punctuation">.</span>left<span class="token punctuation">,</span> cur_sum<span class="token punctuation">)</span>
+            dfs<span class="token punctuation">(</span>node<span class="token punctuation">.</span>right<span class="token punctuation">,</span> cur_sum<span class="token punctuation">)</span>
+
+            mp<span class="token punctuation">[</span>cur_sum<span class="token punctuation">]</span> <span class="token operator">-=</span> <span class="token number">1</span>
+
+        dfs<span class="token punctuation">(</span>root<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
+
+        <span class="token keyword">return</span> res<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<hr>
+<h1>今日总结</h1>
+<h3 id="1-避免递归中构造新列表">1. 避免递归中构造新列表</h3>
+<p><code>append</code> 优于 list <code>+</code></p>
+<h3 id="2-注意-Python-作用域">2. 注意 Python 作用域</h3>
+<p>函数中赋值默认局部变量，需要修改外层变量时使用 <code>nonlocal</code></p>
+<h3 id="3-避免重复计算">3. 避免重复计算</h3>
+<p>能一次 DFS 算完的，不要拆成多个递归</p>
+<h3 id="4-避免递归切片">4. 避免递归切片</h3>
+<p>切片隐藏 O(n)，优先用下标区间</p>
+<h3 id="5-回溯只恢复状态">5. 回溯只恢复状态</h3>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python">mp<span class="token punctuation">[</span>cur_sum<span class="token punctuation">]</span> <span class="token operator">-=</span> <span class="token number">1</span>   <span class="token comment"># 正确</span>
+cur_sum <span class="token operator">-=</span> node<span class="token punctuation">.</span>val  <span class="token comment"># 错误（多此一举且语义错误）</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></div></figure>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/LeetCode-%E5%88%B7%E9%A2%98/" class="category-chain-item">LeetCode 刷题</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E7%AE%97%E6%B3%95/" class="print-no-link">#算法</a>
+      
+        <a href="/tags/LeetCode/" class="print-no-link">#LeetCode</a>
+      
+        <a href="/tags/%E4%BA%8C%E5%8F%89%E6%A0%91/" class="print-no-link">#二叉树</a>
+      
+        <a href="/tags/%E9%80%92%E5%BD%92/" class="print-no-link">#递归</a>
+      
+        <a href="/tags/%E8%B8%A9%E5%9D%91%E5%A4%8D%E7%9B%98/" class="print-no-link">#踩坑复盘</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>算法刷题方法论记录（四）：一天刷树题的五个认知（附错误复盘）</div>
+      <div>https://zyxian31.github.io/2026/03/05/algo-notes-4/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>ZYXian31</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年3月5日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/03/05/algo-notes-3/" title="算法刷题方法论记录（三）：7 道链表题，把&#34;背代码&#34;变成&#34;记转换路径&#34;">
+                        <span class="hidden-mobile">算法刷题方法论记录（三）：7 道链表题，把&#34;背代码&#34;变成&#34;记转换路径&#34;</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script  src="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/custom-toc.js"></script>
+<script src="/js/custom-code.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<!-- hexo injector body_end start -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script src="/js/katex-init.js"></script>
+<!-- hexo injector body_end end --></body>
+</html>
