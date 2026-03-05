@@ -19,15 +19,15 @@
   <meta name="author" content="ZYXian31">
   <meta name="keywords" content="机器学习,深度学习,LLM">
   
-    <meta name="description" content="今天刷题的真实状态是：很多题我&quot;会写&quot;，但常常是背出来的；一旦写错，就靠补丁变量、拍脑袋循环次数、或者临时绕路把它救回来。 今天最大的收获不是&quot;背更多不变量&quot;，而是：  把&quot;错误写法&quot;到&quot;正确写法&quot;的转换路径记下来。 下次再犯同样的错，能迅速定位：我走偏在哪一步，应该把哪一行改回模板。   题目一：相交链表（Inter">
+    <meta name="description" content="今天刷题的真实状态是：很多题我一旦写错，就靠补丁变量、拍脑袋循环次数、或者临时绕路把它救回来。 今天的收获是：  把&quot;错误写法&quot;到&quot;正确写法&quot;的转换路径记下来。 下次再犯同样的错，能迅速定位：我走偏在哪一步，应该把哪一行改回模板。   题目一：相交链表（Intersection of Two Linked Lists） 题目描述 给定两个单链表 headA、">
 <meta property="og:type" content="article">
 <meta property="og:title" content="算法刷题方法论记录（三）：7 道链表题，把&quot;背代码&quot;变成&quot;记转换路径&quot;">
 <meta property="og:url" content="https://zyxian31.github.io/2026/03/05/algo-notes-3/index.html">
 <meta property="og:site_name" content="ZYXian31&#39;s Blog">
-<meta property="og:description" content="今天刷题的真实状态是：很多题我&quot;会写&quot;，但常常是背出来的；一旦写错，就靠补丁变量、拍脑袋循环次数、或者临时绕路把它救回来。 今天最大的收获不是&quot;背更多不变量&quot;，而是：  把&quot;错误写法&quot;到&quot;正确写法&quot;的转换路径记下来。 下次再犯同样的错，能迅速定位：我走偏在哪一步，应该把哪一行改回模板。   题目一：相交链表（Inter">
+<meta property="og:description" content="今天刷题的真实状态是：很多题我一旦写错，就靠补丁变量、拍脑袋循环次数、或者临时绕路把它救回来。 今天的收获是：  把&quot;错误写法&quot;到&quot;正确写法&quot;的转换路径记下来。 下次再犯同样的错，能迅速定位：我走偏在哪一步，应该把哪一行改回模板。   题目一：相交链表（Intersection of Two Linked Lists） 题目描述 给定两个单链表 headA、">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-03-04T17:00:00.000Z">
-<meta property="article:modified_time" content="2026-03-04T17:07:36.647Z">
+<meta property="article:modified_time" content="2026-03-05T02:01:01.055Z">
 <meta property="article:author" content="ZYXian31">
 <meta property="article:tag" content="算法">
 <meta property="article:tag" content="LeetCode">
@@ -233,7 +233,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2.3k 字
+          3.1k 字
         
       </span>
     
@@ -244,7 +244,7 @@
         
         
         
-          20 分钟
+          26 分钟
         
       </span>
     
@@ -286,8 +286,8 @@
             
               <div class="markdown-body">
                 
-                <p>今天刷题的真实状态是：很多题我&quot;会写&quot;，但常常是背出来的；一旦写错，就靠补丁变量、拍脑袋循环次数、或者临时绕路把它救回来。
-今天最大的收获不是&quot;背更多不变量&quot;，而是：</p>
+                <p>今天刷题的真实状态是：很多题我一旦写错，就靠补丁变量、拍脑袋循环次数、或者临时绕路把它救回来。
+今天的收获是：</p>
 <blockquote>
 <p><strong>把&quot;错误写法&quot;到&quot;正确写法&quot;的转换路径记下来。</strong>
 下次再犯同样的错，能迅速定位：我走偏在哪一步，应该把哪一行改回模板。</p>
@@ -299,8 +299,7 @@
 <h3 id="我当时的背景与错误倾向">我当时的背景与错误倾向</h3>
 <p>我引入了额外变量 <code>inter</code> 去&quot;模拟终止条件&quot;（比如最多换头 3 次）。本质是：</p>
 <ul>
-<li>没意识到&quot;不相交时会同时走到 None&quot;</li>
-<li>所以用计数器硬控循环上限</li>
+<li>没意识到&quot;不相交时会同时走到 None&quot;，所以用计数器硬控循环上限</li>
 </ul>
 <h3 id="错误代码片段（典型结构）">错误代码片段（典型结构）</h3>
 <figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python">la<span class="token punctuation">,</span> lb <span class="token operator">=</span> headA<span class="token punctuation">,</span> headB
@@ -394,6 +393,104 @@ inter <span class="token operator">=</span> <span class="token number">0</span>
 <li>反转后半段</li>
 <li>两段同步比较</li>
 </ul>
+<h3 id="📌-小知识点：快慢指针中点落点速查">📌 小知识点：快慢指针中点落点速查</h3>
+<h4 id="1-术语统一">1) 术语统一</h4>
+<p>设链表长度为 <code>n</code>，下标从 0 开始：</p>
+<ul>
+<li><strong>左中点</strong>：<code>(n-1)//2</code>（n=4 → index 1；n=5 → index 2）</li>
+<li><strong>右中点</strong>：<code>n//2</code>（n=4 → index 2；n=5 → index 2，奇数时左右相同）</li>
+</ul>
+<hr>
+<h4 id="2-两种-while-条件对应左-右中点">2) 两种 while 条件对应左/右中点</h4>
+<p><strong>A. <code>while fast and fast.next</code> → slow 停在右中点</strong>（偶数取右，奇数取中）</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python">fast <span class="token operator">=</span> slow <span class="token operator">=</span> head
+<span class="token keyword">while</span> fast <span class="token keyword">and</span> fast<span class="token punctuation">.</span><span class="token builtin">next</span><span class="token punctuation">:</span>
+    fast <span class="token operator">=</span> fast<span class="token punctuation">.</span><span class="token builtin">next</span><span class="token punctuation">.</span><span class="token builtin">next</span>
+    slow <span class="token operator">=</span> slow<span class="token punctuation">.</span><span class="token builtin">next</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<p>例子：1→2→3→4 时 slow 在 3（index 2）；1→2→3→4→5 时 slow 在 3（index 2）。
+适用：后半段从 <code>slow</code> 开始。</p>
+<hr>
+<p><strong>B. <code>while fast.next and fast.next.next</code> → slow 停在左中点</strong>（偶数取左，奇数取中）</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python">fast <span class="token operator">=</span> slow <span class="token operator">=</span> head
+<span class="token keyword">while</span> fast<span class="token punctuation">.</span><span class="token builtin">next</span> <span class="token keyword">and</span> fast<span class="token punctuation">.</span><span class="token builtin">next</span><span class="token punctuation">.</span><span class="token builtin">next</span><span class="token punctuation">:</span>
+    fast <span class="token operator">=</span> fast<span class="token punctuation">.</span><span class="token builtin">next</span><span class="token punctuation">.</span><span class="token builtin">next</span>
+    slow <span class="token operator">=</span> slow<span class="token punctuation">.</span><span class="token builtin">next</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<p>例子：1→2→3→4 时 slow 在 2（index 1）；1→2→3→4→5 时 slow 在 3（index 2）。
+适用：后半段从 <code>slow.next</code> 开始，典型：<strong>回文链表、reorder list</strong>。</p>
+<hr>
+<h4 id="3-需要前驱时：用-prev-版本">3) 需要前驱时：用 prev 版本</h4>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python">prev <span class="token operator">=</span> <span class="token boolean">None</span>
+fast <span class="token operator">=</span> slow <span class="token operator">=</span> head
+<span class="token keyword">while</span> fast <span class="token keyword">and</span> fast<span class="token punctuation">.</span><span class="token builtin">next</span><span class="token punctuation">:</span>
+    prev <span class="token operator">=</span> slow
+    slow <span class="token operator">=</span> slow<span class="token punctuation">.</span><span class="token builtin">next</span>
+    fast <span class="token operator">=</span> fast<span class="token punctuation">.</span><span class="token builtin">next</span><span class="token punctuation">.</span><span class="token builtin">next</span>
+<span class="token comment"># slow：右中点；prev：右中点前驱（断链用）</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<p>适用：需要 <code>prev.next = None</code> 断开链表（归并排序递归版常用）。</p>
+<hr>
+<h4 id="4-fast-从-head-next-开始变体">4) fast 从 head.next 开始变体</h4>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python">slow <span class="token operator">=</span> head
+fast <span class="token operator">=</span> head<span class="token punctuation">.</span><span class="token builtin">next</span>
+<span class="token keyword">while</span> fast <span class="token keyword">and</span> fast<span class="token punctuation">.</span><span class="token builtin">next</span><span class="token punctuation">:</span>
+    slow <span class="token operator">=</span> slow<span class="token punctuation">.</span><span class="token builtin">next</span>
+    fast <span class="token operator">=</span> fast<span class="token punctuation">.</span><span class="token builtin">next</span><span class="token punctuation">.</span><span class="token builtin">next</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<p>slow 更偏左侧，适用于需要 slow 停在&quot;前半段末尾&quot;的场景。</p>
+<hr>
+<h4 id="5-速查表">5) 速查表</h4>
+<table>
+<thead>
+<tr>
+<th>模板</th>
+<th>while 条件</th>
+<th>fast 初始</th>
+<th>slow 落点（偶数）</th>
+<th>slow 落点（奇数）</th>
+<th>常见用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>右中点模板</td>
+<td><code>fast and fast.next</code></td>
+<td>head</td>
+<td>右中点</td>
+<td>中点</td>
+<td>后半段从 slow 开始</td>
+</tr>
+<tr>
+<td>左中点模板</td>
+<td><code>fast.next and fast.next.next</code></td>
+<td>head</td>
+<td>左中点</td>
+<td>中点</td>
+<td>后半段从 slow.next 开始（回文/重排）</td>
+</tr>
+<tr>
+<td>右中点 + 前驱</td>
+<td><code>fast and fast.next</code></td>
+<td>head</td>
+<td>prev=左中点</td>
+<td>prev=中点前驱</td>
+<td>需要断链拿前驱</td>
+</tr>
+<tr>
+<td>fast=head.next 变体</td>
+<td><code>fast and fast.next</code></td>
+<td>head.next</td>
+<td>更偏左</td>
+<td>中点附近</td>
+<td>控制偶数长度偏移</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h4 id="6-选择规则（最实用）">6) 选择规则（最实用）</h4>
+<p>先决定：<strong>我打算用 slow 还是 slow.next 作为后半段头？</strong></p>
+<ul>
+<li>用 <code>slow</code> 作为后半段头 → <strong>右中点模板</strong>（<code>fast and fast.next</code>）</li>
+<li>用 <code>slow.next</code> 作为后半段头 → <strong>左中点模板</strong>（<code>fast.next and fast.next.next</code>）</li>
+<li>需要断链且要前驱 → <strong>prev 版本</strong>最稳</li>
+</ul>
 <hr>
 <h2 id="题目三：环形链表-II（Linked-List-Cycle-II）">题目三：环形链表 II（Linked List Cycle II）</h2>
 <h3 id="题目描述-3">题目描述</h3>
@@ -401,23 +498,32 @@ inter <span class="token operator">=</span> <span class="token number">0</span>
 <h3 id="我的思考背景">我的思考背景</h3>
 <p>我能背代码，但不理解为什么&quot;相遇后把 fast 放回 head，再同步走就到入口&quot;。</p>
 <h3 id="关键推导">关键推导</h3>
-<p>设 <code>a, b, c</code>：</p>
+<p>设：</p>
 <ul>
-<li><code>a</code>：head 到入口</li>
-<li><code>b</code>：入口到相遇点</li>
-<li><code>c</code>：相遇点到入口</li>
+<li><code>a</code>：head 到入口的距离</li>
+<li><code>b</code>：入口到相遇点的距离</li>
+<li><code>c</code>：相遇点回到入口的距离（即环长 - b）</li>
 <li>环长 = <code>b + c</code></li>
 </ul>
-<p>由 fast = 2 * slow 化简得到：
-<code>a ≡ c (mod 环长)</code>
-因此：</p>
+<p><strong>第一阶段：fast 与 slow 相遇</strong></p>
+<p>（这里&quot;步&quot;指<strong>经过的边数</strong>，即 <code>next</code> 指针的跳转次数，不是节点数。<code>a</code>、<code>b</code>、<code>c</code> 均为边数。）</p>
+<p>slow 走了 <code>a + b</code> 步；fast 走了 <code>a + b + k*(b+c)</code> 步（多绕了 k 圈）。</p>
+<p>由 fast = 2 * slow：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">a + b + k*(b+c) &#x3D; 2*(a + b)
+k*(b+c) &#x3D; a + b
+a &#x3D; k*(b+c) - b
+a &#x3D; (k-1)*(b+c) + c<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<p>因此：<code>a ≡ c (mod 环长)</code></p>
+<p><strong>第二阶段：为什么同步走能到入口？</strong></p>
+<p>把 fast 重置到 head，slow 留在相遇点：</p>
 <ul>
-<li>fast 从 head 走 a</li>
-<li>slow 从 meet 走 c
-同步走必在入口相遇</li>
+<li>fast 走 <code>a</code> 步到达入口</li>
+<li>slow 走 <code>a</code> 步 = 走 <code>c + (k-1)*(b+c)</code> 步，即从相遇点走 c 到入口，再绕 k-1 圈回到入口</li>
 </ul>
+<p>两者同时抵达入口，相遇即为答案。</p>
 <h3 id="直觉版补充">直觉版补充</h3>
-<p>在环里 fast 追 slow，相对速度差为 1，必追上。第二阶段是把两人&quot;对齐到入口&quot;。</p>
+<p>第一阶段：环里 fast 比 slow 每步多走 1，相对速度差为 1，必追上（最多绕一圈）。</p>
+<p>第二阶段：相遇点距入口的&quot;剩余距离 c&quot;恰好等于 head 到入口的距离 a（模环长），所以两人从各自起点同步走，必在入口汇合。</p>
 <h3 id="标准代码（源代码）">标准代码（源代码）</h3>
 <figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">Solution</span><span class="token punctuation">:</span>
     <span class="token keyword">def</span> <span class="token function">detectCycle</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> head<span class="token punctuation">:</span> Optional<span class="token punctuation">[</span>ListNode<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> Optional<span class="token punctuation">[</span>ListNode<span class="token punctuation">]</span><span class="token punctuation">:</span>
@@ -439,7 +545,6 @@ inter <span class="token operator">=</span> <span class="token number">0</span>
             fast <span class="token operator">=</span> fast<span class="token punctuation">.</span><span class="token builtin">next</span>
             slow <span class="token operator">=</span> slow<span class="token punctuation">.</span><span class="token builtin">next</span>
         <span class="token keyword">return</span> fast<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
-<p>（这题你没给出具体错误代码片段，我就不硬编；如果你想，也可以把你当时写的版本贴出来，我再加&quot;错→对&quot;diff。）</p>
 <hr>
 <h2 id="题目四：复制带随机指针的链表（Copy-List-with-Random-Pointer）">题目四：复制带随机指针的链表（Copy List with Random Pointer）</h2>
 <h3 id="题目描述-4">题目描述</h3>
@@ -628,10 +733,27 @@ inter <span class="token operator">=</span> <span class="token number">0</span>
 <p>合并 k 条升序链表为一条升序链表。</p>
 <h3 id="我的两种思路">我的两种思路</h3>
 <ul>
-<li>堆：O(n log k) 时间 / O(k) 空间</li>
-<li>分治两两合并：O(n log k) 时间 / O(1) 额外空间（不算 lists 数组本身）</li>
+<li>
+<p>堆：O(n log k) 时间 / O(k) 空间</p>
+</li>
+<li>
+<p>分治两两合并：O(n log k) 时间 / O(1) 额外空间（不算 lists 数组本身）</p>
+<p><strong>思路</strong>：把 k 条链表两两配对合并，每轮把链表数量减半，共 log k 轮。每轮合并的总节点数为 n，所以整体 O(n log k)。与堆相比不需要额外的优先队列，空间更省。</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">第0轮：[L0, L1, L2, L3, L4]  (k&#x3D;5)
+第1轮：[merge(L0,L1), merge(L2,L3), L4]  → 3条
+第2轮：[merge(前两条), L4]  → 2条
+第3轮：[最终结果]  → 1条<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+</li>
 </ul>
 <h3 id="我写的原地两两合并（最终版、简洁漂亮）">我写的原地两两合并（最终版、简洁漂亮）</h3>
+<p><strong>核心思路</strong>：不新建数组，直接在 <code>lists</code> 原地压缩结果。</p>
+<ul>
+<li><code>use_len</code>：当前有效长度（每轮减半）</li>
+<li>每轮 <code>for i in range(0, use_len, 2)</code>：把 <code>lists[i]</code> 和 <code>lists[i+1]</code> 合并，写回 <code>lists[cur_idx]</code>，<code>cur_idx</code> 自增</li>
+<li>奇数条时最后一条 <code>lists[i+1]</code> 不存在，用 <code>None</code> 代替（merge 遇到 None 直接返回另一条）</li>
+<li>每轮结束后 <code>use_len = cur_idx</code>，即新的有效长度</li>
+</ul>
+<p><strong>为什么是 O(1) 额外空间？</strong> 结果直接原地写回 <code>lists[0..cur_idx-1]</code>，没有新建任何辅助数组（merge 函数本身只用了一个 dummy 节点，O(1)）。</p>
 <figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">Solution</span><span class="token punctuation">:</span>
     <span class="token keyword">def</span> <span class="token function">mergeKLists</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> lists<span class="token punctuation">:</span> List<span class="token punctuation">[</span>Optional<span class="token punctuation">[</span>ListNode<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> Optional<span class="token punctuation">[</span>ListNode<span class="token punctuation">]</span><span class="token punctuation">:</span>
         <span class="token keyword">def</span> <span class="token function">merge</span><span class="token punctuation">(</span>l<span class="token punctuation">,</span> r<span class="token punctuation">)</span><span class="token punctuation">:</span>
@@ -659,7 +781,6 @@ inter <span class="token operator">=</span> <span class="token number">0</span>
             use_len <span class="token operator">=</span> cur_idx
 
         <span class="token keyword">return</span> lists<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
-<p>（你问过&quot;新建列表会不会增加空间复杂度&quot;，结论：会是 O(k)，而你这个原地压缩是更严格的 O(1) 额外空间。）</p>
 <hr>
 <h2 id="题目七：LRU-Cache">题目七：LRU Cache</h2>
 <h3 id="题目描述-7">题目描述</h3>
@@ -741,10 +862,10 @@ inter <span class="token operator">=</span> <span class="token number">0</span>
 <li>淘汰 tail.pre 并同步删 dict</li>
 </ul>
 <hr>
-<h1>总结：我真正要&quot;记住&quot;的不是不变量，而是转换路径</h1>
+<h1>总结：要&quot;记住&quot;的是惯性思维到最优解的转换路径</h1>
 <p>今天的收获可以浓缩成一句：</p>
 <blockquote>
-<p>我不追求&quot;背对答案&quot;，而是记住：每类错误出现时，我应该如何把它<strong>一步一步推回</strong>正确范式。</p>
+<p>记住：每类错误出现时，我应该如何把它<strong>一步一步推回</strong>正确范式。</p>
 </blockquote>
 <p>例子：</p>
 <ul>
