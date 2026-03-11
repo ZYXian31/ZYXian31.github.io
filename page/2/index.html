@@ -237,6 +237,171 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2026/03/01/from-gradient-to-rlhf_1/" target="_self">
+          从梯度到 RLHF：策略梯度的数学本质、方差来源与工程控制（Part I）
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/03/01/from-gradient-to-rlhf_1/" target="_self">
+        <div>
+          0. 预备说明：确定性梯度 vs 随机梯度估计器  目的：解决“梯度为什么会有方差？”这一误解  很多读者（包括我最初讨论时的直觉）会认为：梯度是反向传播算出来的，既然计算图确定、数值确定，梯度怎么会有方差？ 这类疑问的关键在于：我们讨论的是两件不同的东西：  确定性梯度：对一个确定的目标函数（以及确定的数据）求导，结果是确定的数。 随机梯度估计器：目标函数是一个期望（Expectation），我
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-03-01 13:20" pubdate>
+              2026-03-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="category-chain-item">学习笔记</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">#深度学习</a>
+            
+              <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">#机器学习</a>
+            
+              <a href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/">#强化学习</a>
+            
+              <a href="/tags/RLHF/">#RLHF</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2026/01/06/claude-code-usage/" target="_self">
+          claude-code usage
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/06/claude-code-usage/" target="_self">
+        <div>
+          claude code 基础结构 被很多人忽略的：Claude Code 的“全流程助手”能力 很多人第一次用 Claude Code，会把它当成“更聪明的代码生成器”。但从官方的能力图来看，它更像是一个贯穿项目全生命周期的搭档：从摸清现状 → 方案设计 → 质量保障 → 部署发布 → 线上维护，每一步都能帮你把“隐性工作”显性化。  1) Discover：先搞懂再动手（最省时间）  Explo
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-01-06 12:49" pubdate>
+              2026-01-06
+            </time>
+          </div>
+        
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2025/07/05/CS336-Spring2025-Lec2/" target="_self">
+          CS336 Language Modeling: Tensors, Operations &amp; Training
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/07/05/CS336-Spring2025-Lec2/" target="_self">
+        <div>
+          课程概述 本讲座深入探讨了语言模型训练的核心组件，从底层的张量操作到完整的训练循环。重点关注资源利用（内存和计算）的精确计算。 主要内容结构  张量基础 → 模型构建 → 优化器 → 训练循环 资源核算：内存（GB）+ 计算（FLOPs）   💡 动机：快速计算题 问题1：训练时间估算 70B参数模型，15T tokens，1024 H100s需要多长时间？ total_flops = 6 *
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-07-05 14:54" pubdate>
+              2025-07-05
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="category-chain-item">学习笔记</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/CS336/">#CS336</a>
+            
+              <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">#深度学习</a>
+            
+              <a href="/tags/LLM/">#LLM</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2025/07/05/CS336-Spring2025-Lec3/" target="_self">
           CS336 Lecture 3: LM架构与训练 - 学习笔记
         </a>

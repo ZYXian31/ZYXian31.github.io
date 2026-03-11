@@ -1,0 +1,1929 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="ZYXian31">
+  <meta name="keywords" content="机器学习,深度学习,LLM">
+  
+    <meta name="description" content="题目一：二分查找（LeetCode 35. 搜索插入位置） 题目基础信息  题目链接：LeetCode 35. 搜索插入位置 题目难度：简单 核心考点：有序数组的二分查找、目标值插入位置定位、区间不变性把控 题目简述：给定一个升序排列的整数数组和一个目标值，在数组中找到目标值并返回其索引；如果目标值不存在于数组中，返回它按顺序插入的位置。算法时间复杂度必须为 O(log n)。  我的初始思路与核">
+<meta property="og:type" content="article">
+<meta property="og:title" content="算法刷题方法论记录（六）：二分查找——从边界踩坑到核心范式与模板固化">
+<meta property="og:url" content="https://zyxian31.github.io/2026/03/12/algo-notes-6/index.html">
+<meta property="og:site_name" content="ZYXian31&#39;s Blog">
+<meta property="og:description" content="题目一：二分查找（LeetCode 35. 搜索插入位置） 题目基础信息  题目链接：LeetCode 35. 搜索插入位置 题目难度：简单 核心考点：有序数组的二分查找、目标值插入位置定位、区间不变性把控 题目简述：给定一个升序排列的整数数组和一个目标值，在数组中找到目标值并返回其索引；如果目标值不存在于数组中，返回它按顺序插入的位置。算法时间复杂度必须为 O(log n)。  我的初始思路与核">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-03-11T16:26:00.000Z">
+<meta property="article:modified_time" content="2026-03-11T16:26:27.871Z">
+<meta property="article:author" content="ZYXian31">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="LeetCode">
+<meta property="article:tag" content="二分查找">
+<meta property="article:tag" content="数组">
+<meta property="article:tag" content="面试高频">
+<meta property="article:tag" content="方法论">
+<meta property="article:tag" content="模板">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>算法刷题方法论记录（六）：二分查找——从边界踩坑到核心范式与模板固化 - ZYXian31&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/custom-toc.css">
+<link rel="stylesheet" href="/css/custom-code.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"zyxian31.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":false,"default":"TEXT"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":6},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<!-- hexo injector head_end start --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="算法刷题方法论记录（六）：二分查找——从边界踩坑到核心范式与模板固化"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-03-12 00:26" pubdate>
+          2026年3月12日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          18k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          152 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">算法刷题方法论记录（六）：二分查找——从边界踩坑到核心范式与模板固化</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1>题目一：二分查找（LeetCode 35. 搜索插入位置）</h1>
+<h2 id="题目基础信息">题目基础信息</h2>
+<ul>
+<li>题目链接：LeetCode 35. 搜索插入位置</li>
+<li>题目难度：简单</li>
+<li>核心考点：有序数组的二分查找、目标值插入位置定位、区间不变性把控</li>
+<li>题目简述：给定一个升序排列的整数数组和一个目标值，在数组中找到目标值并返回其索引；如果目标值不存在于数组中，返回它按顺序插入的位置。算法时间复杂度必须为 O(log n)。</li>
+</ul>
+<h2 id="我的初始思路与核心痛点">我的初始思路与核心痛点</h2>
+<p>最初写这道题，我虽然知道要用二分查找，但全程是「凭模糊记忆堆代码」，核心问题非常突出：</p>
+<ol>
+<li>指针初始化纠结：不确定右边界<code>r</code>该写<code>len(nums)</code>还是<code>len(nums)-1</code>，全靠用例试错</li>
+<li>循环条件混乱：偶尔把<code>l &lt;= r</code>写成<code>l &lt; r</code>，完全不知道两者的适用场景</li>
+<li>指针更新无依据：<code>mid</code>不满足条件时，分不清该写<code>r = mid</code>还是<code>r = mid - 1</code></li>
+<li>返回值全靠蒙：循环结束后，不知道该返回<code>l</code>还是<code>r</code>，只能靠测试用例反推</li>
+</ol>
+<p>本质上，我只记住了二分查找的代码壳子，完全没理解背后的核心逻辑，更没有形成可复用、可推导的解题范式，换一道变种题就会再次踩坑。</p>
+<h2 id="核心认知突破：二分的本质是「区间定义驱动全流程逻辑」">核心认知突破：二分的本质是「区间定义驱动全流程逻辑」</h2>
+<p>这道题给我最大的收获，不是解出了题目本身，而是彻底搞懂了：<strong>二分查找的所有代码细节，都由你定义的「搜索区间」决定，全程必须坚守「区间不变性」</strong>。</p>
+<p>二分查找的核心，就是不断缩小搜索区间，直到找到目标值，或确定目标值的插入位置。而所有代码细节，都要和你最初定义的区间规则完全匹配，一旦规则不统一，必然会出现死循环、越界、结果错误等问题。</p>
+<h3 id="两种核心区间定义的全链路规则">两种核心区间定义的全链路规则</h3>
+<table>
+<thead>
+<tr>
+<th>区间类型</th>
+<th>初始化规则</th>
+<th>循环条件</th>
+<th>核心不变性</th>
+<th>循环结束状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>左闭右闭 <code>[l, r]</code></td>
+<td><code>l=0, r=len(nums)-1</code></td>
+<td><code>l &lt;= r</code></td>
+<td>目标值始终在闭区间<code>[l, r]</code>内，两个端点都可能是答案</td>
+<td><code>l &gt; r</code>，区间变为空集，<code>r</code>和<code>l</code>左右错位</td>
+</tr>
+<tr>
+<td>左闭右开 <code>[l, r)</code></td>
+<td><code>l=0, r=len(nums)</code></td>
+<td><code>l &lt; r</code></td>
+<td>目标值始终在左闭右开区间<code>[l, r)</code>内，左端点可能是答案，右端点不纳入搜索范围</td>
+<td><code>l == r</code>，区间收缩为一个点，该点即为目标位置</td>
+</tr>
+</tbody>
+</table>
+<h2 id="思路迁移范式：从「凭感觉写」到「按步骤推导」">思路迁移范式：从「凭感觉写」到「按步骤推导」</h2>
+<p>通过这道题，我固化了一套通用的二分查找解题四步范式，以后遇到任何二分题，都能按这个流程，从区间定义推导出全部代码，彻底告别死记硬背和试错。</p>
+<h3 id="范式四步走（100-适配所有二分基础题）">范式四步走（100%适配所有二分基础题）</h3>
+<ol>
+<li><strong>先定区间规则</strong>：优先选择左闭右开<code>[l, r)</code>（官方推荐，不易越界，适配场景更广），明确本次搜索的区间边界规则。</li>
+<li><strong>匹配循环条件</strong>：区间定义直接决定循环条件——闭区间用<code>l &lt;= r</code>，开区间用<code>l &lt; r</code>，确保循环结束时区间状态符合预期。</li>
+<li><strong>推导指针更新规则</strong>：全程坚守区间不变性，排除的元素绝不能再出现在后续搜索区间里：
+<ul>
+<li>若<code>nums[mid] &lt; target</code>：说明目标值在<code>mid</code>右侧，<code>mid</code>已被排除，两种区间都统一写<code>l = mid + 1</code></li>
+<li>若<code>nums[mid] &gt; target</code>：闭区间中<code>mid</code>已被排除，写<code>r = mid - 1</code>；开区间中<code>mid</code>仍在右边界范围内，写<code>r = mid</code></li>
+</ul>
+</li>
+<li><strong>确定最终返回值</strong>：两种区间规则下，循环结束后<strong>统一返回<code>l</code></strong>，无需纠结<code>l</code>和<code>r</code>的选择：
+<ul>
+<li>左闭右闭：循环结束时<code>nums[r] &lt; target &lt; nums[l]</code>，<code>l</code>就是插入位置</li>
+<li>左闭右开：循环结束时<code>l == r</code>，这个点就是目标值的位置/插入位置</li>
+</ul>
+</li>
+</ol>
+<h2 id="面试-复习专用：固化可直接复用的模板">面试&amp;复习专用：固化可直接复用的模板</h2>
+<p>我把面试最常考的4类二分场景，整理成了可直接套用的模板，后续刷题、复习、面试前复盘，都可以直接用，确保边界不出错。</p>
+<h3 id="1-基础模板1：左闭右闭区间（适用于精准查找元素）">1. 基础模板1：左闭右闭区间（适用于精准查找元素）</h3>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment"># 适用场景：精准查找目标值，找到返回索引，找不到返回-1</span>
+<span class="token keyword">def</span> <span class="token function">search</span><span class="token punctuation">(</span>nums<span class="token punctuation">,</span> target<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    l<span class="token punctuation">,</span> r <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>nums<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span>
+    <span class="token keyword">while</span> l <span class="token operator">&lt;=</span> r<span class="token punctuation">:</span>
+        mid <span class="token operator">=</span> <span class="token punctuation">(</span>l <span class="token operator">+</span> r<span class="token punctuation">)</span> <span class="token operator">//</span> <span class="token number">2</span>
+        <span class="token keyword">if</span> nums<span class="token punctuation">[</span>mid<span class="token punctuation">]</span> <span class="token operator">==</span> target<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> mid  <span class="token comment"># 找到目标值，直接返回索引</span>
+        <span class="token keyword">elif</span> nums<span class="token punctuation">[</span>mid<span class="token punctuation">]</span> <span class="token operator">&lt;</span> target<span class="token punctuation">:</span>
+            l <span class="token operator">=</span> mid <span class="token operator">+</span> <span class="token number">1</span>  <span class="token comment"># 目标值在右侧，收缩左边界</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            r <span class="token operator">=</span> mid <span class="token operator">-</span> <span class="token number">1</span>  <span class="token comment"># 目标值在左侧，收缩右边界</span>
+    <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span>  <span class="token comment"># 循环结束未找到，返回-1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<h3 id="2-基础模板2：左闭右闭区间（本题场景，查找插入位置）">2. 基础模板2：左闭右闭区间（本题场景，查找插入位置）</h3>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment"># 适用场景：本题的插入位置查找，找到返回索引，找不到返回插入位置</span>
+<span class="token keyword">def</span> <span class="token function">searchInsert</span><span class="token punctuation">(</span>nums<span class="token punctuation">,</span> target<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    l<span class="token punctuation">,</span> r <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>nums<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span>
+    <span class="token keyword">while</span> l <span class="token operator">&lt;=</span> r<span class="token punctuation">:</span>
+        mid <span class="token operator">=</span> <span class="token punctuation">(</span>l <span class="token operator">+</span> r<span class="token punctuation">)</span> <span class="token operator">//</span> <span class="token number">2</span>
+        <span class="token keyword">if</span> nums<span class="token punctuation">[</span>mid<span class="token punctuation">]</span> <span class="token operator">==</span> target<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> mid
+        <span class="token keyword">elif</span> nums<span class="token punctuation">[</span>mid<span class="token punctuation">]</span> <span class="token operator">&lt;</span> target<span class="token punctuation">:</span>
+            l <span class="token operator">=</span> mid <span class="token operator">+</span> <span class="token number">1</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            r <span class="token operator">=</span> mid <span class="token operator">-</span> <span class="token number">1</span>
+    <span class="token keyword">return</span> l  <span class="token comment"># 循环结束，l即为插入位置</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<h3 id="3-通用模板（最推荐，刷题-面试首选）">3. 通用模板（最推荐，刷题&amp;面试首选）</h3>
+<p>一个模板覆盖「插入位置、左边界查找（lower_bound）、区间查找」绝大多数场景，边界更安全，无需反复修改规则。</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment"># 核心能力：查找第一个 >= target 的元素索引（天然适配插入位置、左边界查找）</span>
+<span class="token comment"># 区间始终维持包含大于等于 target 的元素，当区间长度缩小到 1 的时候自然就</span>
+<span class="token comment"># 是第一个大于等于 target 的元素了</span>
+<span class="token keyword">def</span> <span class="token function">searchInsert</span><span class="token punctuation">(</span>nums<span class="token punctuation">,</span> target<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    l<span class="token punctuation">,</span> r <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>nums<span class="token punctuation">)</span>
+    <span class="token keyword">while</span> l <span class="token operator">&lt;</span> r<span class="token punctuation">:</span>
+        mid <span class="token operator">=</span> <span class="token punctuation">(</span>l <span class="token operator">+</span> r<span class="token punctuation">)</span> <span class="token operator">//</span> <span class="token number">2</span>
+        <span class="token keyword">if</span> nums<span class="token punctuation">[</span>mid<span class="token punctuation">]</span> <span class="token operator">&lt;</span> target<span class="token punctuation">:</span>
+            l <span class="token operator">=</span> mid <span class="token operator">+</span> <span class="token number">1</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            r <span class="token operator">=</span> mid
+    <span class="token keyword">return</span> l  <span class="token comment"># 循环结束l==r，直接返回</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<h3 id="4-拓展模板：右边界查找（upper-bound）">4. 拓展模板：右边界查找（upper_bound）</h3>
+<p>适用于查找第一个 &gt; target 的元素索引，适配区间查找等变种场景。</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">upper_bound</span><span class="token punctuation">(</span>nums<span class="token punctuation">,</span> target<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    l<span class="token punctuation">,</span> r <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>nums<span class="token punctuation">)</span>
+    <span class="token keyword">while</span> l <span class="token operator">&lt;</span> r<span class="token punctuation">:</span>
+        mid <span class="token operator">=</span> <span class="token punctuation">(</span>l <span class="token operator">+</span> r<span class="token punctuation">)</span> <span class="token operator">//</span> <span class="token number">2</span>
+        <span class="token keyword">if</span> nums<span class="token punctuation">[</span>mid<span class="token punctuation">]</span> <span class="token operator">&lt;=</span> target<span class="token punctuation">:</span>
+            l <span class="token operator">=</span> mid <span class="token operator">+</span> <span class="token number">1</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            r <span class="token operator">=</span> mid
+    <span class="token keyword">return</span> l<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<h2 id="面试高频避坑指南（刷题踩过的坑，提前规避）">面试高频避坑指南（刷题踩过的坑，提前规避）</h2>
+<ol>
+<li><strong>规则不统一是最大的坑</strong>：最常见的错误，就是初始化用了左闭右闭的<code>r = len(nums)-1</code>，指针更新却写了<code>r = mid</code>，直接导致死循环或结果错误，必须全程坚守区间不变性。</li>
+<li><strong>mid计算溢出问题</strong>：Python中整数无溢出风险，但Java、C++等语言，必须用<code>l + (r - l) // 2</code>替代<code>(l + r) // 2</code>，避免两数相加超出整数范围。</li>
+<li><strong>忽略二分的前提条件</strong>：二分查找的核心前提是「数组有序（或部分有序可判断区间取舍）」，不能对无序数组无脑套用二分模板。</li>
+<li><strong>不要死记返回值</strong>：一定要理解循环结束时的区间状态，而不是死记「返回l还是返回r」，换个变种场景就会出错。</li>
+</ol>
+<h2 id="后续复习与刷题计划">后续复习与刷题计划</h2>
+<ol>
+<li>用这套「四步范式」重刷力扣二分专题的基础题，每道题先写区间定义，再推导代码，而不是先写代码再调试，彻底固化思维模式。</li>
+<li>整理二分变种题（旋转有序数组、找峰值、二分答案类题目）的范式延伸，把这套区间逻辑迁移到更复杂的场景中。</li>
+<li>把上述模板做成速记卡，面试前10分钟快速过一遍，彻底解决二分的边界焦虑，确保基础题不丢分。</li>
+</ol>
+<hr>
+<p>二分查找是面试的基础必考题，看似代码简单，实则边界细节拉满。只有吃透「区间不变性」这个核心，才能从「碰运气写对」变成「100%一次写对」，把送分题稳稳拿住。</p>
+<h1>题目二：在排序数组中查找元素的第一个和最后一个位置（LeetCode 34）</h1>
+<h2 id="题目基础信息-2">题目基础信息</h2>
+<ul>
+<li>题目链接：LeetCode 34. 在排序数组中查找元素的第一个和最后一个位置</li>
+<li>题目难度：中等</li>
+<li>核心考点：有序数组二分左右边界查找、二分模板一致性、数组越界防护</li>
+<li>题目简述：给定一个按照升序排列的整数数组 <code>nums</code>，和一个目标值 <code>target</code>。找出给定目标值在数组中的开始位置和结束位置。如果数组中不存在目标值，返回 <code>[-1, -1]</code>，必须设计并实现时间复杂度为 <code>O(log n)</code> 的算法。</li>
+</ul>
+<h2 id="我的初始思路与核心痛点-2">我的初始思路与核心痛点</h2>
+<p>拿到题目，我的惯性思路是「拆分问题，分别实现」：既然要找左、右两个边界，那就写两段二分代码，第一段找左边界，第二段找右边界。但最终写出来的代码不仅有多处致命错误，还完全违背了之前固化的「区间定义驱动逻辑」的原则，核心问题集中在3点：</p>
+<ol>
+<li><strong>左边界越界检查缺失</strong>：左边界用了左闭右开<code>[l, r)</code>的模板，循环结束后直接访问<code>nums[r]</code>，但当<code>target</code>大于数组所有元素时，最终<code>l=r=len(nums)</code>，直接触发数组越界报错。</li>
+<li><strong>右边界代码触发死循环</strong>：为了找右边界，我临时拼凑了一套不伦不类的模板，用了向下取整的<code>mid=(l+r)//2</code>，满足条件时却写了<code>l=mid</code>，当区间收缩到<code>l</code>和<code>r</code>相邻时，<code>mid</code>会始终等于<code>l</code>，区间无法继续收缩，直接陷入无限循环。</li>
+<li><strong>逻辑混乱导致结果错误</strong>：变量命名与实际含义完全相反，把左边界存成了<code>rb</code>，最后返回时把右边界、左边界顺序写反，哪怕代码修好了边界问题，结果也完全错误。</li>
+</ol>
+<p>本质上，我陷入了「为不同场景硬套不同模板」的误区，之前记住的左闭右开区间规则，在写右边界时完全抛在了脑后，既没有坚守区间不变性，也没有找到统一的解题逻辑，越写越乱，全靠试错改代码。</p>
+<h2 id="核心认知突破：用「一个核心模板-数学转换」，替代多套零散模板">核心认知突破：用「一个核心模板+数学转换」，替代多套零散模板</h2>
+<p>这道题给我最大的收获，不是修好了代码里的bug，而是彻底打破了「不同边界要写不同二分代码」的惯性思维，建立了**「一模板通吃所有二分基础场景」**的核心认知：</p>
+<blockquote>
+<p>只需要记住<code>lower_bound</code>（找第一个<code>&gt;= target</code>的位置）这一个模板，就能通过简单的数学转换，同时解决左边界、右边界、插入位置、精准查找等所有基础二分场景。</p>
+</blockquote>
+<p>针对本题的核心转换逻辑：</p>
+<ul>
+<li>左边界 = <code>lower_bound(target)</code>（天然就是第一个<code>&gt;= target</code>的位置，完全匹配需求）</li>
+<li>右边界 = <code>lower_bound(target + 1) - 1</code>（第一个<code>&gt;= target+1</code>的位置，就是第一个大于<code>target</code>的位置，往前推一位就是最后一个等于<code>target</code>的位置）</li>
+</ul>
+<p>这个思路直接把「写两套容易出错的二分代码」，简化成了「两次调用同一个固定模板」，彻底规避了边界规则不统一、死循环、越界等问题。</p>
+<h2 id="思路迁移范式：从「拼凑多套模板」到「统一逻辑复用」">思路迁移范式：从「拼凑多套模板」到「统一逻辑复用」</h2>
+<p>通过这道题，我彻底完成了二分解题思路的范式升级，从原来的「场景化硬套代码」，转变为「核心逻辑复用」，具体迁移路径如下：</p>
+<h3 id="我的旧思路（错误、不可靠）">我的旧思路（错误、不可靠）</h3>
+<ol>
+<li>拆分问题：左边界要找第一个<code>&gt;= target</code>，右边界要找最后一个<code>&lt;= target</code></li>
+<li>为两个边界分别设计两套二分代码，分别定义区间、循环条件、指针更新规则</li>
+<li>分别处理两套代码的边界检查、返回值，最后拼接结果
+→ 核心问题：两套代码规则不统一，极易写错，调试成本极高，面试时很容易慌神出错。</li>
+</ol>
+<h3 id="最优解新思路（正确、可复用、零出错）">最优解新思路（正确、可复用、零出错）</h3>
+<ol>
+<li>固化核心逻辑：只写一次<code>lower_bound</code>模板，严格坚守左闭右开<code>[l, r)</code>的区间规则，永远不变</li>
+<li>数学转换需求：把左右边界的需求，都转换成对<code>lower_bound</code>的调用</li>
+<li>极简结果校验：只需要一次越界和存在性检查，就能完成结果校验
+→ 核心优势：模板完全固定，只需要记一套规则，没有任何需要临场发挥的内容，面试时100%稳定输出。</li>
+</ol>
+<h2 id="面试-复习专用：固化模板与本题实现">面试&amp;复习专用：固化模板与本题实现</h2>
+<h3 id="唯一需要记住的核心模板：lower-bound">唯一需要记住的核心模板：lower_bound</h3>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment"># 功能：查找有序数组中第一个 >= target 的元素索引</span>
+<span class="token comment"># 区间规则：左闭右开 [l, r)，全程坚守不变性</span>
+<span class="token keyword">def</span> <span class="token function">lower_bound</span><span class="token punctuation">(</span>nums<span class="token punctuation">,</span> target<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    l<span class="token punctuation">,</span> r <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>nums<span class="token punctuation">)</span>
+    <span class="token keyword">while</span> l <span class="token operator">&lt;</span> r<span class="token punctuation">:</span>
+        mid <span class="token operator">=</span> <span class="token punctuation">(</span>l <span class="token operator">+</span> r<span class="token punctuation">)</span> <span class="token operator">//</span> <span class="token number">2</span>
+        <span class="token keyword">if</span> nums<span class="token punctuation">[</span>mid<span class="token punctuation">]</span> <span class="token operator">&lt;</span> target<span class="token punctuation">:</span>
+            l <span class="token operator">=</span> mid <span class="token operator">+</span> <span class="token number">1</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            r <span class="token operator">=</span> mid
+    <span class="token keyword">return</span> l<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<h3 id="本题最终极简实现（面试首选）">本题最终极简实现（面试首选）</h3>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> typing <span class="token keyword">import</span> List
+
+<span class="token keyword">class</span> <span class="token class-name">Solution</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">searchRange</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> nums<span class="token punctuation">:</span> List<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target<span class="token punctuation">:</span> <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> List<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+        <span class="token comment"># 定义统一的lower_bound模板</span>
+        <span class="token keyword">def</span> <span class="token function">lower_bound</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            l<span class="token punctuation">,</span> r <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>nums<span class="token punctuation">)</span>
+            <span class="token keyword">while</span> l <span class="token operator">&lt;</span> r<span class="token punctuation">:</span>
+                mid <span class="token operator">=</span> <span class="token punctuation">(</span>l <span class="token operator">+</span> r<span class="token punctuation">)</span> <span class="token operator">//</span> <span class="token number">2</span>
+                <span class="token keyword">if</span> nums<span class="token punctuation">[</span>mid<span class="token punctuation">]</span> <span class="token operator">&lt;</span> x<span class="token punctuation">:</span>
+                    l <span class="token operator">=</span> mid <span class="token operator">+</span> <span class="token number">1</span>
+                <span class="token keyword">else</span><span class="token punctuation">:</span>
+                    r <span class="token operator">=</span> mid
+            <span class="token keyword">return</span> l
+        
+        <span class="token comment"># 两次调用模板，分别得到左右边界</span>
+        left <span class="token operator">=</span> lower_bound<span class="token punctuation">(</span>target<span class="token punctuation">)</span>
+        <span class="token comment"># 先校验目标值是否存在，避免越界</span>
+        <span class="token keyword">if</span> left <span class="token operator">==</span> <span class="token builtin">len</span><span class="token punctuation">(</span>nums<span class="token punctuation">)</span> <span class="token keyword">or</span> nums<span class="token punctuation">[</span>left<span class="token punctuation">]</span> <span class="token operator">!=</span> target<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span>
+        right <span class="token operator">=</span> lower_bound<span class="token punctuation">(</span>target <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span>
+        
+        <span class="token keyword">return</span> <span class="token punctuation">[</span>left<span class="token punctuation">,</span> right<span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<h3 id="模板的通用复用能力">模板的通用复用能力</h3>
+<p>这个模板不仅能解决本题，还能直接覆盖所有二分基础题，真正实现「刷一道通一类」：</p>
+<table>
+<thead>
+<tr>
+<th>经典题目/需求</th>
+<th>核心解法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LeetCode 35. 搜索插入位置</td>
+<td>直接返回 <code>lower_bound(nums, target)</code></td>
+</tr>
+<tr>
+<td>LeetCode 704. 二分查找</td>
+<td>拿到<code>pos=lower_bound(nums, target)</code>，校验后返回<code>pos</code>或<code>-1</code></td>
+</tr>
+<tr>
+<td>找最后一个 &lt; target 的位置</td>
+<td>返回 <code>lower_bound(nums, target) - 1</code></td>
+</tr>
+<tr>
+<td>找第一个 &gt; target 的位置（upper_bound）</td>
+<td>返回 <code>lower_bound(nums, target + 1)</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="面试高频避坑指南（踩过的坑，绝不再犯）">面试高频避坑指南（踩过的坑，绝不再犯）</h2>
+<ol>
+<li><strong>越界检查的顺序不能反</strong>：必须先判断<code>left == len(nums)</code>，再判断<code>nums[left] != target</code>，否则当<code>left</code>越界时，访问数组会直接报错。</li>
+<li><strong>永远不要为右边界单独写二分代码</strong>：只要用<code>lower_bound(target+1)-1</code>的写法，就能100%规避死循环、边界规则混乱的问题，没有任何例外。</li>
+<li><strong>模板规则必须全程坚守</strong>：<code>lower_bound</code>的区间、循环条件、指针更新规则，一个字都不要改，不要临场修改模板，避免出现规则不统一的错误。</li>
+<li><strong>变量命名必须语义清晰</strong>：左边界就叫<code>left</code>，右边界就叫<code>right</code>，不要用容易混淆的缩写，避免出现返回顺序颠倒的低级错误。</li>
+</ol>
+<h2 id="后续复习与固化计划">后续复习与固化计划</h2>
+<ol>
+<li><strong>彻底精简记忆内容</strong>：删掉脑子里所有零散的二分模板，只保留<code>lower_bound</code>这一个核心模板，形成肌肉记忆，做到10秒内无错写出。</li>
+<li><strong>用统一模板重刷二分基础题</strong>：用这个模板重新做LeetCode 35、704、34这三道核心题，彻底固化「模板+转换」的解题思路，不再走回头路。</li>
+<li><strong>拓展模板的变种场景</strong>：整理如何用这个模板解决旋转有序数组、二分答案等进阶场景，把这套统一逻辑迁移到更复杂的二分题中。</li>
+</ol>
+<hr>
+<p>这道题让我对二分查找的理解又上了一个台阶：算法刷题的核心从来不是记住越多模板越好，而是找到问题最本质的核心逻辑，用最简单、最稳定的方式，覆盖尽可能多的场景。从「记两套边界代码」到「只记一个模板」，不仅大幅降低了记忆负担，更让我在面试时能完全稳定输出，再也不会在二分题上踩坑。</p>
+<h1>题目三：搜索旋转排序数组（LeetCode 33）</h1>
+<h2 id="题目基础信息-3">题目基础信息</h2>
+<ul>
+<li>题目链接：LeetCode 33. 搜索旋转排序数组</li>
+<li>题目难度：中等</li>
+<li>核心考点：旋转有序数组的二分查找、有序区间判断、边界退化处理</li>
+<li>题目简述：整数数组 <code>nums</code> 按升序排列且值互不相同，在某个下标 <code>k</code> 上进行了旋转（例如 <code>[0,1,2,4,5,6,7]</code> 变为 <code>[4,5,6,7,0,1,2]</code>）。给定旋转后的数组和目标值 <code>target</code>，返回 <code>target</code> 的下标，不存在则返回 <code>-1</code>，必须设计时间复杂度为 <code>O(log n)</code> 的算法。</li>
+</ul>
+<h2 id="我的初始思路与核心痛点-3">我的初始思路与核心痛点</h2>
+<p>一开始拿到这题完全没思路，不知道旋转后的数组怎么用二分。后来知道了「至少一半有序」的核心，但自己写代码时还是踩了两个致命的边界坑：</p>
+<ol>
+<li><strong>有序区间判断漏了单元素情况</strong>：用 <code>nums[l] &lt; nums[mid]</code> 判断左边有序，没考虑当 <code>l == mid</code> 时（区间只剩1个元素），单元素也算有序，导致判断逻辑在边界收缩时失效。</li>
+<li><strong>区间判断重复包含已排除的 <code>mid</code></strong>：前面已经单独判断过 <code>nums[mid] == target</code>，但后面写有序区间判断时还是用了 <code>&lt;= nums[mid]</code> 或 <code>&gt;= nums[mid]</code>，逻辑不干净，虽然偶尔能过但容易出错。</li>
+</ol>
+<p>本质上，我对「二分边界退化场景」的理解完全缺失，只记住了「一半有序」的壳子，没搞清楚判断条件的细节，导致代码在边界情况（如 <code>nums = [3,1]</code>）下直接出错。</p>
+<h2 id="核心认知突破：记住「两个固定判断-一个边界意识」，直接套模板">核心认知突破：记住「两个固定判断 + 一个边界意识」，直接套模板</h2>
+<p>这道题的最优解不需要复杂思考，只要记住三个核心点，就能直接写出无错代码：</p>
+<ol>
+<li><strong>核心前提</strong>：旋转后的数组，任意二分后<strong>至少有一半是有序的</strong>（单元素区间也算有序）。</li>
+<li><strong>固定判断顺序</strong>：先判断 <code>nums[mid] == target</code>（找到直接返回），再判断哪边有序，最后判断 <code>target</code> 在不在这个有序区间里。</li>
+<li><strong>边界意识</strong>：判断有序用 <code>&lt;=</code>（包含单元素），判断区间用 <code>&lt;</code>/<code>&gt;</code>（排除已检查过的 <code>mid</code>）。</li>
+</ol>
+<h2 id="思路迁移范式：从「凭感觉写判断」到「三步固定流程」">思路迁移范式：从「凭感觉写判断」到「三步固定流程」</h2>
+<h3 id="我的旧思路（错误、不稳定）">我的旧思路（错误、不稳定）</h3>
+<ol>
+<li>知道要用二分，但不确定怎么处理旋转</li>
+<li>凭感觉写 <code>nums[l] &lt; nums[mid]</code> 判断有序</li>
+<li>区间判断随便写 <code>&lt;=</code>，没考虑 <code>mid</code> 已经被排除
+→ 核心问题：边界情况必错，调试全靠试错。</li>
+</ol>
+<h3 id="最优解新思路（固定、零出错）">最优解新思路（固定、零出错）</h3>
+<p>严格按照三步流程走，不需要临场发挥：</p>
+<ol>
+<li><strong>第一步：判 <code>mid</code></strong>：如果 <code>nums[mid] == target</code>，直接返回 <code>mid</code>。</li>
+<li><strong>第二步：判哪边有序</strong>：用 <code>nums[l] &lt;= nums[mid]</code> 判断左边是否有序（包含单元素），是则处理左边，否则处理右边。</li>
+<li><strong>第三步：判 <code>target</code> 在不在有序区间</strong>：
+<ul>
+<li>左边有序：判断 <code>nums[l] &lt;= target &lt; nums[mid]</code>，在则缩右边界，否则缩左边界。</li>
+<li>右边有序：判断 <code>nums[mid] &lt; target &lt;= nums[r]</code>，在则缩左边界，否则缩右边界。
+→ 核心优势：流程完全固定，没有任何需要临场思考的内容，边界情况100%稳定。</li>
+</ul>
+</li>
+</ol>
+<h2 id="面试-复习专用：直接背这个模板和记忆口诀">面试&amp;复习专用：直接背这个模板和记忆口诀</h2>
+<h3 id="唯一需要背的代码模板">唯一需要背的代码模板</h3>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> typing <span class="token keyword">import</span> List
+
+<span class="token keyword">class</span> <span class="token class-name">Solution</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">search</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> nums<span class="token punctuation">:</span> List<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target<span class="token punctuation">:</span> <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token builtin">int</span><span class="token punctuation">:</span>
+        l<span class="token punctuation">,</span> r <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>nums<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span>
+        
+        <span class="token keyword">while</span> l <span class="token operator">&lt;=</span> r<span class="token punctuation">:</span>
+            mid <span class="token operator">=</span> <span class="token punctuation">(</span>l <span class="token operator">+</span> r<span class="token punctuation">)</span> <span class="token operator">//</span> <span class="token number">2</span>
+            
+            <span class="token comment"># 第一步：先看mid是不是目标</span>
+            <span class="token keyword">if</span> nums<span class="token punctuation">[</span>mid<span class="token punctuation">]</span> <span class="token operator">==</span> target<span class="token punctuation">:</span>
+                <span class="token keyword">return</span> mid
+            
+            <span class="token comment"># 第二步：判断左边是否有序（&lt;= 包含单元素）</span>
+            <span class="token keyword">if</span> nums<span class="token punctuation">[</span>l<span class="token punctuation">]</span> <span class="token operator">&lt;=</span> nums<span class="token punctuation">[</span>mid<span class="token punctuation">]</span><span class="token punctuation">:</span>
+                <span class="token comment"># 第三步：判断target在不在左边有序区间（排除mid）</span>
+                <span class="token keyword">if</span> nums<span class="token punctuation">[</span>l<span class="token punctuation">]</span> <span class="token operator">&lt;=</span> target <span class="token operator">&lt;</span> nums<span class="token punctuation">[</span>mid<span class="token punctuation">]</span><span class="token punctuation">:</span>
+                    r <span class="token operator">=</span> mid <span class="token operator">-</span> <span class="token number">1</span>
+                <span class="token keyword">else</span><span class="token punctuation">:</span>
+                    l <span class="token operator">=</span> mid <span class="token operator">+</span> <span class="token number">1</span>
+            <span class="token comment"># 否则右边有序</span>
+            <span class="token keyword">else</span><span class="token punctuation">:</span>
+                <span class="token comment"># 第三步：判断target在不在右边有序区间（排除mid）</span>
+                <span class="token keyword">if</span> nums<span class="token punctuation">[</span>mid<span class="token punctuation">]</span> <span class="token operator">&lt;</span> target <span class="token operator">&lt;=</span> nums<span class="token punctuation">[</span>r<span class="token punctuation">]</span><span class="token punctuation">:</span>
+                    l <span class="token operator">=</span> mid <span class="token operator">+</span> <span class="token number">1</span>
+                <span class="token keyword">else</span><span class="token punctuation">:</span>
+                    r <span class="token operator">=</span> mid <span class="token operator">-</span> <span class="token number">1</span>
+        
+        <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<h3 id="超简单记忆口诀（三句话）">超简单记忆口诀（三句话）</h3>
+<ol>
+<li>先看 <code>mid</code> 对不对，对了直接回</li>
+<li>左边有序用 <code>&lt;=</code>，单元素也算</li>
+<li>区间判断排除 <code>mid</code>，左闭右开/右闭左开记清楚</li>
+</ol>
+<h2 id="面试高频避坑指南（踩过的坑，绝不再犯）-2">面试高频避坑指南（踩过的坑，绝不再犯）</h2>
+<ol>
+<li><strong>有序判断必须用 <code>&lt;=</code></strong>：哪怕数组元素互不相同，也要用 <code>nums[l] &lt;= nums[mid]</code>，因为当 <code>l == mid</code> 时，单元素区间必须被视为有序。</li>
+<li><strong>区间判断必须排除 <code>mid</code></strong>：前面已经单独判断过 <code>nums[mid] == target</code>，所以左边有序时写 <code>target &lt; nums[mid]</code>，右边有序时写 <code>nums[mid] &lt; target</code>，不要重复包含 <code>mid</code>。</li>
+<li><strong>循环条件用 <code>l &lt;= r</code></strong>：这题用左闭右闭区间 <code>[l, r]</code> 最直观，循环条件必须匹配，不要和左闭右开搞混。</li>
+<li><strong>不要尝试找旋转点再二分</strong>：直接用「一半有序」的思路，比先找旋转点再两次二分更简单、更不容易出错。</li>
+</ol>
+<h2 id="后续复习与固化计划-2">后续复习与固化计划</h2>
+<ol>
+<li><strong>把模板和口诀刻进脑子里</strong>：每天睡前默背一遍模板和三句口诀，确保10秒内能写出无错代码。</li>
+<li><strong>用这个模板重刷边界测试用例</strong>：专门刷 <code>nums = [3,1]</code>、<code>nums = [1,3]</code>、<code>nums = [1]</code> 这类边界情况，彻底固化边界意识。</li>
+<li><strong>整理「二分边界退化场景」</strong>：把普通二分、<code>lower_bound</code>、旋转数组搜索这三类题里的 <code>&lt;=</code>/<code>&lt;</code> 场景整理在一起，对比记忆，彻底搞懂边界退化的逻辑。</li>
+</ol>
+<hr>
+<p>这道题让我明白：<strong>中等难度的二分题，核心往往不是复杂的逻辑，而是对边界退化场景的精准把控</strong>。从「凭感觉写判断」到「三步固定流程」，不仅大幅降低了思考成本，更让我在面试时能完全稳定输出，再也不会在边界情况上慌神出错。</p>
+<h1>题目四：寻找旋转排序数组中的最小值（LeetCode 153）</h1>
+<h2 id="题目基础信息-4">题目基础信息</h2>
+<ul>
+<li>题目链接：LeetCode 153. 寻找旋转排序数组中的最小值</li>
+<li>题目难度：中等</li>
+<li>核心考点：旋转有序数组的极值二分查找、边界保留规则、判断逻辑简化</li>
+<li>题目简述：已知一个长度为 <code>n</code> 的升序排列数组，在预先未知的某个下标 <code>k</code> 上进行了旋转（例如 <code>[0,1,2,4,5,6,7]</code> 变为 <code>[4,5,6,7,0,1,2]</code>）。请找出并返回数组中的最小元素，必须设计时间复杂度为 <code>O(log n)</code> 的算法。</li>
+</ul>
+<h2 id="我的初始思路与核心痛点-4">我的初始思路与核心痛点</h2>
+<p>一开始我想沿用「搜索旋转数组 target」的思路，试图通过判断「左边有序/右边有序」来缩区间，但写出来的代码有三个致命问题：</p>
+<ol>
+<li><strong>直接丢掉了可能是答案的 <code>mid</code></strong>：用了找 target 时的 <code>r = mid - 1</code>，但在找最小值时，<code>nums[mid]</code> 本身就可能是最小值，直接排除会导致区间错乱。</li>
+<li><strong>判断逻辑过于复杂</strong>：试图同时比较 <code>nums[l]</code>、<code>nums[mid]</code>、<code>nums[r]</code> 三者关系，绕晕了自己，其实这题根本不需要这么复杂。</li>
+<li><strong>循环结束后忘了返回值</strong>：以为能在循环内直接找到答案，没意识到这题是通过缩区间到唯一值来得到结果，最后必须返回 <code>nums[l]</code>。</li>
+</ol>
+<p>本质上，我<strong>完全混淆了「找确定 target」和「找极值位置」的二分逻辑</strong>，把前一题的习惯直接套过来，既没搞懂这题的核心不变量，也没简化判断思路。</p>
+<h2 id="核心认知突破：记住「一个比较对象-一个保留原则」，直接套模板">核心认知突破：记住「一个比较对象 + 一个保留原则」，直接套模板</h2>
+<p>这道题的最优解比想象中简单得多，只要记住两个核心点，就能10秒写出无错代码：</p>
+<ol>
+<li><strong>只和右端点 <code>nums[r]</code> 比</strong>：不需要判断左右是否有序，只要看 <code>nums[mid]</code> 和 <code>nums[r]</code> 的大小，就能知道最小值在哪边。</li>
+<li><strong>可能是答案的 <code>mid</code> 必须保留</strong>：如果判断出最小值在左边，<code>mid</code> 自己也可能是最小值，所以要写 <code>r = mid</code>，不能写 <code>r = mid - 1</code>。</li>
+</ol>
+<h3 id="为什么只和-nums-r-比就够了？">为什么只和 <code>nums[r]</code> 比就够了？</h3>
+<p>旋转数组可以理解成「较大的一段 + 较小的一段」，比如 <code>[4,5,6,7,0,1,2]</code>，最小值右侧的「较小的一段」一定是升序的。所以：</p>
+<ul>
+<li>如果 <code>nums[mid] &gt; nums[r]</code>：说明 <code>mid</code> 在「较大的一段」，最小值一定在右边，写 <code>l = mid + 1</code>。</li>
+<li>如果 <code>nums[mid] &lt; nums[r]</code>：说明 <code>mid</code> 在「较小的一段」，最小值在左边（含 <code>mid</code>），写 <code>r = mid</code>。</li>
+</ul>
+<h2 id="思路迁移范式：从「套前一题思路」到「极简极值二分」">思路迁移范式：从「套前一题思路」到「极简极值二分」</h2>
+<h3 id="我的旧思路（错误、复杂、易丢答案）">我的旧思路（错误、复杂、易丢答案）</h3>
+<ol>
+<li>沿用找 target 的思路，试图判断「左边有序/右边有序」。</li>
+<li>同时比较 <code>nums[l]</code>、<code>nums[mid]</code>、<code>nums[r]</code> 三者，逻辑绕成一团。</li>
+<li>用 <code>r = mid - 1</code> 直接排除可能是答案的 <code>mid</code>。</li>
+<li>以为能在循环内直接返回，忘了最后返回唯一值。
+→ 核心问题：完全没区分「找 target」和「找极值」的逻辑，边界必错。</li>
+</ol>
+<h3 id="最优解新思路（极简、稳定、零出错）">最优解新思路（极简、稳定、零出错）</h3>
+<p>严格按照两步走，不需要任何复杂判断：</p>
+<ol>
+<li><strong>只和右端点比</strong>：<code>nums[mid] &gt; nums[r]</code> 就去右边，否则留左边（含 <code>mid</code>）。</li>
+<li><strong>循环结束返回唯一值</strong>：当 <code>l == r</code> 时，这个位置就是最小值，直接返回 <code>nums[l]</code>。
+→ 核心优势：逻辑极简，没有任何需要临场思考的内容，边界情况100%稳定。</li>
+</ol>
+<h2 id="面试-复习专用：直接背这个模板和记忆口诀-2">面试&amp;复习专用：直接背这个模板和记忆口诀</h2>
+<h3 id="唯一需要背的代码模板-2">唯一需要背的代码模板</h3>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> typing <span class="token keyword">import</span> List
+
+<span class="token keyword">class</span> <span class="token class-name">Solution</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">findMin</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> nums<span class="token punctuation">:</span> List<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token builtin">int</span><span class="token punctuation">:</span>
+        l<span class="token punctuation">,</span> r <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>nums<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span>
+        
+        <span class="token keyword">while</span> l <span class="token operator">&lt;</span> r<span class="token punctuation">:</span>
+            mid <span class="token operator">=</span> <span class="token punctuation">(</span>l <span class="token operator">+</span> r<span class="token punctuation">)</span> <span class="token operator">//</span> <span class="token number">2</span>
+            
+            <span class="token comment"># 只和右端点比：大了去右，小了留左（含mid）</span>
+            <span class="token keyword">if</span> nums<span class="token punctuation">[</span>mid<span class="token punctuation">]</span> <span class="token operator">></span> nums<span class="token punctuation">[</span>r<span class="token punctuation">]</span><span class="token punctuation">:</span>
+                l <span class="token operator">=</span> mid <span class="token operator">+</span> <span class="token number">1</span>
+            <span class="token keyword">else</span><span class="token punctuation">:</span>
+                r <span class="token operator">=</span> mid
+        
+        <span class="token comment"># 循环结束l==r，直接返回</span>
+        <span class="token keyword">return</span> nums<span class="token punctuation">[</span>l<span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<h3 id="超简单记忆口诀（两句话）">超简单记忆口诀（两句话）</h3>
+<ol>
+<li>和右端比，大了去右，小了留左</li>
+<li>循环结束，l等于r，直接返回</li>
+</ol>
+<h2 id="面试高频避坑指南（踩过的坑，绝不再犯）-3">面试高频避坑指南（踩过的坑，绝不再犯）</h2>
+<ol>
+<li><strong>绝对不要写 <code>r = mid - 1</code></strong>：找最小值时，<code>nums[mid]</code> 可能就是答案，必须保留，只能写 <code>r = mid</code>。</li>
+<li><strong>绝对不要和 <code>nums[l]</code> 比</strong>：这题不需要判断左右是否有序，只和 <code>nums[r]</code> 比是最直接、最不容易绕晕的方法。</li>
+<li><strong>绝对不要忘循环结束后返回值</strong>：这题不是在循环内找答案，而是通过缩区间到唯一值来得到结果，最后必须返回 <code>nums[l]</code>。</li>
+<li><strong>不要混淆「找 target」和「找极值」的二分</strong>：找 target 可以排除 mid，找极值时要先问自己「mid 会不会是答案」，会的话就必须保留。</li>
+</ol>
+<h2 id="后续复习与固化计划-3">后续复习与固化计划</h2>
+<ol>
+<li><strong>把模板和口诀刻进脑子里</strong>：每天睡前默背一遍模板和两句口诀，确保10秒内能写出无错代码。</li>
+<li><strong>用这个模板重刷边界测试用例</strong>：专门刷 <code>nums = [3,1,2]</code>、<code>nums = [1,2,3]</code>、<code>nums = [2,1]</code> 这类边界情况，彻底固化「保留 mid」的意识。</li>
+<li><strong>对比「找 target」和「找极值」的二分</strong>：把 LeetCode 33 和 153 放在一起对比，总结两者在「比较对象」、「边界更新」、「返回方式」上的区别，彻底搞懂两类二分的逻辑差异。</li>
+</ol>
+<hr>
+<p>这道题让我彻底明白：<strong>不同的二分场景，核心逻辑完全不同，不能盲目套前一题的思路</strong>。从「复杂的三者判断」到「极简的和右端点比」，不仅大幅降低了思考成本，更让我理解了「二分核心不变量」的重要性——找极值时，必须始终保证「答案一定在当前区间里」。</p>
+<h1>题目五：寻找两个正序数组的中位数（LeetCode 4）</h1>
+<h2 id="题目基础信息-5">题目基础信息</h2>
+<ul>
+<li>题目链接：LeetCode 4. 寻找两个正序数组的中位数</li>
+<li>题目难度：困难</li>
+<li>核心考点：双有序数组的二分切分、中位数本质转换、边界越界处理、单调性空间利用</li>
+<li>题目简述：给定两个大小分别为 <code>m</code> 和 <code>n</code> 的正序（从小到大）数组 <code>nums1</code> 和 <code>nums2</code>，请找出并返回这两个正序数组的<strong>中位数</strong>，算法时间复杂度必须为 <code>O(log (m+n))</code>。</li>
+</ul>
+<h2 id="我的初始思路与核心痛点-5">我的初始思路与核心痛点</h2>
+<p>一开始完全没思路，第一反应是「合并两个有序数组再直接取中位数」，但这个方法复杂度是 <code>O(m+n)</code>，不符合题目要求。核心痛点集中在3点：</p>
+<ol>
+<li><strong>不知道怎么不合并数组找中位数</strong>：对中位数的理解只停留在「合并后中间的数」，没挖到更本质的逻辑。</li>
+<li><strong>对 <code>O(log(m+n))</code> 没方向</strong>：不知道怎么在两个独立的有序数组上用二分，找不到单调性在哪里。</li>
+<li><strong>越界和边界处理完全没概念</strong>：想象不到两个数组切分后会有什么边界情况，不知道怎么处理。</li>
+</ol>
+<p>本质上，我既<strong>没完成「中位数→切分」的本质转换</strong>，也<strong>没找到这题的单调性空间</strong>，完全被「两个数组」的形式吓住了。</p>
+<h2 id="核心认知突破：记住「一个本质转换-四个固定步骤」，直接套模板">核心认知突破：记住「一个本质转换 + 四个固定步骤」，直接套模板</h2>
+<p>这题虽然是困难题，但只要记住四个核心认知点，就能把它拆解成机械的步骤：</p>
+<ol>
+<li><strong>本质转换</strong>：中位数不是「合并后的中间数」，而是「找到一个切分，把所有数分成左右两半，左半部分总数固定，且左半部分所有元素 ≤ 右半部分所有元素」。</li>
+<li><strong>左边总数固定</strong>：左半部分总个数统一为 <code>(m + n + 1) // 2</code>，奇数时左边多1个，偶数时左右一样多，一套公式覆盖两种情况。</li>
+<li><strong>只二分短数组</strong>：为了避免被动算出的 <code>j</code> 越界，只在更短的数组 <code>nums1</code> 上二分切分位置 <code>i</code>，长数组的切分位置 <code>j</code> 由 <code>j = (m + n + 1) // 2 - i</code> 直接推出。</li>
+<li><strong>检查四个边界值</strong>：切分后关注四个数：<code>nums1</code> 左最大值、<code>nums1</code> 右最小值、<code>nums2</code> 左最大值、<code>nums2</code> 右最小值，只要满足「<code>nums1左 &lt;= nums2右</code> 且 <code>nums2左 &lt;= nums1右</code>」，切分就正确。</li>
+</ol>
+<h3 id="为什么能二分？">为什么能二分？</h3>
+<p>因为切分位置 <code>i</code> 具有单调性：</p>
+<ul>
+<li>如果 <code>nums1左 &gt; nums2右</code>：说明 <code>nums1</code> 左边切太多了，<code>i</code> 要往左缩。</li>
+<li>如果 <code>nums2左 &gt; nums1右</code>：说明 <code>nums1</code> 左边切太少了，<code>i</code> 要往右扩。
+这就是单调性，所以可以二分 <code>i</code>。</li>
+</ul>
+<h2 id="思路迁移范式：从「想合并数组」到「二分切分位置」">思路迁移范式：从「想合并数组」到「二分切分位置」</h2>
+<h3 id="我的旧思路（错误、复杂度不达标）">我的旧思路（错误、复杂度不达标）</h3>
+<ol>
+<li>合并两个有序数组，得到一个大的有序数组。</li>
+<li>根据总长度的奇偶性，直接取中间的一个或两个数的平均值。
+→ 核心问题：复杂度是 <code>O(m+n)</code>，不符合题目要求的 <code>O(log(m+n))</code>，且完全没用到二分。</li>
+</ol>
+<h3 id="最优解新思路（固定、复杂度达标、可机械执行）">最优解新思路（固定、复杂度达标、可机械执行）</h3>
+<p>严格按照五步走，不需要任何复杂思考：</p>
+<ol>
+<li><strong>先交换数组</strong>：保证 <code>nums1</code> 是更短的那个，避免 <code>j</code> 越界。</li>
+<li><strong>固定左边总数</strong>：计算 <code>total_left = (m + n + 1) // 2</code>。</li>
+<li><strong>二分短数组的 <code>i</code></strong>：<code>i</code> 的范围是 <code>0 ~ m</code>（表示 <code>nums1</code> 左边取 <code>i</code> 个元素）。</li>
+<li><strong>推出 <code>j</code> 并取四个边界值</strong>：<code>j = total_left - i</code>，用 <code>-inf</code> 和 <code>inf</code> 处理切在数组两端的边界情况。</li>
+<li><strong>检查切分并计算中位数</strong>：满足交叉边界条件后，奇数返回左半部分最大值，偶数返回左半最大值和右半最小值的平均值。
+→ 核心优势：把困难题拆解成了机械步骤，每一步都有固定的写法，不需要临场发挥。</li>
+</ol>
+<h2 id="面试-复习专用：直接背这个模板和记忆口诀-3">面试&amp;复习专用：直接背这个模板和记忆口诀</h2>
+<h3 id="唯一需要背的代码模板-3">唯一需要背的代码模板</h3>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> typing <span class="token keyword">import</span> List
+
+<span class="token keyword">class</span> <span class="token class-name">Solution</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">findMedianSortedArrays</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> nums1<span class="token punctuation">:</span> List<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">,</span> nums2<span class="token punctuation">:</span> List<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token builtin">float</span><span class="token punctuation">:</span>
+        <span class="token comment"># 第一步：保证 nums1 是更短的数组，避免 j 越界</span>
+        <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>nums1<span class="token punctuation">)</span> <span class="token operator">></span> <span class="token builtin">len</span><span class="token punctuation">(</span>nums2<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            nums1<span class="token punctuation">,</span> nums2 <span class="token operator">=</span> nums2<span class="token punctuation">,</span> nums1
+        
+        m<span class="token punctuation">,</span> n <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>nums1<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>nums2<span class="token punctuation">)</span>
+        <span class="token comment"># 第二步：固定左半部分总个数</span>
+        total_left <span class="token operator">=</span> <span class="token punctuation">(</span>m <span class="token operator">+</span> n <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">//</span> <span class="token number">2</span>
+        
+        <span class="token comment"># 第三步：二分短数组的切分位置 i（0 &lt;= i &lt;= m）</span>
+        l<span class="token punctuation">,</span> r <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> m
+        <span class="token keyword">while</span> l <span class="token operator">&lt;=</span> r<span class="token punctuation">:</span>
+            i <span class="token operator">=</span> <span class="token punctuation">(</span>l <span class="token operator">+</span> r<span class="token punctuation">)</span> <span class="token operator">//</span> <span class="token number">2</span>
+            j <span class="token operator">=</span> total_left <span class="token operator">-</span> i
+            
+            <span class="token comment"># 第四步：取四个边界值，用 -inf/inf 处理边界情况</span>
+            nums1_left <span class="token operator">=</span> nums1<span class="token punctuation">[</span>i<span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token keyword">if</span> i <span class="token operator">></span> <span class="token number">0</span> <span class="token keyword">else</span> <span class="token builtin">float</span><span class="token punctuation">(</span><span class="token string">'-inf'</span><span class="token punctuation">)</span>
+            nums1_right <span class="token operator">=</span> nums1<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token keyword">if</span> i <span class="token operator">&lt;</span> m <span class="token keyword">else</span> <span class="token builtin">float</span><span class="token punctuation">(</span><span class="token string">'inf'</span><span class="token punctuation">)</span>
+            nums2_left <span class="token operator">=</span> nums2<span class="token punctuation">[</span>j<span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token keyword">if</span> j <span class="token operator">></span> <span class="token number">0</span> <span class="token keyword">else</span> <span class="token builtin">float</span><span class="token punctuation">(</span><span class="token string">'-inf'</span><span class="token punctuation">)</span>
+            nums2_right <span class="token operator">=</span> nums2<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token keyword">if</span> j <span class="token operator">&lt;</span> n <span class="token keyword">else</span> <span class="token builtin">float</span><span class="token punctuation">(</span><span class="token string">'inf'</span><span class="token punctuation">)</span>
+            
+            <span class="token comment"># 第五步：检查切分并计算中位数</span>
+            <span class="token keyword">if</span> nums1_left <span class="token operator">&lt;=</span> nums2_right <span class="token keyword">and</span> nums2_left <span class="token operator">&lt;=</span> nums1_right<span class="token punctuation">:</span>
+                <span class="token comment"># 切分正确，根据奇偶性返回</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>m <span class="token operator">+</span> n<span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">2</span> <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">:</span>
+                    <span class="token keyword">return</span> <span class="token builtin">max</span><span class="token punctuation">(</span>nums1_left<span class="token punctuation">,</span> nums2_left<span class="token punctuation">)</span>
+                <span class="token keyword">else</span><span class="token punctuation">:</span>
+                    <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token builtin">max</span><span class="token punctuation">(</span>nums1_left<span class="token punctuation">,</span> nums2_left<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token builtin">min</span><span class="token punctuation">(</span>nums1_right<span class="token punctuation">,</span> nums2_right<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">2</span>
+            <span class="token keyword">elif</span> nums1_left <span class="token operator">></span> nums2_right<span class="token punctuation">:</span>
+                <span class="token comment"># nums1 左边切太多了，i 往左缩</span>
+                r <span class="token operator">=</span> i <span class="token operator">-</span> <span class="token number">1</span>
+            <span class="token keyword">else</span><span class="token punctuation">:</span>
+                <span class="token comment"># nums1 左边切太少了，i 往右扩</span>
+                l <span class="token operator">=</span> i <span class="token operator">+</span> <span class="token number">1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<h3 id="超简单记忆口诀（四句话）">超简单记忆口诀（四句话）</h3>
+<ol>
+<li>中位数是切分，不是合并</li>
+<li>左边总数固定，短数组二分</li>
+<li>四个边界值，交叉比大小</li>
+<li>奇返左最大，偶返平均好</li>
+</ol>
+<h2 id="面试高频避坑指南（踩过的坑，绝不再犯）-4">面试高频避坑指南（踩过的坑，绝不再犯）</h2>
+<ol>
+<li><strong>必须先交换数组保证 nums1 更短</strong>：这是避免 <code>j</code> 越界的关键，哪怕 nums1 一开始更长，也要先交换。</li>
+<li><strong>切分位置 i 的范围是 0 ~ m</strong>：<code>i</code> 不是元素下标，而是「nums1 左边取 i 个元素」，所以可以取 0（左边不取）或 m（左边全取）。</li>
+<li><strong>边界情况必须用 -inf 和 inf 处理</strong>：当 <code>i=0</code> 时，nums1 左边没有元素，最大值设为 <code>-inf</code>；当 <code>i=m</code> 时，nums1 右边没有元素，最小值设为 <code>inf</code>，这样判断公式能统一。</li>
+<li><strong>判断条件是交叉比较，不是同侧比较</strong>：必须是 <code>nums1_left &lt;= nums2_right</code> 且 <code>nums2_left &lt;= nums1_right</code>，不是同侧比较，这是保证「左半部分所有元素 ≤ 右半部分所有元素」的核心。</li>
+<li><strong>不要尝试在两个数组上都二分</strong>：只二分短数组的 <code>i</code>，<code>j</code> 由公式推出，这样复杂度才是 <code>O(log(min(m,n)))</code>，优于题目要求的 <code>O(log(m+n))</code>。</li>
+</ol>
+<h2 id="后续复习与固化计划-4">后续复习与固化计划</h2>
+<ol>
+<li><strong>手推两个示例</strong>：用草稿纸亲手推一遍示例1（<code>nums1=[1,3], nums2=[2]</code>）和示例2（<code>nums1=[1,2], nums2=[3,4]</code>），彻底搞懂每一步的含义。</li>
+<li><strong>把模板和口诀刻进脑子里</strong>：每天睡前默背一遍模板和四句口诀，确保能在1分钟内写出无错代码。</li>
+<li><strong>整理二分的三种类型</strong>：把「有序数组上的二分」、「二分答案」、「二分切分位置」这三类题放在一起对比，总结它们的「单调性空间」、「比较对象」、「边界更新」的区别，彻底建立二分的底层思维。</li>
+</ol>
+<hr>
+<p>这道题让我彻底明白：<strong>困难题的核心往往不是复杂的逻辑，而是「本质转换」——把一个陌生的问题，转换成一个已知的、可解决的问题</strong>。从「想合并数组」到「二分切分位置」，不仅满足了复杂度要求，更让我理解了「单调性空间不一定是数组本身，也可以是切分位置、答案空间」这一二分的底层逻辑。</p>
+<h1>题目六：有效的括号（LeetCode 20）</h1>
+<h2 id="题目基础信息-6">题目基础信息</h2>
+<ul>
+<li>题目链接：LeetCode 20. 有效的括号</li>
+<li>题目难度：简单</li>
+<li>核心考点：栈的应用、括号匹配映射、代码简洁性优化、前置剪枝</li>
+<li>题目简述：给定一个只包括 <code>'('</code>、<code>')'</code>、<code>'&#123;'</code>、<code>'&#125;'</code>、<code>'['</code>、<code>']'</code> 的字符串 <code>s</code>，判断字符串是否有效。有效字符串需满足：左括号必须用相同类型的右括号闭合，左括号必须以正确的顺序闭合，每个右括号都有一个对应的相同类型的左括号。</li>
+</ul>
+<h2 id="我的初始思路与核心痛点-6">我的初始思路与核心痛点</h2>
+<p>我的初始思路是<strong>标准的「栈 + 映射匹配」</strong>，逻辑完全正确：遇到左括号入栈，遇到右括号则出栈匹配，最后检查栈是否为空。但代码写得比较啰嗦，核心问题集中在3点：</p>
+<ol>
+<li><strong>用了索引循环但没用到索引</strong>：写了 <code>for i in range(n)</code> 再取 <code>s[i]</code>，但完全不需要索引，多了一层冗余。</li>
+<li><strong>连续失败判断分开写</strong>：把「栈空」和「括号不匹配」分成了两次 <code>if</code> 判断，还多了一个只用一次的临时变量 <code>left</code>。</li>
+<li><strong>布尔值用了三元表达式</strong>：最后写了 <code>return True if not stack else False</code>，但 <code>not stack</code> 本身就是布尔值，多此一举。</li>
+</ol>
+<p>本质上，我<strong>逻辑拆分很稳，但还没形成「短代码机械压缩规则」</strong>，能写对但写不够简洁，面试时会浪费时间，也不够 Pythonic。</p>
+<h2 id="核心认知突破：记住「一个前置剪枝-五个短代码转换规则」，快速压缩代码">核心认知突破：记住「一个前置剪枝 + 五个短代码转换规则」，快速压缩代码</h2>
+<p>这道题的核心认知不是算法本身（算法很标准），而是<strong>如何把「稳但啰嗦」的代码，快速压缩成「简洁且不丢逻辑」的代码</strong>，再加上一个前置剪枝优化：</p>
+<ol>
+<li><strong>前置剪枝优化</strong>：括号必须成对出现，所以如果字符串长度是奇数，直接返回 <code>False</code>，这是典型的「必要条件提前判断」，能在很多输入下提前返回。</li>
+<li><strong>五个短代码转换规则</strong>（机械套用，不影响正确性）：
+<ul>
+<li>不用索引就别写 <code>range(n)</code>，直接 <code>for c in s</code>。</li>
+<li>连续「失败即返回 False」的逻辑，用 <code>or</code> 合并成一个判断。</li>
+<li>只用一次的临时变量，直接内联，不要单独赋值。</li>
+<li>布尔表达式本身就是 <code>True/False</code>，直接 <code>return</code>，不要包三元表达式。</li>
+<li>变量名按「语义最短」来缩，比如 <code>valid</code> 改成 <code>pairs</code> 或 <code>match</code>。</li>
+</ul>
+</li>
+</ol>
+<h2 id="思路迁移范式：从「稳但啰嗦」到「简洁稳定」">思路迁移范式：从「稳但啰嗦」到「简洁稳定」</h2>
+<h3 id="我的旧思路（正确但啰嗦）">我的旧思路（正确但啰嗦）</h3>
+<ol>
+<li>先算字符串长度 <code>n</code>，用 <code>for i in range(n)</code> 循环。</li>
+<li>遇到右括号时，先判断栈空，再出栈赋值给临时变量，再判断是否匹配。</li>
+<li>最后用三元表达式返回布尔值。
+→ 核心问题：逻辑正确，但有很多冗余，不够简洁。</li>
+</ol>
+<h3 id="最优解新思路（简洁且稳定，机械套用规则）">最优解新思路（简洁且稳定，机械套用规则）</h3>
+<p>严格按照四步走，快速压缩代码：</p>
+<ol>
+<li><strong>前置剪枝</strong>：先判断 <code>len(s) % 2</code>，奇数直接返回 <code>False</code>。</li>
+<li><strong>直接遍历字符</strong>：把 <code>for i in range(n)</code> 改成 <code>for c in s</code>。</li>
+<li><strong>合并失败判断</strong>：把「栈空」和「不匹配」合并成 <code>if not stack or stack.pop() != pairs[c]</code>。</li>
+<li><strong>直接返回布尔值</strong>：把三元表达式改成 <code>return not stack</code>。
+→ 核心优势：逻辑完全没变，但代码更短、更 Pythonic，面试时能快速写出来。</li>
+</ol>
+<h2 id="面试-复习专用：直接背这个简洁模板和记忆口诀">面试&amp;复习专用：直接背这个简洁模板和记忆口诀</h2>
+<h3 id="唯一需要背的简洁代码模板">唯一需要背的简洁代码模板</h3>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> typing <span class="token keyword">import</span> List
+
+<span class="token keyword">class</span> <span class="token class-name">Solution</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">isValid</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> s<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token builtin">bool</span><span class="token punctuation">:</span>
+        <span class="token comment"># 前置剪枝：奇数长度直接返回False</span>
+        <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">2</span><span class="token punctuation">:</span>
+            <span class="token keyword">return</span> <span class="token boolean">False</span>
+        
+        stack <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token comment"># 右括号映射到对应左括号</span>
+        pairs <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token string">')'</span><span class="token punctuation">:</span> <span class="token string">'('</span><span class="token punctuation">,</span> <span class="token string">']'</span><span class="token punctuation">:</span> <span class="token string">'['</span><span class="token punctuation">,</span> <span class="token string">'&#125;'</span><span class="token punctuation">:</span> <span class="token string">'&#123;'</span><span class="token punctuation">&#125;</span>
+        
+        <span class="token keyword">for</span> c <span class="token keyword">in</span> s<span class="token punctuation">:</span>
+            <span class="token keyword">if</span> c <span class="token keyword">in</span> pairs<span class="token punctuation">:</span>
+                <span class="token comment"># 合并失败判断：栈空或不匹配直接返回False</span>
+                <span class="token keyword">if</span> <span class="token keyword">not</span> stack <span class="token keyword">or</span> stack<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!=</span> pairs<span class="token punctuation">[</span>c<span class="token punctuation">]</span><span class="token punctuation">:</span>
+                    <span class="token keyword">return</span> <span class="token boolean">False</span>
+            <span class="token keyword">else</span><span class="token punctuation">:</span>
+                stack<span class="token punctuation">.</span>append<span class="token punctuation">(</span>c<span class="token punctuation">)</span>
+        
+        <span class="token comment"># 直接返回布尔表达式</span>
+        <span class="token keyword">return</span> <span class="token keyword">not</span> stack<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<h3 id="超简单记忆口诀（两句话）-2">超简单记忆口诀（两句话）</h3>
+<ol>
+<li>奇数直接回，栈加映射对</li>
+<li>遍历不用索引，失败合并判断，布尔直接返回</li>
+</ol>
+<h2 id="面试高频避坑指南（踩过的坑，绝不再犯）-5">面试高频避坑指南（踩过的坑，绝不再犯）</h2>
+<ol>
+<li><strong>不要为了短而短</strong>：短代码的前提是「不损失可读性」，不要追求极限压缩（比如把多行写成一行用分号隔开），那样反而容易错，也不利于复盘。</li>
+<li><strong>前置剪枝不要忘</strong>：奇数长度提前返回是很有效的优化，虽然不影响时间复杂度，但能在很多输入下提前结束，性能更好。</li>
+<li><strong>映射的键值对不要搞反</strong>：要让「右括号作为键，映射到对应左括号」，这样遇到右括号时能直接查映射，不要搞反成左括号作为键。</li>
+<li><strong>最后一定要检查栈是否为空</strong>：比如输入 <code>'('</code>，栈里还有元素，必须返回 <code>False</code>，不要忘了这一步。</li>
+</ol>
+<h2 id="后续复习与固化计划-5">后续复习与固化计划</h2>
+<ol>
+<li><strong>把五个短代码转换规则刻进脑子里</strong>：每次写完代码，都用这五个规则扫一遍，快速压缩冗余。</li>
+<li><strong>练习「先写正确，再压简洁」</strong>：不要一开始就追求写最短，先写一个逻辑正确的版本，再按规则压缩，这样更稳。</li>
+<li><strong>整理「从啰嗦到精炼」的通用 checklist</strong>：把最近几道题里的压缩规则整理在一起，形成一个通用的 checklist，以后写代码时快速对照。</li>
+</ol>
+<hr>
+<p>这道题让我明白：<strong>简单题的核心不是算法本身，而是「代码质量」——如何把正确的代码，写得更简洁、更专业、更符合语言习惯</strong>。从「稳但啰嗦」到「简洁稳定」，不仅能在面试时节省时间，更能培养良好的编码习惯，为以后写复杂代码打下基础。</p>
+<h1>题目七：最小栈（LeetCode 155）</h1>
+<h2 id="题目基础信息-7">题目基础信息</h2>
+<ul>
+<li>题目链接：LeetCode 155. 最小栈</li>
+<li>题目难度：中等</li>
+<li>核心考点：栈的辅助信息维护、O(1) 极值查询、历史信息编码、差值法技巧</li>
+<li>题目简述：设计一个支持 <code>push</code>、<code>pop</code>、<code>top</code> 操作，并能在常数时间内检索到最小元素的栈。实现 <code>MinStack</code> 类：<code>MinStack()</code> 初始化堆栈对象；<code>void push(int val)</code> 将元素推入堆栈；<code>void pop()</code> 删除堆栈顶部的元素；<code>int top()</code> 获取堆栈顶部的元素；<code>int getMin()</code> 获取堆栈中的最小元素。</li>
+</ul>
+<h2 id="我的初始思路与核心痛点-7">我的初始思路与核心痛点</h2>
+<p>一开始我知道普通栈只能保证栈顶操作 O(1)，但 <code>getMin()</code> 做不到，核心痛点集中在3点：</p>
+<ol>
+<li><strong>本能想“查询时再算”</strong>：觉得栈就存元素，要最小值时再遍历，完全不符合 O(1) 要求。</li>
+<li><strong>尝试用单个变量存最小值</strong>：维护一个 <code>min_val</code>，但 <code>pop()</code> 时会丢失历史最小值——比如弹出当前最小值后，不知道上一个最小值是谁。</li>
+<li><strong>对“单栈存差值”完全没思路</strong>：不知道如何在不使用辅助栈的情况下，把历史最小值的信息保存下来。</li>
+</ol>
+<p>本质上，我<strong>还没建立「更新时维护答案，而不是查询时再计算」的思维</strong>，也不知道可以「把辅助信息编码进栈元素本身」。</p>
+<h2 id="核心认知突破：记住「一个思维转变-一个编码技巧」，推导出差值法">核心认知突破：记住「一个思维转变 + 一个编码技巧」，推导出差值法</h2>
+<p>这道题的核心认知不是背代码，而是<strong>理解从“普通思路”到“差值法”的推导路径</strong>，只要记住两个关键点，就能自己推导出算法：</p>
+<ol>
+<li><strong>思维转变</strong>：从「查询时计算」转为「更新时维护」——不要等 <code>getMin()</code> 时再找，而是在每次 <code>push</code>/<code>pop</code> 时，顺手把“当前最小值”的信息存好。</li>
+<li><strong>编码技巧</strong>：把历史最小值编码进栈里——不直接存原值，而是存 <code>val - 当前最小值</code> 的差值，用「<code>diff &lt; 0</code>」作为“这里更新了最小值”的信号。</li>
+</ol>
+<h3 id="差值法的核心逻辑（自己就能推）">差值法的核心逻辑（自己就能推）</h3>
+<ol>
+<li><strong>先想变量存 <code>min_val</code></strong>：发现 <code>pop()</code> 会丢历史，必须把历史信息存下来。</li>
+<li><strong>不想用辅助栈</strong>：那就把信息编码进栈元素里——存 <code>diff = val - min_val</code>。</li>
+<li><strong>用 <code>diff</code> 的符号做信号</strong>：
+<ul>
+<li>如果 <code>diff &gt;= 0</code>：说明 <code>val &gt;= min_val</code>，最小值没变化，原值可以用 <code>min_val + diff</code> 恢复。</li>
+<li>如果 <code>diff &lt; 0</code>：说明 <code>val &lt; min_val</code>，这里更新了最小值，<code>pop()</code> 时可以用 <code>min_val - diff</code> 恢复旧最小值。</li>
+</ul>
+</li>
+</ol>
+<h2 id="思路迁移范式：从「普通栈」到「差值法」的四步推导">思路迁移范式：从「普通栈」到「差值法」的四步推导</h2>
+<h3 id="我的旧思路（走不通）">我的旧思路（走不通）</h3>
+<ol>
+<li>用普通栈存元素，<code>getMin()</code> 时遍历 → 复杂度 O(n)，不行。</li>
+<li>加一个变量 <code>min_val</code> 存当前最小值 → <code>pop()</code> 时丢历史，不行。
+→ 核心问题：没地方存历史最小值，又不想用辅助栈。</li>
+</ol>
+<h3 id="最优解新思路（推导式，不是背代码）">最优解新思路（推导式，不是背代码）</h3>
+<p>严格按照四步推导，自然想到差值法：</p>
+<ol>
+<li><strong>必须存历史</strong>：<code>pop()</code> 要恢复旧最小值，历史信息不能丢。</li>
+<li><strong>编码进栈里</strong>：不直接存 <code>val</code>，存 <code>diff = val - min_val</code>，把历史信息藏在差值里。</li>
+<li><strong>用符号做信号</strong>：<code>diff &lt; 0</code> 就代表“这里更新了最小值”，<code>pop()</code> 时看到负数就知道要恢复旧 <code>min_val</code>。</li>
+<li><strong>恢复原值和旧 min</strong>：
+<ul>
+<li><code>top()</code>：<code>diff &gt;= 0</code> 就返回 <code>min_val + diff</code>；<code>diff &lt; 0</code> 就直接返回 <code>min_val</code>。</li>
+<li><code>pop()</code>：<code>diff &lt; 0</code> 就用 <code>min_val - diff</code> 恢复旧最小值。
+→ 核心优势：不是死记代码，而是理解推导路径，面试时哪怕忘了也能自己推出来。</li>
+</ul>
+</li>
+</ol>
+<h2 id="面试-复习专用：直接背这个差值法模板和推导口诀">面试&amp;复习专用：直接背这个差值法模板和推导口诀</h2>
+<h3 id="唯一需要背的差值法代码模板">唯一需要背的差值法代码模板</h3>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">MinStack</span><span class="token punctuation">:</span>
+
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>stack <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        self<span class="token punctuation">.</span>min_val <span class="token operator">=</span> <span class="token boolean">None</span>
+
+    <span class="token keyword">def</span> <span class="token function">push</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> val<span class="token punctuation">:</span> <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> <span class="token keyword">not</span> self<span class="token punctuation">.</span>stack<span class="token punctuation">:</span>
+            <span class="token comment"># 栈空时，diff 存 0，min_val 直接存 val</span>
+            self<span class="token punctuation">.</span>stack<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+            self<span class="token punctuation">.</span>min_val <span class="token operator">=</span> val
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            <span class="token comment"># 存 val - 当前 min_val 的差值</span>
+            diff <span class="token operator">=</span> val <span class="token operator">-</span> self<span class="token punctuation">.</span>min_val
+            self<span class="token punctuation">.</span>stack<span class="token punctuation">.</span>append<span class="token punctuation">(</span>diff<span class="token punctuation">)</span>
+            <span class="token comment"># 如果 diff &lt; 0，说明更新了最小值</span>
+            <span class="token keyword">if</span> diff <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">:</span>
+                self<span class="token punctuation">.</span>min_val <span class="token operator">=</span> val
+
+    <span class="token keyword">def</span> <span class="token function">pop</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+        diff <span class="token operator">=</span> self<span class="token punctuation">.</span>stack<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token comment"># 如果 diff &lt; 0，说明弹出的是当时的最小值，需要恢复旧 min</span>
+        <span class="token keyword">if</span> diff <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">:</span>
+            self<span class="token punctuation">.</span>min_val <span class="token operator">=</span> self<span class="token punctuation">.</span>min_val <span class="token operator">-</span> diff
+
+    <span class="token keyword">def</span> <span class="token function">top</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token builtin">int</span><span class="token punctuation">:</span>
+        diff <span class="token operator">=</span> self<span class="token punctuation">.</span>stack<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span>
+        <span class="token comment"># diff &lt; 0 说明当前元素就是 min_val</span>
+        <span class="token keyword">if</span> diff <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">:</span>
+            <span class="token keyword">return</span> self<span class="token punctuation">.</span>min_val
+        <span class="token comment"># 否则用 min_val + diff 恢复原值</span>
+        <span class="token keyword">return</span> self<span class="token punctuation">.</span>min_val <span class="token operator">+</span> diff
+
+    <span class="token keyword">def</span> <span class="token function">getMin</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token builtin">int</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> self<span class="token punctuation">.</span>min_val<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<h3 id="超简单推导口诀（帮你自己推出算法）">超简单推导口诀（帮你自己推出算法）</h3>
+<ol>
+<li>要 O(1) 最小值，pop 不能丢历史</li>
+<li>历史存栈里，不存原值存差值</li>
+<li>diff 小于 0，就是新最小值</li>
+<li>pop 见负数，恢复旧最小值</li>
+</ol>
+<h2 id="面试高频避坑指南（差值法专属坑）">面试高频避坑指南（差值法专属坑）</h2>
+<ol>
+<li><strong>top() 的恢复逻辑不要搞反</strong>：<code>diff &lt; 0</code> 时直接返回 <code>min_val</code>，不要加 <code>diff</code>；<code>diff &gt;= 0</code> 时才返回 <code>min_val + diff</code>。</li>
+<li><strong>pop() 只有见负数才恢复 min</strong>：不是每次 pop 都要改 <code>min_val</code>，只有弹出的 <code>diff &lt; 0</code> 时，才说明弹出的是当时的最小值，需要恢复。</li>
+<li><strong>栈空时的初始化要注意</strong>：栈空时 <code>diff</code> 存 <code>0</code>，<code>min_val</code> 直接存 <code>val</code>，不要用差值公式。</li>
+<li><strong>不要死记代码，要记推导路径</strong>：面试时哪怕忘了代码，只要记住「存差值、diff&lt;0是信号」，就能自己推导出每一步。</li>
+</ol>
+<h2 id="后续复习与固化计划-6">后续复习与固化计划</h2>
+<ol>
+<li><strong>手推两个例子</strong>：用草稿纸亲手推一遍 <code>push(-2), push(0), push(-3)</code> 和对应的 <code>pop()</code> 过程，彻底搞懂 <code>diff</code>、<code>min_val</code> 的变化。</li>
+<li><strong>把推导路径刻进脑子里</strong>：不要死记代码，每天睡前默背一遍「从普通思路到差值法的四步推导」，确保能自己推出算法。</li>
+<li><strong>对比双栈和差值法</strong>：把「辅助双栈」和「单栈差值法」放在一起对比，理解它们的本质都是「存前缀最小值」，只是存储形式不同。</li>
+</ol>
+<hr>
+<p>这道题让我彻底明白：<strong>很多巧妙的算法不是“凭空想到”的，而是通过「发现问题→找到瓶颈→转换思路→编码信息」的路径一步步推导出来的</strong>。从「普通栈」到「差值法」，不仅解决了问题，更让我理解了「把辅助信息编码进数据结构本身」这一通用技巧，以后遇到类似的 O(1) 查询问题，也能尝试用这个思路推导。</p>
+<h1>题目八：字符串解码（LeetCode 394）【重点复习标注版】</h1>
+<h2 id="题目基础信息-8">题目基础信息</h2>
+<ul>
+<li>题目链接：LeetCode 394. 字符串解码</li>
+<li>题目难度：中等</li>
+<li>核心考点：栈的分层上下文保存、括号嵌套处理、多位数累积、出栈结算拼接</li>
+<li>题目简述：给定一个经过编码的字符串，按照 <code>k[encoded_string]</code> 的规则解码（方括号内的 <code>encoded_string</code> 正好重复 <code>k</code> 次，<code>k</code> 为正整数）。输入字符串总是有效，无额外空格，方括号符合格式要求，原始数据不包含数字，所有数字仅表示重复次数。</li>
+</ul>
+<hr>
+<h2 id="【复习优先级总览】">【复习优先级总览】</h2>
+<table>
+<thead>
+<tr>
+<th>优先级</th>
+<th>内容</th>
+<th>复习要求</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>🔥 最高优先级（必背必懂，面试核心）</td>
+<td>核心解题思维、标准代码模板、四步固定操作流程</td>
+<td>背到能1分钟无错写出，能讲清每一步逻辑</td>
+</tr>
+<tr>
+<td>⚠️ 次高优先级（避坑不丢分）</td>
+<td>高频避坑指南</td>
+<td>烂熟于心，写代码时直接规避，杜绝低级错误</td>
+</tr>
+<tr>
+<td>📌 巩固优先级（理解防忘）</td>
+<td>思路迁移范式、嵌套示例手推</td>
+<td>能自己推一遍嵌套场景，彻底理解底层逻辑</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="我的初始思路与核心痛点-8">我的初始思路与核心痛点</h2>
+<p>我知道这题是括号嵌套，要用栈，但完全没思路，核心痛点集中在4点：</p>
+<ol>
+<li>不知道栈里到底存什么：只模糊知道要存东西，但不确定是存数字、存字符串，还是存别的。</li>
+<li>不知道什么时候入栈出栈：对 <code>[</code> 和 <code>]</code> 的触发逻辑完全没概念。</li>
+<li>数字可能多位不知道怎么处理：比如 <code>123[a]</code>，不知道怎么把 <code>123</code> 拼成完整的数字。</li>
+<li>嵌套括号不知道怎么接回上一层：比如 <code>3[a2[c]]</code>，解码完内层不知道怎么和外层的 <code>a</code> 拼接，再重复3次。</li>
+</ol>
+<p>本质上，我<strong>只知道「括号嵌套用栈」这个结论，但没建立「栈存外层现场」的核心思维</strong>，也没形成「遇到不同字符做不同操作」的固定流程。</p>
+<hr>
+<h2 id="【⭐-核心必懂-认知突破】">【⭐ 核心必懂 认知突破】</h2>
+<p>这道题的核心认知不是背代码，而是<strong>建立「字符类型→操作」的固定映射</strong>，只要记住四个关键点，就能顺理成章写出代码：</p>
+<ol>
+<li><strong>⭐ 核心映射（底层逻辑）</strong>：<code>[</code> 是「新子问题开始」，要存「外层现场」；<code>]</code> 是「子问题结束」，要结算并「接回上一层」。</li>
+<li><strong>⭐ 栈的存储规则（最关键）</strong>：栈里必须存一对信息 <code>(之前的字符串, 重复次数)</code>——这是回到上一层时必须的两个信息，缺一个都无法完成结算。</li>
+<li><strong>⭐ 多位数处理规则</strong>：数字可能不止一位，要用 <code>cur_num = cur_num * 10 + int(c)</code> 累积，不能只取单个字符。</li>
+<li><strong>⭐ 变量维护规则</strong>：遍历全程只需要维护两个当前层变量：<code>cur_num</code>（当前累积的数字）、<code>cur_str</code>（当前层拼好的字符串）。</li>
+</ol>
+<hr>
+<h2 id="【📌-必掌握-思路迁移范式】">【📌 必掌握 思路迁移范式】</h2>
+<h3 id="我的旧思路（走不通）-2">我的旧思路（走不通）</h3>
+<ol>
+<li>知道是括号嵌套，要用栈，但不知道存什么、什么时候操作。</li>
+<li>遇到数字不知道累积，遇到嵌套不知道怎么接回上一层。
+→ 核心问题：没有「字符类型→操作」的固定映射，完全乱撞。</li>
+</ol>
+<h3 id="最优解新思路（固定流程，机械执行，必背）">最优解新思路（固定流程，机械执行，必背）</h3>
+<p>严格按照四步走，遇到不同字符做不同操作，不需要临场思考：</p>
+<ol>
+<li><strong>📌 遇数字</strong>：累积到 <code>cur_num</code>，用 <code>cur_num = cur_num * 10 + int(c)</code>。</li>
+<li><strong>📌 遇 <code>[</code></strong>：把外层现场 <code>(cur_str, cur_num)</code> 入栈，然后重置 <code>cur_str = &quot;&quot;</code>、<code>cur_num = 0</code>，开启新层。</li>
+<li><strong>📌 遇字母</strong>：直接拼到 <code>cur_str</code> 里。</li>
+<li><strong>📌 遇 <code>]</code></strong>：弹出外层现场 <code>(prev_str, num)</code>，结算当前层：<code>cur_str = prev_str + cur_str * num</code>，接回上一层。</li>
+</ol>
+<p>→ 核心优势：把复杂的嵌套问题拆解成了机械的字符处理流程，每一步都有固定的写法，不会乱。</p>
+<hr>
+<h2 id="【🔥-面试必背-标准代码模板（带重点标注）】">【🔥 面试必背 标准代码模板（带重点标注）】</h2>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">Solution</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">decodeString</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> s<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token builtin">str</span><span class="token punctuation">:</span>
+        stack <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        cur_num <span class="token operator">=</span> <span class="token number">0</span>  <span class="token comment"># 📌 必维护：当前层累积的重复次数</span>
+        cur_str <span class="token operator">=</span> <span class="token string">""</span> <span class="token comment"># 📌 必维护：当前层拼接的字符串</span>
+
+        <span class="token keyword">for</span> c <span class="token keyword">in</span> s<span class="token punctuation">:</span>
+            <span class="token keyword">if</span> c<span class="token punctuation">.</span>isdigit<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                <span class="token comment"># 📌 重点1：多位数累积，必考易错点，不能只取单个字符</span>
+                cur_num <span class="token operator">=</span> cur_num <span class="token operator">*</span> <span class="token number">10</span> <span class="token operator">+</span> <span class="token builtin">int</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span>
+            <span class="token keyword">elif</span> c <span class="token operator">==</span> <span class="token string">"["</span><span class="token punctuation">:</span>
+                <span class="token comment"># 📌 重点2：入栈保存外层现场，核心入栈操作</span>
+                stack<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span>cur_str<span class="token punctuation">,</span> cur_num<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token comment"># 重置当前层，开启新的子问题</span>
+                cur_str <span class="token operator">=</span> <span class="token string">""</span>
+                cur_num <span class="token operator">=</span> <span class="token number">0</span>
+            <span class="token keyword">elif</span> c <span class="token operator">==</span> <span class="token string">"]"</span><span class="token punctuation">:</span>
+                <span class="token comment"># 📌 重点3：出栈结算，整题最核心的一行，顺序绝对不能错</span>
+                prev_str<span class="token punctuation">,</span> num <span class="token operator">=</span> stack<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span>
+                cur_str <span class="token operator">=</span> prev_str <span class="token operator">+</span> cur_str <span class="token operator">*</span> num
+            <span class="token keyword">else</span><span class="token punctuation">:</span>
+                <span class="token comment"># 普通小写字母，直接拼入当前层</span>
+                cur_str <span class="token operator">+=</span> c
+
+        <span class="token keyword">return</span> cur_str<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<h3 id="【⭐-超简单记忆口诀（必背）】">【⭐ 超简单记忆口诀（必背）】</h3>
+<ol>
+<li>遇数字，累积倍数</li>
+<li>遇左括号，存现场开新层</li>
+<li>遇字母，拼当前串</li>
+<li>遇右括号，结算接回上一层</li>
+</ol>
+<hr>
+<h2 id="【⚠️-高频踩坑-重点避坑（面试必看）】">【⚠️ 高频踩坑 重点避坑（面试必看）】</h2>
+<ol>
+<li><strong>数字必须累积，不能只取一位</strong>：比如 <code>12[a]</code>，不能只取 <code>1</code> 或 <code>2</code>，必须用 <code>cur_num * 10 + int(c)</code> 拼成完整数字。</li>
+<li><strong>栈里必须同时存两个信息</strong>：必须存 <code>(之前的字符串, 重复次数)</code>，只存数字或只存字符串都不行——结算时需要同时知道「重复几次」和「接到哪个前缀后面」。</li>
+<li><strong>遇 <code>]</code> 时的拼接顺序绝对不能搞反</strong>：必须是 <code>prev_str + cur_str * num</code>，不能写成 <code>cur_str * num + prev_str</code>——外层前缀在前，当前层重复结果在后，写反会直接导致结果完全错误。</li>
+<li><strong>遇 <code>[</code> 后必须重置当前变量</strong>：入栈后一定要把 <code>cur_str</code> 设为空、<code>cur_num</code> 设为0，因为括号里是全新的子问题，会污染下一层的内容。</li>
+</ol>
+<hr>
+<h2 id="后续复习与固化计划-7">后续复习与固化计划</h2>
+<ol>
+<li><strong>手推嵌套示例</strong>：用草稿纸亲手推一遍 <code>3[a2[c]]</code> 的完整过程，把每一步的 <code>stack</code>、<code>cur_num</code>、<code>cur_str</code> 变化都写出来，彻底搞懂「存现场→开新层→结算→接回」的流程。</li>
+<li><strong>把四步流程刻进脑子里</strong>：每天睡前默背一遍「遇数字→遇<code>[</code>→遇字母→遇<code>]</code>」的四步操作，确保看到任何字符都能条件反射地知道该做什么。</li>
+<li><strong>整理「栈存上下文」的题型</strong>：把这题和「最小栈」、「有效的括号」放在一起对比，总结什么时候栈存「值+辅助信息」，什么时候存「外层现场」，建立栈的通用思维。</li>
+</ol>
+<hr>
+<h2 id="【复习自检清单】">【复习自检清单】</h2>
+<p>复习完后，能答出以下问题，才算完全掌握：</p>
+<ol>
+<li>这道题的栈里必须存哪两个信息？为什么缺一不可？</li>
+<li>遇到多位数的处理公式是什么？为什么不能直接 <code>cur_num = int(c)</code>？</li>
+<li>遇到左括号 <code>[</code> 时，必须做哪两件事？</li>
+<li>遇到右括号 <code>]</code> 时，必须做哪两件事？拼接的顺序是什么？</li>
+<li>这道题最容易踩的3个坑是什么？</li>
+</ol>
+<h1>题目九：数组中的第K个最大元素（LeetCode 215）【重点复习标注版】</h1>
+<h2 id="题目基础信息-9">题目基础信息</h2>
+<ul>
+<li>题目链接：LeetCode 215. 数组中的第K个最大元素</li>
+<li>题目难度：中等</li>
+<li>核心考点：快速选择（Quickselect）、Top K 问题、小根堆、Lomuto 分区法、题面本质转换</li>
+<li>题目简述：给定整数数组 <code>nums</code> 和整数 <code>k</code>，返回数组排序后的第 <code>k</code> 个最大的元素（不是第 <code>k</code> 个不同的元素），必须设计并实现时间复杂度为 <code>O(n)</code> 的算法。</li>
+</ul>
+<hr>
+<h2 id="【复习优先级总览】-2">【复习优先级总览】</h2>
+<table>
+<thead>
+<tr>
+<th>优先级</th>
+<th>内容</th>
+<th>复习要求</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>🔥 最高优先级（必背必懂，面试核心）</td>
+<td>题面本质转换、快速选择核心思想、Lomuto 分区法、小根堆备选方案</td>
+<td>背到能1分钟写出快速选择或堆的代码，能讲清“为什么不用单调栈”</td>
+</tr>
+<tr>
+<td>⚠️ 次高优先级（避坑不丢分）</td>
+<td>高频避坑指南、随机选 pivot 的作用、目标下标计算</td>
+<td>烂熟于心，杜绝方向错误，能解释每一行代码的作用</td>
+</tr>
+<tr>
+<td>📌 巩固优先级（理解防忘）</td>
+<td>思路迁移范式、快排 vs 快速选择对比、partition 不变量</td>
+<td>能自己手推一遍 partition 过程，彻底理解“只找一边”的优化</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="我的初始思路与核心痛点-9">我的初始思路与核心痛点</h2>
+<p>我一开始完全走偏了，核心痛点集中在3点：</p>
+<ol>
+<li><strong>错误的数据结构联想</strong>：看到“第k大”本能想单调栈，但单调栈擅长的是“最近更大/更小、区间边界”这类<strong>相邻关系问题</strong>，和“全局排名”完全无关。</li>
+<li><strong>不知道 Top K 类题的标准解法</strong>：对“第k大/第k小、Top K”这类题的解法优先级（排序→堆→快速选择）完全没概念。</li>
+<li><strong>对快速选择不熟悉</strong>：即使想到要找排名，也不知道可以用“基于快排但只找一边”的快速选择，来达到平均 O(n) 的复杂度。</li>
+</ol>
+<p>本质上，我<strong>既没建立「Top K 类题→标准解法」的题感映射，也没完成「第k大→找n-k小」的本质转换</strong>。</p>
+<hr>
+<h2 id="【⭐-核心必懂-认知突破】-2">【⭐ 核心必懂 认知突破】</h2>
+<p>这道题的核心认知不是背代码，而是<strong>完成两次关键的思维转换</strong>，只要记住三个关键点，就能建立完整的思考链：</p>
+<ol>
+<li>
+<p><strong>⭐ 第一次转换：Top K 类题的解法优先级（必背）</strong>
+看到“第k大/第k小、Top K、中位数、顺序统计量”，按以下优先级想：</p>
+<ul>
+<li>要完整顺序：排序（O(n log n)）</li>
+<li>要动态维护前k个：小根堆（O(n log k)）</li>
+<li>只要答案、不要全部排序、要 O(n)：快速选择（Quickselect）</li>
+</ul>
+</li>
+<li>
+<p><strong>⭐ 第二次转换：题面本质翻译（最关键）</strong>
+不要想“找第k大”，要翻译成：</p>
+<blockquote>
+<p><strong>找排序后下标为 <code>n - k</code> 的元素</strong>（第k大 = 第 <code>n-k</code> 小）
+例如：<code>nums = [3,2,1,5,6,4]</code>，k=2，排序后是 <code>[1,2,3,4,5,6]</code>，第2大就是下标 <code>6-2=4</code> 的元素 <code>5</code>。</p>
+</blockquote>
+</li>
+<li>
+<p><strong>⭐ 快速选择的核心思想</strong>
+快速选择是**“阉割版的快排”**：</p>
+<ul>
+<li>快排：每次 partition 后，递归左右两边。</li>
+<li>快速选择：每次 partition 后，只递归目标下标所在的那一边。
+因为不需要排完整个数组，所以平均复杂度是 O(n)。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="【📌-必掌握-思路迁移范式】-2">【📌 必掌握 思路迁移范式】</h2>
+<h3 id="我的旧思路（走偏，完全错误）">我的旧思路（走偏，完全错误）</h3>
+<ol>
+<li>看到“第k大”，错误联想到单调栈。</li>
+<li>试图维护单调减栈，想从剩余栈里取第k个，完全不成立（单调栈会丢掉大量全局信息）。
+→ 核心问题：没建立 Top K 类题的题感，错误联想数据结构。</li>
+</ol>
+<h3 id="最优解新思路（完整思考链，必背）">最优解新思路（完整思考链，必背）</h3>
+<p>严格按照四步走，建立从“题面”到“代码”的完整映射：</p>
+<ol>
+<li><strong>📌 定解法优先级</strong>：题目要 O(n)，优先选快速选择；如果想写稳的，选小根堆。</li>
+<li><strong>📌 转目标下标</strong>：计算 <code>target = len(nums) - k</code>。</li>
+<li><strong>📌 选分区方法</strong>：用 Lomuto 分区法，随机选 pivot 避免最坏情况。</li>
+<li><strong>📌 只找一边</strong>：partition 后，若 pivot_idx == target，直接返回；若太小，去右边；若太大，去左边。</li>
+</ol>
+<hr>
+<h2 id="【🔥-面试必背-标准代码模板（带重点标注）】-2">【🔥 面试必背 标准代码模板（带重点标注）】</h2>
+<h3 id="方案一：快速选择（平均-O-n-，题目要求最优）">方案一：快速选择（平均 O(n)，题目要求最优）</h3>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> random
+<span class="token keyword">from</span> typing <span class="token keyword">import</span> List
+
+<span class="token keyword">class</span> <span class="token class-name">Solution</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">findKthLargest</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> nums<span class="token punctuation">:</span> List<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">,</span> k<span class="token punctuation">:</span> <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token builtin">int</span><span class="token punctuation">:</span>
+        <span class="token comment"># 📌 重点1：第k大 = 找第 n-k 小，目标下标必背</span>
+        target <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>nums<span class="token punctuation">)</span> <span class="token operator">-</span> k
+
+        <span class="token keyword">def</span> <span class="token function">partition</span><span class="token punctuation">(</span>left<span class="token punctuation">:</span> <span class="token builtin">int</span><span class="token punctuation">,</span> right<span class="token punctuation">:</span> <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token builtin">int</span><span class="token punctuation">:</span>
+            <span class="token comment"># 📌 重点2：随机选 pivot，避免最坏 O(n²)（如有序数组）</span>
+            pivot_idx <span class="token operator">=</span> random<span class="token punctuation">.</span>randint<span class="token punctuation">(</span>left<span class="token punctuation">,</span> right<span class="token punctuation">)</span>
+            <span class="token comment"># 把 pivot 换到最右边，方便 Lomuto 分区</span>
+            nums<span class="token punctuation">[</span>pivot_idx<span class="token punctuation">]</span><span class="token punctuation">,</span> nums<span class="token punctuation">[</span>right<span class="token punctuation">]</span> <span class="token operator">=</span> nums<span class="token punctuation">[</span>right<span class="token punctuation">]</span><span class="token punctuation">,</span> nums<span class="token punctuation">[</span>pivot_idx<span class="token punctuation">]</span>
+            pivot <span class="token operator">=</span> nums<span class="token punctuation">[</span>right<span class="token punctuation">]</span>
+
+            <span class="token comment"># 📌 重点3：Lomuto 分区的不变量（核心）</span>
+            <span class="token comment"># i 永远指向下一个 &lt; pivot 应该放的位置</span>
+            <span class="token comment"># [left, i-1] &lt; pivot；[i, j-1] >= pivot；[j, right-1] 未处理</span>
+            i <span class="token operator">=</span> left
+            <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>left<span class="token punctuation">,</span> right<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                <span class="token keyword">if</span> nums<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">&lt;</span> pivot<span class="token punctuation">:</span>
+                    nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> nums<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> nums<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">,</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+                    i <span class="token operator">+=</span> <span class="token number">1</span>
+
+            <span class="token comment"># 把 pivot 换到正确的位置（i）</span>
+            nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> nums<span class="token punctuation">[</span>right<span class="token punctuation">]</span> <span class="token operator">=</span> nums<span class="token punctuation">[</span>right<span class="token punctuation">]</span><span class="token punctuation">,</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+            <span class="token keyword">return</span> i
+
+        left<span class="token punctuation">,</span> right <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>nums<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span>
+
+        <span class="token comment"># 📌 重点4：只找一边，不递归两边，这是比快排快的核心</span>
+        <span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
+            pivot_idx <span class="token operator">=</span> partition<span class="token punctuation">(</span>left<span class="token punctuation">,</span> right<span class="token punctuation">)</span>
+            <span class="token keyword">if</span> pivot_idx <span class="token operator">==</span> target<span class="token punctuation">:</span>
+                <span class="token keyword">return</span> nums<span class="token punctuation">[</span>pivot_idx<span class="token punctuation">]</span>
+            <span class="token keyword">elif</span> pivot_idx <span class="token operator">&lt;</span> target<span class="token punctuation">:</span>
+                <span class="token comment"># pivot 太小，目标在右边</span>
+                left <span class="token operator">=</span> pivot_idx <span class="token operator">+</span> <span class="token number">1</span>
+            <span class="token keyword">else</span><span class="token punctuation">:</span>
+                <span class="token comment"># pivot 太大，目标在左边</span>
+                right <span class="token operator">=</span> pivot_idx <span class="token operator">-</span> <span class="token number">1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<h3 id="方案二：小根堆（O-n-log-k-，非常稳，面试备选）">方案二：小根堆（O(n log k)，非常稳，面试备选）</h3>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> heapq
+<span class="token keyword">from</span> typing <span class="token keyword">import</span> List
+
+<span class="token keyword">class</span> <span class="token class-name">Solution</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">findKthLargest</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> nums<span class="token punctuation">:</span> List<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">,</span> k<span class="token punctuation">:</span> <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token builtin">int</span><span class="token punctuation">:</span>
+        heap <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> x <span class="token keyword">in</span> nums<span class="token punctuation">:</span>
+            <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>heap<span class="token punctuation">)</span> <span class="token operator">&lt;</span> k<span class="token punctuation">:</span>
+                <span class="token comment"># 堆不满，直接入堆</span>
+                heapq<span class="token punctuation">.</span>heappush<span class="token punctuation">(</span>heap<span class="token punctuation">,</span> x<span class="token punctuation">)</span>
+            <span class="token keyword">elif</span> x <span class="token operator">></span> heap<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+                <span class="token comment"># 当前数比堆顶（第k大的候选）大，替换</span>
+                heapq<span class="token punctuation">.</span>heapreplace<span class="token punctuation">(</span>heap<span class="token punctuation">,</span> x<span class="token punctuation">)</span>
+        <span class="token comment"># 堆顶就是第k大的元素</span>
+        <span class="token keyword">return</span> heap<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<h3 id="【⭐-超简单记忆口诀（必背）】-2">【⭐ 超简单记忆口诀（必背）】</h3>
+<ol>
+<li>第k大转n-k小，快排partition找目标</li>
+<li>随机pivot防最坏，太左去右太右去左</li>
+<li>想写稳的用小根堆，堆顶就是第k大</li>
+</ol>
+<hr>
+<h2 id="【⚠️-高频踩坑-重点避坑（面试必看）】-2">【⚠️ 高频踩坑 重点避坑（面试必看）】</h2>
+<ol>
+<li><strong>绝对不要用单调栈</strong>：单调栈解决的是“相邻关系/最近边界”问题，和“全局排名”完全无关，这是方向性错误。</li>
+<li><strong>快速选择必须随机选 pivot</strong>：如果不随机，遇到有序数组会退化成 O(n²)，随机选 pivot 能保证平均 O(n)。</li>
+<li><strong>Lomuto 分区的不变量要理解</strong>：<code>i</code> 是下一个 <code>&lt; pivot</code> 应该放的位置，循环结束后要把 pivot 换到 <code>i</code> 的位置。</li>
+<li><strong>小根堆不是大根堆</strong>：维护大小为 <code>k</code> 的<strong>小根堆</strong>，堆里放当前最大的 <code>k</code> 个数，堆顶就是这 <code>k</code> 个数里最小的，也就是全局第 <code>k</code> 大的。</li>
+<li><strong>目标下标不要搞反</strong>：是 <code>target = len(nums) - k</code>，不是 <code>k-1</code>，也不是 <code>len(nums) - k + 1</code>。</li>
+</ol>
+<hr>
+<h2 id="【📌-巩固理解-核心问题解答】">【📌 巩固理解 核心问题解答】</h2>
+<h3 id="1-为什么单调栈不行？">1. 为什么单调栈不行？</h3>
+<p>单调栈的弹出逻辑代表的是“当前元素和栈顶有某种相邻支配关系”（如最近更大），它会丢掉大量全局信息，无法维护元素的<strong>全局排名</strong>。而“第k大”需要的是全局顺序，和相邻关系无关，所以单调栈完全不适用。</p>
+<h3 id="2-快速选择和快排的区别是什么？">2. 快速选择和快排的区别是什么？</h3>
+<ul>
+<li>快排：每次 partition 后，递归左右两边，时间复杂度 O(n log n)。</li>
+<li>快速选择：每次 partition 后，只递归目标下标所在的那一边，平均时间复杂度 O(n)（因为每次平均排除一半元素，总操作数是 n + n/2 + n/4 + ... = 2n）。</li>
+</ul>
+<hr>
+<h2 id="后续复习与固化计划-8">后续复习与固化计划</h2>
+<ol>
+<li><strong>手推 Lomuto 分区过程</strong>：用草稿纸亲手推一遍 <code>nums = [3,2,1,5,6,4]</code> 的 partition 过程，把每一步的 <code>i</code>、<code>j</code>、数组变化都写出来，彻底理解不变量。</li>
+<li><strong>整理 Top K 类题的解法清单</strong>：总结什么时候用排序、什么时候用堆、什么时候用快速选择，建立题感映射。</li>
+<li><strong>对比快排和快速选择的代码</strong>：把两者放在一起对比，理解“只找一边”的优化点，彻底搞懂为什么快速选择平均是 O(n)。</li>
+</ol>
+<hr>
+<h2 id="【复习自检清单】-2">【复习自检清单】</h2>
+<p>复习完后，能答出以下问题，才算完全掌握：</p>
+<ol>
+<li>这道题为什么不能用单调栈？单调栈擅长解决什么问题？</li>
+<li>Top K 类题的解法优先级是什么？</li>
+<li>“第k大”怎么转换成“找下标”？目标下标公式是什么？</li>
+<li>快速选择的核心思想是什么？为什么比快排快？</li>
+<li>Lomuto 分区法的不变量是什么？<code>i</code> 的含义是什么？</li>
+<li>快速选择为什么要随机选 pivot？</li>
+<li>小根堆方案中，为什么堆顶是第k大的元素？</li>
+</ol>
+<h1>题目九.1：数组中的第K个最大元素（LeetCode 215）【踩坑复盘与全场景兼容版】</h1>
+<h2 id="题目基础信息-10">题目基础信息</h2>
+<ul>
+<li>题目链接：LeetCode 215. 数组中的第K个最大元素</li>
+<li>题目难度：中等</li>
+<li>核心考点：快速选择（Quickselect）、Lomuto分区坑点、三路划分、重复元素场景优化、循环逻辑适用边界</li>
+<li>题目简述：给定整数数组 <code>nums</code> 和整数 <code>k</code>，返回数组排序后的第 <code>k</code> 个最大的元素（不是第 <code>k</code> 个不同的元素），必须设计并实现时间复杂度为 <code>O(n)</code> 的算法。</li>
+</ul>
+<hr>
+<h2 id="我的初始思路与核心踩坑历程">我的初始思路与核心踩坑历程</h2>
+<p>我已经理解了这道题的核心是「第k大 = 找下标为 <code>n-k</code> 的元素」，也确定了用快速选择来实现O(n)复杂度，但写代码时连续踩了三个致命坑，从“代码跑不通”到“跑通了超时”，再到“想优化写法反而逻辑出错”，核心痛点集中在3点：</p>
+<ol>
+<li><strong>分区操作的状态同步完全缺失</strong>：交换pivot位置后，依然从旧下标取值，导致partition逻辑完全混乱，基础功能都跑不通。</li>
+<li><strong>对二路分区的局限性毫无认知</strong>：修正基础错误后，遇到大量重复元素的测试用例直接超时，完全没意识到普通二路分区在重复元素场景下会退化成O(n²)，甚至以为是随机pivot没起作用。</li>
+<li><strong>对循环结构的适用边界完全不清</strong>：学会三路划分解决超时问题后，想强行把三路划分的while循环改成二路分区的for循环形式，完全没理解两种循环的索引控制逻辑差异，导致元素漏检、分类错误。</li>
+</ol>
+<p>本质上，我<strong>只记住了快速选择的框架，却没吃透partition的核心细节，也没预判到算法的边界场景短板</strong>，属于“懂了思路，但写出来的代码一踩就坑”。</p>
+<hr>
+<h2 id="【⭐-核心认知突破（补全所有缺失的思维点）】">【⭐ 核心认知突破（补全所有缺失的思维点）】</h2>
+<p>这道题的复盘，核心不是改对代码，而是补全了快速选择从“能跑”到“稳定高效”的三个关键认知，彻底搞懂了之前踩坑的根源：</p>
+<h3 id="1-基础认知：partition操作的核心是「状态同步」">1. 基础认知：partition操作的核心是「状态同步」</h3>
+<p>我之前犯的最低级错误，根源是完全没意识到：<strong>交换操作会改变元素的位置，后续所有取值必须跟着新位置走</strong>。</p>
+<ul>
+<li>我把随机选中的pivot元素交换到了数组最右侧<code>r</code>的位置，但依然从原来的<code>pivot_idx</code>取值，完全忽略了交换后<code>pivot_idx</code>位置的元素已经被替换成了原来的<code>nums[r]</code>。</li>
+<li>这个错误也让我养成了固定习惯：只要把pivot换到固定位置，后续就只从这个固定位置取值，绝对不跟着随机下标走。</li>
+</ul>
+<h3 id="2-进阶认知：二路分区的天然短板，随机化也救不了">2. 进阶认知：二路分区的天然短板，随机化也救不了</h3>
+<p>我之前以为“加了随机选pivot，就能避免最坏情况”，但完全忽略了：<strong>随机化只能解决“有序数组导致的最坏情况”，解决不了“大量重复元素导致的分区失衡”</strong>。</p>
+<ul>
+<li>普通二路分区（Lomuto）会把数组分成<code>&lt; pivot</code>和<code>&gt;= pivot</code>两部分，当数组里全是相同元素时，所有元素都会被分到右边，每次分区只能排除1个元素，算法直接从O(n)退化成O(n²)，必然超时。</li>
+<li>这不是代码写错了，是二路分区的逻辑本身，在重复元素场景下就有致命短板。</li>
+</ul>
+<h3 id="3-核心解法：三路划分是解决重复元素退化的终极方案">3. 核心解法：三路划分是解决重复元素退化的终极方案</h3>
+<p>要解决重复元素的问题，核心思路是<strong>把“两段分区”改成“三段分区”</strong>，也就是荷兰国旗算法：</p>
+<ul>
+<li>把数组分成三段：<code>&lt; pivot</code>、<code>== pivot</code>、<code>&gt; pivot</code>，把所有和pivot相等的元素都聚在中间。</li>
+<li>这样哪怕全是重复元素，一次分区就能直接确定目标下标是否在中间段，直接返回结果，不会再一层层递归/迭代，完美解决退化问题。</li>
+<li>同时，分区后只需要去左边或右边继续找，中间的重复元素全部跳过，效率远高于二路分区。</li>
+</ul>
+<h3 id="4-细节认知：for循环和while循环的适用边界完全不同">4. 细节认知：for循环和while循环的适用边界完全不同</h3>
+<p>我想把三路划分的while改成for循环，本质是没搞懂两种循环的核心差异：</p>
+<ul>
+<li>for循环的索引是<strong>自动、规则递增</strong>的，适合“每个元素只检查一次，不需要回头”的场景，比如二路分区里的<code>j</code>，每个元素只判断一次，不会回头。</li>
+<li>while循环的索引是<strong>完全可控</strong>的，适合“索引增长不规则，有时需要暂停、甚至重新检查当前元素”的场景。三路划分里，当<code>nums[i] &gt; pivot</code>时，交换过来的新元素还没检查，<code>i</code>不能前进，必须留在原地重新判断，这是for循环做不到的。</li>
+</ul>
+<hr>
+<h2 id="思路迁移范式：从“连续踩坑”到“全场景稳定写法”">思路迁移范式：从“连续踩坑”到“全场景稳定写法”</h2>
+<h3 id="我的错误思路演进（三次踩坑）">我的错误思路演进（三次踩坑）</h3>
+<ol>
+<li><strong>第一次错误：pivot取值位置错误</strong>
+写了二路分区的框架，但交换pivot后依然从旧下标取值，导致partition逻辑完全错误，基础用例都跑不通。</li>
+<li><strong>第二次错误：二路分区无法应对重复元素</strong>
+修正了pivot取值，普通用例能过，但遇到大量重复元素的用例直接超时，不知道问题根源在哪，以为是随机化没写好。</li>
+<li><strong>第三次错误：强行改写循环结构</strong>
+知道要用三路划分解决超时，但想强行统一成for循环写法，忽略了“交换后需要重新检查当前元素”的逻辑，导致分类错误、结果不对。</li>
+</ol>
+<h3 id="最优解新思路（全场景兼容，面试首选）">最优解新思路（全场景兼容，面试首选）</h3>
+<p>严格按照“预判边界→选对方案→严谨实现”的思路，一步到位写出稳定的代码：</p>
+<ol>
+<li><strong>先做需求与边界预判</strong>：题目没说数组元素唯一，必须考虑大量重复元素的场景，直接放弃二路分区，选择<strong>三路划分</strong>。</li>
+<li><strong>明确三路划分的核心不变量</strong>：维护三个指针<code>lt</code>、<code>i</code>、<code>gt</code>，把数组分成四段，全程坚守区间规则。</li>
+<li><strong>用while循环做可控的索引遍历</strong>：根据元素和pivot的大小关系，决定索引是前进、后退还是原地不动，保证每个元素都被正确分类。</li>
+<li><strong>分区后精准缩小区间</strong>：根据目标下标和<code>lt</code>、<code>gt</code>的关系，直接决定去左边、右边，还是直接返回结果，完全跳过中间的重复元素。</li>
+</ol>
+<hr>
+<h2 id="【🔥-面试-复习专用：代码模板（带重点标注）】">【🔥 面试&amp;复习专用：代码模板（带重点标注）】</h2>
+<h3 id="方案一：修正后的二路分区（仅适用于元素无大量重复的场景）">方案一：修正后的二路分区（仅适用于元素无大量重复的场景）</h3>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> random
+<span class="token keyword">from</span> typing <span class="token keyword">import</span> List
+
+<span class="token keyword">class</span> <span class="token class-name">Solution</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">findKthLargest</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> nums<span class="token punctuation">:</span> List<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">,</span> k<span class="token punctuation">:</span> <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token builtin">int</span><span class="token punctuation">:</span>
+        n <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>nums<span class="token punctuation">)</span>
+        target <span class="token operator">=</span> n <span class="token operator">-</span> k
+
+        <span class="token keyword">def</span> <span class="token function">partition</span><span class="token punctuation">(</span>l<span class="token punctuation">,</span> r<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token comment"># 随机选pivot，避免有序数组最坏情况</span>
+            pivot_idx <span class="token operator">=</span> random<span class="token punctuation">.</span>randint<span class="token punctuation">(</span>l<span class="token punctuation">,</span> r<span class="token punctuation">)</span>
+            <span class="token comment"># 交换到最右侧</span>
+            nums<span class="token punctuation">[</span>r<span class="token punctuation">]</span><span class="token punctuation">,</span> nums<span class="token punctuation">[</span>pivot_idx<span class="token punctuation">]</span> <span class="token operator">=</span> nums<span class="token punctuation">[</span>pivot_idx<span class="token punctuation">]</span><span class="token punctuation">,</span> nums<span class="token punctuation">[</span>r<span class="token punctuation">]</span>
+            <span class="token comment"># 📌 重点修正：必须从新位置r取pivot，不能再用pivot_idx</span>
+            pivot <span class="token operator">=</span> nums<span class="token punctuation">[</span>r<span class="token punctuation">]</span>
+            
+            i <span class="token operator">=</span> l
+            <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>l<span class="token punctuation">,</span> r<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                <span class="token keyword">if</span> nums<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">&lt;</span> pivot<span class="token punctuation">:</span>
+                    nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> nums<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> nums<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">,</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+                    i <span class="token operator">+=</span> <span class="token number">1</span>
+            <span class="token comment"># 把pivot换到正确位置</span>
+            nums<span class="token punctuation">[</span>r<span class="token punctuation">]</span><span class="token punctuation">,</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> nums<span class="token punctuation">[</span>r<span class="token punctuation">]</span>
+            <span class="token keyword">return</span> i
+        
+        l<span class="token punctuation">,</span> r <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> n<span class="token operator">-</span><span class="token number">1</span>
+        <span class="token keyword">while</span> l <span class="token operator">&lt;=</span> r<span class="token punctuation">:</span>
+            p_idx <span class="token operator">=</span> partition<span class="token punctuation">(</span>l<span class="token punctuation">,</span> r<span class="token punctuation">)</span>
+            <span class="token keyword">if</span> p_idx <span class="token operator">==</span> target<span class="token punctuation">:</span>
+                <span class="token keyword">return</span> nums<span class="token punctuation">[</span>p_idx<span class="token punctuation">]</span>
+            <span class="token keyword">elif</span> p_idx <span class="token operator">></span> target<span class="token punctuation">:</span>
+                r <span class="token operator">=</span> p_idx <span class="token operator">-</span> <span class="token number">1</span>
+            <span class="token keyword">else</span><span class="token punctuation">:</span>
+                l <span class="token operator">=</span> p_idx <span class="token operator">+</span> <span class="token number">1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<h3 id="方案二：三路划分最终版（全场景兼容，面试必背，解决重复元素超时）">方案二：三路划分最终版（全场景兼容，面试必背，解决重复元素超时）</h3>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> random
+<span class="token keyword">from</span> typing <span class="token keyword">import</span> List
+
+<span class="token keyword">class</span> <span class="token class-name">Solution</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">findKthLargest</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> nums<span class="token punctuation">:</span> List<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">,</span> k<span class="token punctuation">:</span> <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token builtin">int</span><span class="token punctuation">:</span>
+        target <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>nums<span class="token punctuation">)</span> <span class="token operator">-</span> k
+        l<span class="token punctuation">,</span> r <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>nums<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span>
+
+        <span class="token keyword">while</span> l <span class="token operator">&lt;=</span> r<span class="token punctuation">:</span>
+            <span class="token comment"># 随机选pivot，避免有序数组最坏情况</span>
+            pivot <span class="token operator">=</span> nums<span class="token punctuation">[</span>random<span class="token punctuation">.</span>randint<span class="token punctuation">(</span>l<span class="token punctuation">,</span> r<span class="token punctuation">)</span><span class="token punctuation">]</span>
+            <span class="token comment"># 📌 三路划分核心：三个指针，维护四段区间不变量</span>
+            <span class="token comment"># [l, lt-1] &lt; pivot | [lt, i-1] == pivot | [i, gt] 未处理 | [gt+1, r] > pivot</span>
+            lt<span class="token punctuation">,</span> i<span class="token punctuation">,</span> gt <span class="token operator">=</span> l<span class="token punctuation">,</span> l<span class="token punctuation">,</span> r
+
+            <span class="token comment"># 📌 必须用while循环，因为i有时不能前进</span>
+            <span class="token keyword">while</span> i <span class="token operator">&lt;=</span> gt<span class="token punctuation">:</span>
+                <span class="token keyword">if</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">&lt;</span> pivot<span class="token punctuation">:</span>
+                    <span class="token comment"># 小于pivot，换到左边小于区</span>
+                    nums<span class="token punctuation">[</span>lt<span class="token punctuation">]</span><span class="token punctuation">,</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> nums<span class="token punctuation">[</span>lt<span class="token punctuation">]</span>
+                    lt <span class="token operator">+=</span> <span class="token number">1</span>
+                    i <span class="token operator">+=</span> <span class="token number">1</span>  <span class="token comment"># 当前元素已处理，前进</span>
+                <span class="token keyword">elif</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">></span> pivot<span class="token punctuation">:</span>
+                    <span class="token comment"># 大于pivot，换到右边大于区</span>
+                    nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> nums<span class="token punctuation">[</span>gt<span class="token punctuation">]</span> <span class="token operator">=</span> nums<span class="token punctuation">[</span>gt<span class="token punctuation">]</span><span class="token punctuation">,</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+                    gt <span class="token operator">-=</span> <span class="token number">1</span>
+                    <span class="token comment"># 📌 重点：i不前进！因为换过来的元素还没检查</span>
+                <span class="token keyword">else</span><span class="token punctuation">:</span>
+                    <span class="token comment"># 等于pivot，留在中间区，前进</span>
+                    i <span class="token operator">+=</span> <span class="token number">1</span>
+
+            <span class="token comment"># 分区后判断目标在哪边</span>
+            <span class="token keyword">if</span> target <span class="token operator">&lt;</span> lt<span class="token punctuation">:</span>
+                <span class="token comment"># 目标在左边小于区</span>
+                r <span class="token operator">=</span> lt <span class="token operator">-</span> <span class="token number">1</span>
+            <span class="token keyword">elif</span> target <span class="token operator">></span> gt<span class="token punctuation">:</span>
+                <span class="token comment"># 目标在右边大于区</span>
+                l <span class="token operator">=</span> gt <span class="token operator">+</span> <span class="token number">1</span>
+            <span class="token keyword">else</span><span class="token punctuation">:</span>
+                <span class="token comment"># 目标在中间等于区，直接返回结果</span>
+                <span class="token keyword">return</span> nums<span class="token punctuation">[</span>target<span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<h3 id="【⭐-超简单记忆口诀（必背）】-3">【⭐ 超简单记忆口诀（必背）】</h3>
+<ol>
+<li>第k大转n-k小，重复元素要想好</li>
+<li>三路划分三段分，小于左、大于右、等于中间留</li>
+<li>大于pivoti不动，其他情况i往前走</li>
+<li>目标在哪边就去哪，中间直接返回值</li>
+</ol>
+<hr>
+<h2 id="【⚠️-高频踩坑指南（我踩过的坑，绝不再犯）】">【⚠️ 高频踩坑指南（我踩过的坑，绝不再犯）】</h2>
+<ol>
+<li><strong>绝对不能交换pivot后还从旧下标取值</strong>：只要把pivot交换到了固定位置，后续就只从这个固定位置取pivot，交换后旧下标已经不是原来的值了。</li>
+<li><strong>大量重复元素场景，绝对不要用二路分区</strong>：哪怕加了随机化，也会因为分区失衡退化成O(n²)，直接上三路划分，一劳永逸。</li>
+<li><strong>三路划分绝对不能强行改成for循环</strong>：遇到大于pivot的情况，i需要原地不动重新检查新元素，for循环的自动递增会直接跳过这个元素，导致分类错误。</li>
+<li><strong>三路划分里，大于pivot时i绝对不能加1</strong>：交换过来的元素来自未处理区，必须重新判断，加1会直接漏检。</li>
+<li><strong>随机选pivot不能省</strong>：哪怕用了三路划分，随机选pivot也能避免有序数组的最坏情况，养成习惯加上。</li>
+</ol>
+<hr>
+<h2 id="后续复习与固化计划-9">后续复习与固化计划</h2>
+<ol>
+<li><strong>手推重复元素场景的分区过程</strong>：用<code>nums = [1,1,1,1,1]</code>这个用例，分别手推二路分区和三路划分的过程，直观理解为什么二路会超时、三路能一次解决。</li>
+<li><strong>固化三路划分的模板和不变量</strong>：每天默背一遍三路划分的三个指针含义、区间规则、三种情况的处理方式，确保面试时能1分钟无错写出。</li>
+<li><strong>整理循环结构的适用场景清单</strong>：把for循环和while循环的适用边界、典型算法场景整理在一起，彻底搞懂什么时候用哪种循环，不再强行改写。</li>
+<li><strong>对比快排、快速选择、三路划分的区别</strong>：把三者的分区逻辑、适用场景、复杂度放在一起对比，彻底吃透快速排序家族的核心逻辑。</li>
+</ol>
+<hr>
+<h2 id="【复习自检清单】-3">【复习自检清单】</h2>
+<p>复习完后，能答出以下问题，才算完全掌握：</p>
+<ol>
+<li>第一次写代码时，pivot取值的错误根源是什么？正确的写法是什么？</li>
+<li>为什么加了随机选pivot，遇到大量重复元素还是会超时？</li>
+<li>三路划分把数组分成了哪几段？三个指针<code>lt</code>、<code>i</code>、<code>gt</code>分别代表什么含义？</li>
+<li>三路划分里，为什么遇到<code>nums[i] &gt; pivot</code>时，<code>i</code>不能前进？</li>
+<li>为什么三路划分不能改成简单的for循环？for循环和while循环的核心适用场景差异是什么？</li>
+<li>三路划分完成后，如何根据目标下标决定下一步的搜索区间？</li>
+</ol>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/LeetCode-%E5%88%B7%E9%A2%98/" class="category-chain-item">LeetCode 刷题</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E7%AE%97%E6%B3%95/" class="print-no-link">#算法</a>
+      
+        <a href="/tags/LeetCode/" class="print-no-link">#LeetCode</a>
+      
+        <a href="/tags/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE/" class="print-no-link">#二分查找</a>
+      
+        <a href="/tags/%E6%95%B0%E7%BB%84/" class="print-no-link">#数组</a>
+      
+        <a href="/tags/%E9%9D%A2%E8%AF%95%E9%AB%98%E9%A2%91/" class="print-no-link">#面试高频</a>
+      
+        <a href="/tags/%E6%96%B9%E6%B3%95%E8%AE%BA/" class="print-no-link">#方法论</a>
+      
+        <a href="/tags/%E6%A8%A1%E6%9D%BF/" class="print-no-link">#模板</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>算法刷题方法论记录（六）：二分查找——从边界踩坑到核心范式与模板固化</div>
+      <div>https://zyxian31.github.io/2026/03/12/algo-notes-6/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>ZYXian31</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年3月12日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/03/12/algo-notes-7/" title="算法刷题复盘与方法论总结（七）：从9道题看状态、不变量与更新时机的核心性">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">算法刷题复盘与方法论总结（七）：从9道题看状态、不变量与更新时机的核心性</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/03/05/algo-notes-5/" title="算法刷题方法论记录（五）：">
+                        <span class="hidden-mobile">算法刷题方法论记录（五）：</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script  src="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/custom-toc.js"></script>
+<script src="/js/custom-code.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<!-- hexo injector body_end start -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script src="/js/katex-init.js"></script>
+<!-- hexo injector body_end end --></body>
+</html>
